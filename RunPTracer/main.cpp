@@ -25,5 +25,9 @@ void main(int argc, char *argv[]) {
             break;
         }
     }
+    uint64_t instructionCount = ptracer.GetInstructionIndex();
+
+    printf("instructionCount = %x", instructionCount);
+
     return;
 }
