@@ -13,12 +13,12 @@ void main(int argc, char *argv[]) {
     
     filename = argv[1];
 
-    PTracer ipt = PTracer();
-    ipt.Open(filename);
-    ipt.StartInstructionTrace();
+    PTracer ptracer = PTracer();
+    ptracer.Open(filename);
+    ptracer.StartInstructionTrace();
 
     for (;;) {
-        int status = ipt.DecodeInstruction();
+        int status = ptracer.DecodeInstruction();
 
         if (status == -pte_eos)
         {
