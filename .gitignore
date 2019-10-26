@@ -10,3 +10,7 @@
 /PTracer/PTracer.vcxproj.user
 /PTracer/PTracer.vcxproj.filters
 /x64/Debug
+/Libs/libipt/lib/libipt.pdb
+/Libs/libipt/lib/libipt.lib
+/Libs/libipt/lib/libipt.dll
+/Libs/libipt/include/intel-pt.h
