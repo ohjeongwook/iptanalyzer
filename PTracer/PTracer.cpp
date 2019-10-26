@@ -128,12 +128,18 @@ int PTracer::DecodeInstruction() {
     if (status < 0)
         return status;
 
-    // Skip non-relevant events
-    for (;;) {
-        struct pt_event event;
-        status = pt_insn_event(m_insnDecoder, &event, sizeof(event));
-        if (status < 0)
-            break;
+    
+    if (status != 0)
+    {
+        for (;;) {
+            struct pt_event event;
+            status = pt_insn_event(m_insnDecoder, &event, sizeof(event));
+            if (status < 0)
+                return status;
+
+            if (status == 0)
+                break;
+        }
     }
 
     uint64_t offset;
