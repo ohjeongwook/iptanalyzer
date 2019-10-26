@@ -143,15 +143,34 @@ int PTracer::DecodeInstruction() {
     insn.ip = 0ull;
     status = pt_insn_next(m_insnDecoder, &insn, sizeof(insn));
     printf("> insn.ip = % 016" PRIx64 " (%s)\n", insn.ip, GetModeName(insn.mode));
-    printf("\tinsn.size = %d\n", insn.size);
-    printf("\toffset = %x\n", offset);
 
-    if (status < 0)
+    if (m_verboseLevel > 1)
     {
-        printf("\tstatus = %s\n", pt_errstr((pt_error_code)status));
+        printf("\tinsn.size = %d\n", insn.size);
+        printf("\traw: ");
+        for (int i = 0; i < pt_max_insn_size; i++)
+        {
+            printf("%.2x ", insn.raw[i]);
+        }
+        printf("\n");
+
+        printf("\toffset = %x\n", offset);
+
+        if (status < 0)
+        {
+            printf("\tstatus = %s\n", pt_errstr((pt_error_code)status));
+        }
+
+        printf("\n");
     }
-    printf("\n");
+
+    m_instructionIndex++;
     return status;
+}
+
+uint64_t PTracer::GetInstructionIndex()
+{
+    return m_instructionIndex;
 }
 
 int PTracer::StartBlockTracing()
