@@ -6,7 +6,7 @@
 void main(int argc, char *argv[]) {
     const char* filename;
 
-    if (argc < 1)
+    if (argc < 2)
     {
         return;
     }
@@ -18,6 +18,7 @@ void main(int argc, char *argv[]) {
     ptracer.StartInstructionTrace();
 
     for (;;) {
+        struct pt_insn insn;
         int status = ptracer.DecodeInstruction();
 
         if (status == -pte_eos)
