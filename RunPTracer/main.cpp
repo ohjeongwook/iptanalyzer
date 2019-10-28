@@ -15,20 +15,17 @@ void main(int argc, char *argv[]) {
 
     PTracer ptracer = PTracer();
     ptracer.Open(filename);
-    ptracer.StartInstructionTrace();
+    ptracer.StartInstructionDecoding();
 
     for (;;) {
         struct pt_insn insn;
-        int status = ptracer.DecodeInstruction();
+        int status = ptracer.DecodeInstruction(insn);
 
         if (status == -pte_eos)
         {
             break;
         }
     }
-    uint64_t instructionCount = ptracer.GetInstructionIndex();
-
-    printf("instructionCount = %x", instructionCount);
 
     return;
 }

@@ -13,7 +13,8 @@ if not os.path.isfile('trace.pt'):
 
 p=pyptracer.PTracer()
 p.Open(r'trace.pt')
-p.StartInstructionTrace()
+p.StartInstructionDecoding()
 
 while 1:
-    p.DecodeInstruction()
+    pinsn = p.DecodeInstruction()
+    print('%x: %x' % (p.GetOffset(), pinsn.ip))

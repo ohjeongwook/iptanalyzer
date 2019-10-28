@@ -3,6 +3,7 @@
 #include <pybind11/pybind11.h>
 
 #include "PTracer.h"
+#include "intel-pt.h"
 
 namespace py = pybind11;
 
@@ -10,8 +11,12 @@ PYBIND11_MODULE(pyptracer, m) {
     py::class_<PTracer>(m, "PTracer")
         .def(py::init())
         .def("Open", &PTracer::Open)
-        .def("StartInstructionTrace", &PTracer::StartInstructionTrace)
+        .def("GetOffset", &PTracer::GetOffset)
+        .def("StartInstructionDecoding", &PTracer::StartInstructionDecoding)
         .def("DecodeInstruction", &PTracer::DecodeInstruction)
-        .def("StartBlockTracing", &PTracer::StartBlockTracing)
+        .def("StartBlockDecoding", &PTracer::StartBlockDecoding)
         .def("DecodeBlock", &PTracer::DecodeBlock);
+
+    py::class_<pt_insn>(m, "pt_insn")
+        .def_readwrite("ip", &pt_insn::ip);
 }
