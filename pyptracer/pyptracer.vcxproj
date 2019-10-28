@@ -172,7 +172,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="pywrapper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PTracer\PTracer.vcxproj">
