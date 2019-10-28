@@ -15,10 +15,10 @@
 /Libs/libipt/lib/libipt.dll
 /Libs/libipt/include/intel-pt.h
 /Debug
-/PTracerLib/Debug
-/PTracerLib/x64
-/PTracerLib/PTracerLib.vcxproj.user
-/PTracerLib/PTracerLib.vcxproj.filters
+/PTracer/Debug
+/PTracer/x64
+/PTracer/PTracer.vcxproj.user
+/PTracer/PTracer.vcxproj.filters
 /PyPTracer/Debug
 /PyPTracer/x64
 /PyPTracer/PyPTracer.vcxproj.user

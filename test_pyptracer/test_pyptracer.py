@@ -11,7 +11,7 @@ if not os.path.isfile('trace.pt'):
     with ZipFile('trace.zip', 'r') as zf:
        zf.extractall()
 
-p=pyptracer.PTracerLib()
+p=pyptracer.PTracer()
 p.Open(r'trace.pt')
 p.StartInstructionTrace()
 

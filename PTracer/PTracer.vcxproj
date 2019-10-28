@@ -22,7 +22,7 @@
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{1E1E288F-17D6-4C70-9FED-326C8CCE6AAA}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>PTracerLib</RootNamespace>
+    <RootNamespace>PTracer</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -157,10 +157,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="PTracerLib.cpp" />
+    <ClCompile Include="PTracer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="PTracerLib.h" />
+    <ClInclude Include="PTracer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\README.md" />

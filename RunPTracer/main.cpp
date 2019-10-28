@@ -1,7 +1,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
-#include "PTracerLib.h"
+#include "PTracer.h"
 
 void main(int argc, char *argv[]) {
     const char* filename;
@@ -13,7 +13,7 @@ void main(int argc, char *argv[]) {
     
     filename = argv[1];
 
-    PTracerLib ptracer = PTracerLib();
+    PTracer ptracer = PTracer();
     ptracer.Open(filename);
     ptracer.StartInstructionTrace();
 

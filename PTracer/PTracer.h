@@ -9,7 +9,7 @@ using namespace std;
 #define PRIx64 "llx"
 #endif
 
-class PTracerLib
+class PTracer
 {
 private:
     int m_verboseLevel = 0;
@@ -22,8 +22,8 @@ private:
     void BuildConfig(uint8_t* begin, uint8_t* end);
 
 public:
-    PTracerLib();
-    ~PTracerLib();
+    PTracer();
+    ~PTracer();
 
     void Open(const char* filename);
     const char* GetModeName(pt_exec_mode mode);

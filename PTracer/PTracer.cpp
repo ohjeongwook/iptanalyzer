@@ -2,13 +2,13 @@
 #include <iostream>
 #include <string>
 
-#include "PTracerLib.h"
+#include "PTracer.h"
 
-PTracerLib::PTracerLib()
+PTracer::PTracer()
 {
 }
 
-PTracerLib::~PTracerLib()
+PTracer::~PTracer()
 {
     if (m_insnDecoder)
     {
@@ -21,7 +21,7 @@ PTracerLib::~PTracerLib()
     }
 }
 
-void PTracerLib::Open(const char* filename)
+void PTracer::Open(const char* filename)
 {
     int errcode = 0;
 
@@ -37,7 +37,7 @@ void PTracerLib::Open(const char* filename)
     BuildConfig((uint8_t*)&m_buffer[0], (uint8_t*)&m_buffer[0] + fileSize);
 }
 
-const char* PTracerLib::GetModeName(pt_exec_mode mode) {
+const char* PTracer::GetModeName(pt_exec_mode mode) {
     switch (mode) {
     case ptem_unknown:
         return "unknown";
@@ -55,7 +55,7 @@ const char* PTracerLib::GetModeName(pt_exec_mode mode) {
     return "unknown";
 }
 
-const char* PTracerLib::GetEventTypeName(enum pt_event_type event_type) {
+const char* PTracer::GetEventTypeName(enum pt_event_type event_type) {
     switch (event_type) {
     case ptev_enabled:
         return "ptev_enabled";
@@ -102,7 +102,7 @@ const char* PTracerLib::GetEventTypeName(enum pt_event_type event_type) {
     return "unknown";
 }
 
-int PTracerLib::StartInstructionTrace()
+int PTracer::StartInstructionTrace()
 {
     if (!m_insnDecoder)
     {
@@ -116,7 +116,7 @@ int PTracerLib::StartInstructionTrace()
     return 0;
 }
 
-int PTracerLib::DecodeInstruction() {
+int PTracer::DecodeInstruction() {
     int status;
 
     if (!m_insnDecoder)
@@ -172,12 +172,12 @@ int PTracerLib::DecodeInstruction() {
     return status;
 }
 
-uint64_t PTracerLib::GetInstructionIndex()
+uint64_t PTracer::GetInstructionIndex()
 {
     return m_instructionIndex;
 }
 
-int PTracerLib::StartBlockTracing()
+int PTracer::StartBlockTracing()
 {
     if (!m_blockDecoder) {
         m_blockDecoder = pt_blk_alloc_decoder(&m_config);
@@ -189,7 +189,7 @@ int PTracerLib::StartBlockTracing()
     return 0;
 }
 
-int PTracerLib::DecodeBlock() {
+int PTracer::DecodeBlock() {
     int status;
 
     if (!m_blockDecoder) {
@@ -229,7 +229,7 @@ int PTracerLib::DecodeBlock() {
     return status;
 }
 
-void PTracerLib::BuildConfig(uint8_t* begin, uint8_t* end)
+void PTracer::BuildConfig(uint8_t* begin, uint8_t* end)
 {
     memset(&m_config, 0, sizeof(m_config));
     m_config.size = sizeof(m_config);
