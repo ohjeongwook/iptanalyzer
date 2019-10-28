@@ -12,11 +12,14 @@ PYBIND11_MODULE(pyptracer, m) {
         .def(py::init())
         .def("Open", &PTracer::Open)
         .def("GetOffset", &PTracer::GetOffset)
+        .def("AddImage", &PTracer::AddImage)
         .def("StartInstructionDecoding", &PTracer::StartInstructionDecoding)
         .def("DecodeInstruction", &PTracer::DecodeInstruction)
+        .def("GetNextInsnStatus", &PTracer::GetNextInsnStatus)        
         .def("StartBlockDecoding", &PTracer::StartBlockDecoding)
         .def("DecodeBlock", &PTracer::DecodeBlock);
 
     py::class_<pt_insn>(m, "pt_insn")
-        .def_readwrite("ip", &pt_insn::ip);
+        .def_readwrite("ip", &pt_insn::ip)
+        .def_readonly("raw", &pt_insn::raw);
 }

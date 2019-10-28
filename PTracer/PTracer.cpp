@@ -6,6 +6,7 @@
 
 PTracer::PTracer()
 {
+    InitImageCache();
 }
 
 PTracer::~PTracer()
@@ -127,10 +128,45 @@ int PTracer::GetStatus()
     return m_status;
 }
 
+int PTracer::InitImageCache()
+{
+    m_iscache = pt_iscache_alloc(NULL);
+    if (!m_iscache)
+        return -pte_nomem;
+
+    m_image = pt_image_alloc(NULL);
+}
+
+void PTracer::AddImage(uint64_t base, const char* filename)
+{
+    ifstream file(filename, ios::binary | ios::ate);
+    streamsize fileSize = file.tellg();
+
+    int isid = pt_iscache_add_file(m_iscache, filename, 0, fileSize, base);
+
+    if (isid < 0)
+    {
+        return;
+    }
+
+    m_status = pt_image_add_cached(m_image, m_iscache, isid, NULL);
+
+    if (m_status < 0)
+    {
+        return;
+    }
+
+    if (m_insnDecoder)
+    {
+        m_status = pt_insn_set_image(m_insnDecoder, m_image);
+    }
+}
+
 int PTracer::StartInstructionDecoding()
 {
     m_status = 0;
     m_offset = 0;
+    m_insnNextStatus = -1;
 
     if (!m_insnDecoder)
     {
@@ -140,49 +176,59 @@ int PTracer::StartInstructionDecoding()
         {
             return -1;
         }
+
+        if (m_image)
+        {
+            m_status = pt_insn_set_image(m_insnDecoder, m_image);
+            if (m_status < 0) {
+                return m_status;
+            }
+        }
     }
+
     return 0;
 }
 
-pt_insn *PTracer::DecodeInstruction() {
+pt_insn* PTracer::DecodeInstruction() {
     if (!m_insnDecoder)
     {
         return NULL;
     }
 
-    m_status = pt_insn_sync_forward(m_insnDecoder);
-
-    if (m_status < 0)
-        return NULL;
-
-    if (m_status != 0)
+    if (m_insnNextStatus < 0)
     {
-        for (;;) {
-            struct pt_event event;
-            m_status = pt_insn_event(m_insnDecoder, &event, sizeof(event));
-            if (m_status < 0)
-                return NULL;
+        m_status = pt_insn_sync_forward(m_insnDecoder);
 
-            if (m_status == 0)
-                break;
-        }
+        if (m_status < 0)
+            return NULL;
+    }
+
+    for (;;) {
+        struct pt_event event;
+        m_status = pt_insn_event(m_insnDecoder, &event, sizeof(event));
+        if (m_status <= 0)
+            break;
     }
 
     m_status = pt_insn_get_offset(m_insnDecoder, &m_offset);
 
-    struct pt_insn *pinsn = new pt_insn();
+    struct pt_insn* pinsn = new pt_insn();
     if (!pinsn)
     {
         return NULL;
     }
 
     pinsn->ip = 0ull;
-    m_status = pt_insn_next(m_insnDecoder, pinsn, sizeof(pt_insn));
-    m_instructionIndex++;
+    m_insnNextStatus = pt_insn_next(m_insnDecoder, pinsn, sizeof(pt_insn));
     return pinsn;
 }
 
-void PTracer::PrintInsn(struct pt_insn*pinsn)
+int PTracer::GetNextInsnStatus()
+{
+    return m_insnNextStatus;
+}
+
+void PTracer::PrintInsn(struct pt_insn* pinsn)
 {
     printf("> insn.ip = % 016" PRIx64 " (%s) @%x\n", pinsn->ip, GetModeName(pinsn->mode), m_offset);
 
