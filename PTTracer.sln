@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.29418.71
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RunPTracer", "RunPTracer\RunPTracer.vcxproj", "{08251DEB-D585-4C35-8114-AC4AA91610D8}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pyptracer", "PyPTracer\PyPTracer.vcxproj", "{AED12ED3-51EA-4FB7-9F2E-E25A2BC5EF52}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pyptracer", "pyptracer\pyptracer.vcxproj", "{AED12ED3-51EA-4FB7-9F2E-E25A2BC5EF52}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PTracerLib", "PTracerLib\PTracerLib.vcxproj", "{1E1E288F-17D6-4C70-9FED-326C8CCE6AAA}"
 EndProject
