@@ -25,3 +25,4 @@
 /PyPTracer/PyPTracer.vcxproj.filters
 /x64/Release
 /test_pyptracer/trace.pt
+/TestFiles/trace.pt
