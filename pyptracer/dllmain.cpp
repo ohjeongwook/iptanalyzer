@@ -7,13 +7,11 @@
 namespace py = pybind11;
 
 PYBIND11_MODULE(pyptracer, m) {
-    py::class_<PTracerLib>(m, "Open")
-        .def("Open", &PTracerLib::Open);
-
-    /*
-    py::class_<PTracerLib>(m, "DecodeBlock")
+    py::class_<PTracerLib>(m, "PTracerLib")
+        .def(py::init())
+        .def("Open", &PTracerLib::Open)
+        .def("StartInstructionTrace", &PTracerLib::StartInstructionTrace)
+        .def("DecodeInstruction", &PTracerLib::DecodeInstruction)
+        .def("StartBlockTracing", &PTracerLib::StartBlockTracing)
         .def("DecodeBlock", &PTracerLib::DecodeBlock);
-
-    py::class_<PTracerLib>(m, "DecodeInstruction")
-        .def("DecodeInstruction", &PTracerLib::DecodeInstruction);*/
 }
