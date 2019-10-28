@@ -14,3 +14,13 @@
 /Libs/libipt/lib/libipt.lib
 /Libs/libipt/lib/libipt.dll
 /Libs/libipt/include/intel-pt.h
+/Debug
+/PTracerLib/Debug
+/PTracerLib/x64
+/PTracerLib/PTracerLib.vcxproj.user
+/PTracerLib/PTracerLib.vcxproj.filters
+/PyPTracer/Debug
+/PyPTracer/x64
+/PyPTracer/PyPTracer.vcxproj.user
+/PyPTracer/PyPTracer.vcxproj.filters
+/x64/Release
