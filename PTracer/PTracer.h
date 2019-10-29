@@ -45,7 +45,7 @@ public:
     void AddImage(uint64_t base, const char* filename);
 
     int StartInstructionDecoding();
-    pt_insn* DecodeInstruction();
+    pt_insn* DecodeInstruction(bool moveForward = true);
     pt_error_code GetNextInsnStatus();
 
     int StartBlockDecoding();

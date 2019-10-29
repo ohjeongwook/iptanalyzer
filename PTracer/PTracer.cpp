@@ -189,25 +189,28 @@ int PTracer::StartInstructionDecoding()
     return 0;
 }
 
-pt_insn* PTracer::DecodeInstruction() {
+pt_insn* PTracer::DecodeInstruction(bool moveForward) {
     if (!m_insnDecoder)
     {
         return NULL;
     }
 
-    if (m_insnNextStatus < 0)
+    if (moveForward)
     {
-        m_status = pt_insn_sync_forward(m_insnDecoder);
+        if (m_insnNextStatus < 0)
+        {
+            m_status = pt_insn_sync_forward(m_insnDecoder);
 
-        if (m_status < 0)
-            return NULL;
-    }
+            if (m_status < 0)
+                return NULL;
+        }
 
-    for (;;) {
-        struct pt_event event;
-        m_status = pt_insn_event(m_insnDecoder, &event, sizeof(event));
-        if (m_status <= 0)
-            break;
+        for (;;) {
+            struct pt_event event;
+            m_status = pt_insn_event(m_insnDecoder, &event, sizeof(event));
+            if (m_status <= 0)
+                break;
+        }
     }
 
     m_status = pt_insn_get_offset(m_insnDecoder, &m_offset);
