@@ -25,8 +25,9 @@ pip install pybind11
 
 ## test_pyptracer
 
-* Install capstone
+* Install capstone, windbgtool 
 
 ```
 pip install capstone
+pip install git+https://github.com/ohjeongwook/windbgtool
 ```
