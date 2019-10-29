@@ -22,3 +22,11 @@
 ```
 pip install pybind11
 ```
+
+## test_pyptracer
+
+* Install capstone
+
+```
+pip install capstone
+```
