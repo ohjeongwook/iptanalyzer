@@ -40,13 +40,13 @@ public:
     void Open(const char* filename);
 
     uint64_t GetOffset();
-    int GetStatus();
+    pt_error_code GetStatus();
 
     void AddImage(uint64_t base, const char* filename);
 
     int StartInstructionDecoding();
     pt_insn* DecodeInstruction();
-    int GetNextInsnStatus();
+    pt_error_code GetNextInsnStatus();
 
     int StartBlockDecoding();
     struct pt_block* DecodeBlock();

@@ -123,9 +123,9 @@ uint64_t PTracer::GetOffset()
     return m_offset;
 }
 
-int PTracer::GetStatus()
+pt_error_code PTracer::GetStatus()
 {
-    return m_status;
+    return pt_errcode(m_status);
 }
 
 int PTracer::InitImageCache()
@@ -223,9 +223,9 @@ pt_insn* PTracer::DecodeInstruction() {
     return pinsn;
 }
 
-int PTracer::GetNextInsnStatus()
+pt_error_code PTracer::GetNextInsnStatus()
 {
-    return m_insnNextStatus;
+    return pt_errcode(m_insnNextStatus);
 }
 
 void PTracer::PrintInsn(struct pt_insn* pinsn)
@@ -249,7 +249,6 @@ void PTracer::PrintInsn(struct pt_insn* pinsn)
 
         printf("\n");
     }
-
 }
 
 int PTracer::StartBlockDecoding()
