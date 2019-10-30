@@ -6,6 +6,7 @@
 
 PTracer::PTracer()
 {
+    m_startOffset = 0;
     InitImageCache();
 }
 
@@ -22,10 +23,14 @@ PTracer::~PTracer()
     }
 }
 
+uint64_t PTracer::GetSyncOffset()
+{
+    return m_startOffset + m_syncOffset;
+}
 
 uint64_t PTracer::GetOffset()
 {
-    return m_offset;
+    return m_startOffset + m_offset;
 }
 
 uint64_t PTracer::GetSize()
@@ -117,14 +122,23 @@ void PTracer::BuildConfig(uint8_t* begin, uint8_t* end)
     m_config.decode.callback = NULL;
     m_config.decode.context = NULL;
 }
-void PTracer::Open(const char* filename)
+
+void PTracer::Open(const char* filename, uint64_t start_offset, uint64_t end_offset)
 {
     int errcode = 0;
+    m_startOffset = start_offset;
+    m_endOffset = end_offset;
 
     ifstream file(filename, ios::binary | ios::ate);
-    m_size = file.tellg();
-    file.seekg(0, ios::beg);
 
+    if (m_endOffset == 0)
+    {
+        m_endOffset = file.tellg();
+    }
+    
+    file.seekg(m_startOffset, ios::beg);
+
+    m_size = m_endOffset - m_startOffset;
     m_buffer.resize(m_size);
     if (!file.read(m_buffer.data(), m_size)) {
         return;
@@ -266,6 +280,8 @@ pt_block* PTracer::DecodeBlock(bool moveForward) {
             {
                 return NULL;
             }
+
+            pt_blk_get_sync_offset(m_blockDecoder, &m_syncOffset);
         }
 
         m_status = pt_blk_get_offset(m_blockDecoder, &m_offset);
@@ -280,8 +296,9 @@ pt_block* PTracer::DecodeBlock(bool moveForward) {
         }
     }
 
-    m_decodeStatus = pt_blk_next(m_blockDecoder, &m_block, sizeof(m_block));
-    return &m_block;
+    pt_block* p_block = new pt_block();
+    m_decodeStatus = pt_blk_next(m_blockDecoder, p_block, sizeof(pt_block));
+    return p_block;
 }
 
 pt_error_code PTracer::GetDecodeStatus()

@@ -22,6 +22,10 @@ private:
 
     int m_status;
     int m_decodeStatus = 0;
+
+    uint64_t m_startOffset;
+    uint64_t m_endOffset;
+    uint64_t m_syncOffset;
     uint64_t m_offset;
     streamsize m_size;
 
@@ -47,8 +51,9 @@ public:
     PTracer();
     ~PTracer();
 
-    void Open(const char* filename);
+    void Open(const char* filename, uint64_t start_offset = 0, uint64_t endoffset = 0);
 
+    uint64_t GetSyncOffset();
     uint64_t GetOffset();
     uint64_t GetSize();
     pt_error_code GetStatus();
