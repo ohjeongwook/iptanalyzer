@@ -55,7 +55,7 @@ class Decoder:
         self.LoadedMemories[ip] = False
 
         address_info = self.Debugger.GetAddressInfo(ip)
-        if self.DumpSymbols:
+        if self.DumpSymbols and address_info and 'Module Name' in address_info:
             for (address, symbol) in self.Debugger.EnumerateModuleSymbols([address_info['Module Name'], ]).items():
                 self.AddressToSymbols[address] = symbol
 
