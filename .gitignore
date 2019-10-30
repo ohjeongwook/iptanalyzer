@@ -27,3 +27,4 @@
 /test_pyptracer/trace.pt
 /TestFiles/trace.pt
 *.dmp
+*.p
