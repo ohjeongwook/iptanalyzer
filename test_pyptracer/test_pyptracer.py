@@ -14,11 +14,13 @@ class PyPTracer:
         self.DumpInstructions = dump_instructions
         self.DumpSymbols = dump_symbols
         self.Disassembler = disassembler
+        self.LoadedMemories = {}
+        self.AddressToSymbols = {}
 
         if dump_filename:
             self.Debugger = windbgtool.debugger.DbgEngine()
-            #self.Debugger.SetLogLevel(True)
             self.Debugger.LoadDump(dump_filename)
+            self.AddressList = self.Debugger.GetAddressList()
 
             if dump_symbols:
                 self.Debugger.EnumerateModules()
@@ -39,18 +41,29 @@ class PyPTracer:
         for byte in raw_bytes:
             raw_line += '%.2x ' % (byte % 256)
 
-    def LoadMemory(self, ip):
+    def LoadMemory(self, ip, use_address_map = True):
         if ip in self.LoadedMemories:
             return False
 
         address_info = self.Debugger.GetAddressInfo(ip)
-
         if self.DumpSymbols:
             for (address, symbol) in self.Debugger.EnumerateModuleSymbols([address_info['Module Name'], ]).items():
                 self.AddressToSymbols[address] = symbol
 
-        base_address = int(address_info['Base Address'], 16)
-        region_size = int(address_info['Region Size'], 16)
+        base_address = region_size = None
+
+        if use_address_map:
+            for mem_info in self.AddressList:
+                if mem_info['BaseAddr'] <= ip and ip <= mem_info['EndAddr']:
+                    base_address = mem_info['BaseAddr']
+                    region_size = mem_info['RgnSize']
+                    break
+        else:
+            base_address = int(address_info['Base Address'], 16)
+            region_size = int(address_info['Region Size'], 16)
+
+        if base_address == None or region_size == None:
+            return False
 
         if base_address in self.LoadedMemories:
             return False
@@ -80,8 +93,6 @@ class PyPTracer:
     def Run(self):
         self.PyTracer.StartInstructionDecoding()
 
-        self.LoadedMemories = {}
-        self.AddressToSymbols = {}
         move_forward = True
 
         i = 0
@@ -112,5 +123,9 @@ class PyPTracer:
             move_forward = True
 
 if __name__ == '__main__':
-    pytracer = PyPTracer('../TestFiles/trace.zip', '../TestFiles/trace.pt', '../TestFiles/notepad.exe.dmp', disassembler = "none")
+    pytracer = PyPTracer(
+        '../TestFiles/trace.zip', 
+        '../TestFiles/trace.pt',
+        '../TestFiles/notepad.exe.dmp', 
+        disassembler = "capstone")
     pytracer.Run()
