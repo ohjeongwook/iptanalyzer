@@ -22,35 +22,20 @@ PTracer::~PTracer()
     }
 }
 
-void PTracer::BuildConfig(uint8_t* begin, uint8_t* end)
-{
-    memset(&m_config, 0, sizeof(m_config));
-    m_config.size = sizeof(m_config);
-    m_config.begin = begin;
-    m_config.end = end;
 
-    m_config.cpu.vendor = pcv_intel;
-    m_config.cpu.family = 6;
-    m_config.cpu.model = 4;
-    m_config.cpu.stepping = 22;
-    m_config.decode.callback = NULL;
-    m_config.decode.context = NULL;
+uint64_t PTracer::GetOffset()
+{
+    return m_offset;
 }
 
-void PTracer::Open(const char* filename)
+uint64_t PTracer::GetSize()
 {
-    int errcode = 0;
+    return m_size;
+}
 
-    ifstream file(filename, ios::binary | ios::ate);
-    streamsize fileSize = file.tellg();
-    file.seekg(0, ios::beg);
-
-    m_buffer.resize(fileSize);
-    if (!file.read(m_buffer.data(), fileSize)) {
-        return;
-    }
-
-    BuildConfig((uint8_t*)&m_buffer[0], (uint8_t*)&m_buffer[0] + fileSize);
+pt_error_code PTracer::GetStatus()
+{
+    return pt_errcode(m_status);
 }
 
 const char* PTracer::GetModeName(pt_exec_mode mode) {
@@ -118,16 +103,35 @@ const char* PTracer::GetEventTypeName(enum pt_event_type event_type) {
     return "unknown";
 }
 
-uint64_t PTracer::GetOffset()
+void PTracer::BuildConfig(uint8_t* begin, uint8_t* end)
 {
-    return m_offset;
-}
+    memset(&m_config, 0, sizeof(m_config));
+    m_config.size = sizeof(m_config);
+    m_config.begin = begin;
+    m_config.end = end;
 
-pt_error_code PTracer::GetStatus()
+    m_config.cpu.vendor = pcv_intel;
+    m_config.cpu.family = 6;
+    m_config.cpu.model = 4;
+    m_config.cpu.stepping = 22;
+    m_config.decode.callback = NULL;
+    m_config.decode.context = NULL;
+}
+void PTracer::Open(const char* filename)
 {
-    return pt_errcode(m_status);
-}
+    int errcode = 0;
 
+    ifstream file(filename, ios::binary | ios::ate);
+    m_size = file.tellg();
+    file.seekg(0, ios::beg);
+
+    m_buffer.resize(m_size);
+    if (!file.read(m_buffer.data(), m_size)) {
+        return;
+    }
+
+    BuildConfig((uint8_t*)&m_buffer[0], (uint8_t*)&m_buffer[0] + m_size);
+}
 int PTracer::InitImageCache()
 {
     m_iscache = pt_iscache_alloc(NULL);
@@ -160,15 +164,20 @@ void PTracer::AddImage(uint64_t base, const char* filename)
     {
         m_status = pt_insn_set_image(m_insnDecoder, m_image);
     }
+
+    if (m_blockDecoder)
+    {
+        m_status = pt_blk_set_image(m_blockDecoder, m_image);
+    }
 }
 
-int PTracer::StartInstructionDecoding()
+int PTracer::InitDecoding(DecodingMode decodingMode)
 {
     m_status = 0;
     m_offset = 0;
-    m_insnNextStatus = -1;
+    m_decodeStatus = -1;
 
-    if (!m_insnDecoder)
+    if (decodingMode == Instruction && !m_insnDecoder)
     {
         m_insnDecoder = pt_insn_alloc_decoder(&m_config);
 
@@ -185,6 +194,23 @@ int PTracer::StartInstructionDecoding()
             }
         }
     }
+    else if (decodingMode == Block && !m_blockDecoder)
+    {
+        m_blockDecoder = pt_blk_alloc_decoder(&m_config);
+
+        if (!m_blockDecoder)
+        {
+            return -1;
+        }
+
+        if (m_image)
+        {
+            m_status = pt_blk_set_image(m_blockDecoder, m_image);
+            if (m_status < 0) {
+                return m_status;
+            }
+        }
+    }
 
     return 0;
 }
@@ -192,12 +218,16 @@ int PTracer::StartInstructionDecoding()
 pt_insn* PTracer::DecodeInstruction(bool moveForward) {
     if (!m_insnDecoder)
     {
-        return NULL;
+        InitDecoding(Instruction);
+        if (!m_insnDecoder)
+        {
+            return NULL;
+        }
     }
 
     if (moveForward)
     {
-        if (m_insnNextStatus < 0)
+        if (m_decodeStatus < 0)
         {
             m_status = pt_insn_sync_forward(m_insnDecoder);
 
@@ -214,86 +244,47 @@ pt_insn* PTracer::DecodeInstruction(bool moveForward) {
     }
 
     m_status = pt_insn_get_offset(m_insnDecoder, &m_offset);
-
-    struct pt_insn* pinsn = new pt_insn();
-    if (!pinsn)
-    {
-        return NULL;
-    }
-
-    pinsn->ip = 0ull;
-    m_insnNextStatus = pt_insn_next(m_insnDecoder, pinsn, sizeof(pt_insn));
-    return pinsn;
+    m_decodeStatus = pt_insn_next(m_insnDecoder, &m_insn, sizeof(m_insn));
+    return &m_insn;
 }
 
-pt_error_code PTracer::GetNextInsnStatus()
-{
-    return pt_errcode(m_insnNextStatus);
-}
-
-void PTracer::PrintInsn(struct pt_insn* pinsn)
-{
-    printf("> insn.ip = % 016" PRIx64 " (%s) @%x\n", pinsn->ip, GetModeName(pinsn->mode), m_offset);
-
-    if (m_verboseLevel > 1)
-    {
-        printf("\tinsn.size = %d\n", pinsn->size);
-        printf("\traw: ");
-        for (int i = 0; i < pt_max_insn_size; i++)
-        {
-            printf("%.2x ", pinsn->raw[i]);
-        }
-        printf("\n");
-
-        if (m_status < 0)
-        {
-            printf("\tstatus = %s\n", pt_errstr((pt_error_code)m_status));
-        }
-
-        printf("\n");
-    }
-}
-
-int PTracer::StartBlockDecoding()
-{
-    m_status = 0;
-    m_offset = 0;
-
+pt_block* PTracer::DecodeBlock(bool moveForward) {
     if (!m_blockDecoder) {
-        m_blockDecoder = pt_blk_alloc_decoder(&m_config);
+        InitDecoding(Block);
         if (!m_blockDecoder) {
-            return -1;
+            return NULL;
         }
     }
 
-    return 0;
+    if (moveForward)
+    {
+        if (m_decodeStatus < 0)
+        {
+            m_status = pt_blk_sync_forward(m_blockDecoder);
+
+            if (m_status < 0)
+            {
+                return NULL;
+            }
+        }
+
+        m_status = pt_blk_get_offset(m_blockDecoder, &m_offset);
+
+        for (;;) {
+            struct pt_event event;
+            m_status = pt_blk_event(m_blockDecoder, &event, sizeof(event));
+            if (m_status <= 0)
+            {
+                break;
+            }
+        }
+    }
+
+    m_decodeStatus = pt_blk_next(m_blockDecoder, &m_block, sizeof(m_block));
+    return &m_block;
 }
 
-struct pt_block* PTracer::DecodeBlock() {
-    if (!m_blockDecoder) {
-        return NULL;
-    }
-
-    m_status = pt_blk_sync_forward(m_blockDecoder);
-
-    if (m_status < 0)
-    {
-        return NULL;
-    }
-
-    m_status = pt_blk_get_offset(m_blockDecoder, &m_offset);
-
-    for (;;) {
-        struct pt_event event;
-        m_status = pt_blk_event(m_blockDecoder, &event, sizeof(event));
-
-        if (m_status < 0)
-        {
-            break;
-        }
-    }
-
-    struct pt_block* pblock = new pt_block();
-    m_status = pt_blk_next(m_blockDecoder, pblock, sizeof(pt_block));
-    return pblock;
+pt_error_code PTracer::GetDecodeStatus()
+{
+    return pt_errcode(m_decodeStatus);
 }
