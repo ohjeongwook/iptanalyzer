@@ -28,3 +28,4 @@
 /TestFiles/trace.pt
 *.dmp
 *.p
+/test_pyptracer/__pycache__
