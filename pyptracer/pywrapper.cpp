@@ -13,14 +13,13 @@ PYBIND11_MODULE(pyptracer, m) {
         .def(py::init())
         .def("Open", &PTracer::Open)
         .def("GetOffset", &PTracer::GetOffset)
+        .def("GetSize", &PTracer::GetSize)
         .def("AddImage", &PTracer::AddImage)
-        .def("StartInstructionDecoding", &PTracer::StartInstructionDecoding)
         .def("DecodeInstruction", &PTracer::DecodeInstruction)
-        .def("GetNextInsnStatus", &PTracer::GetNextInsnStatus)
-        .def("StartBlockDecoding", &PTracer::StartBlockDecoding)
-        .def("DecodeBlock", &PTracer::DecodeBlock);
+        .def("DecodeBlock", &PTracer::DecodeBlock)
+        .def("GetDecodeStatus", &PTracer::GetDecodeStatus);
 
-    py::class_<pt_insn>(m, "pt_insn", py::buffer_protocol())
+    py::class_<pt_insn>(m, "pt_insn")
         .def_readwrite("ip", &pt_insn::ip)
         .def("GetRawBytes",
             [](const pt_insn& a) {
@@ -33,6 +32,12 @@ PYBIND11_MODULE(pyptracer, m) {
                 return arr;
             }
          );
+
+    py::class_<pt_block>(m, "pt_block")
+        .def_readwrite("ip", &pt_block::ip)
+        .def_readwrite("end_ip", &pt_block::end_ip)
+        .def_readwrite("ninsn", &pt_block::ninsn)
+        .def_readwrite("size", &pt_block::size);
 
     py::enum_<pt_error_code>(m, "pt_error_code")
         .value("pte_ok", pt_error_code::pte_ok)
