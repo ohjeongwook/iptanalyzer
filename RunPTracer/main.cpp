@@ -18,7 +18,7 @@ void main(int argc, char* argv[]) {
     ptracer.AddImage(0x00007ffbb5ba1000, "..\\TestFiles\\00007ffb`b5ba1000.dmp");
     ptracer.AddImage(0x00007ffbb7cc1000, "..\\TestFiles\\00007ffb`b7cc1000.dmp");
 
-    ptracer.StartInstructionDecoding();
+    ptracer.InitDecoding();
 
     for (;;) {
         struct pt_insn* insn = ptracer.DecodeInstruction();
