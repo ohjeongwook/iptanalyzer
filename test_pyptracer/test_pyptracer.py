@@ -64,13 +64,18 @@ class PyPTracer:
 
     def PrintDisassembly(self, ip, raw_bytes = ''):
         symbol = ''
-        if insn.ip in self.AddressToSymbols:
-            symbol = self.AddressToSymbols[insn.ip]
+        if ip in self.AddressToSymbols:
+            symbol = self.AddressToSymbols[ip]
 
         md = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_64)
-        for disas in md.disasm(bytearray(raw_bytes), insn.ip):                   
-            print('%s (%x): %s %s' % (symbol, disas.address, disas.mnemonic, disas.op_str))
-            break
+
+        if raw_bytes:
+            for disas in md.disasm(bytearray(raw_bytes), ip):
+                print('%s (%x): %s %s' % (symbol, disas.address, disas.mnemonic, disas.op_str))
+                break
+        else:
+            disasmline = self.Debugger.RunCmd('u %x L1' % (ip))
+            print(disasmline)
 
     def Run(self):
         self.PyTracer.StartInstructionDecoding()
@@ -90,18 +95,18 @@ class PyPTracer:
                     self.PrintDisassembly(insn.ip, insn.GetRawBytes())
 
                 elif self.Disassembler == "windbg":
-                        disasmline = self.Debugger.RunCmd('u %x L1' % (insn.ip))
-                        print('\t'+disasmline)
+                    disasmline = self.Debugger.RunCmd('u %x L1' % (insn.ip))
+                    print('\t'+disasmline)
 
             errcode = self.PyTracer.GetNextInsnStatus()
             if errcode != pyptracer.pt_error_code.pte_ok:
-                self.PrintDisassembly(insn.ip)
-                print('\terrorcode= %s' % (self.PyTracer.GetOffset(), errcode))
-
                 if errcode == pyptracer.pt_error_code.pte_nomap:
                     if self.LoadMemory(insn.ip):
                         move_forward = False
                         continue
+                    else:
+                        self.PrintDisassembly(insn.ip)
+                        print('\terrorcode= %s' % (errcode))
 
             i += 1
             move_forward = True
