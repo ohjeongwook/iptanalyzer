@@ -5,19 +5,24 @@ sys.path.append(r'..\x64\Debug')
 import pickle
 import pprint
 from zipfile import ZipFile
+from datetime import datetime, timedelta
 
 import capstone
 
 import pyptracer
 import windbgtool.debugger
 
-class PyPTracer:
-    def __init__(self, pt_zip_filename, pt_filename, dump_filename = '', dump_instructions = False, dump_symbols = True, disassembler = "capstone"):
+class Decoder:
+    def __init__(self, pt_filename, dump_filename = '', start_offset = 0, end_offset = 0, load_image = False, dump_instructions = False, dump_symbols = True, disassembler = "capstone"):
+        self.StartOffset = start_offset
+        self.EndOffset = end_offset
         self.DumpInstructions = dump_instructions
         self.DumpSymbols = dump_symbols
+        self.LoadImage = load_image
         self.Disassembler = disassembler
         self.LoadedMemories = {}
         self.AddressToSymbols = {}
+        self.BlockIPLocations = {}
 
         if dump_filename:
             self.Debugger = windbgtool.debugger.DbgEngine()
@@ -27,10 +32,10 @@ class PyPTracer:
             if dump_symbols:
                 self.Debugger.EnumerateModules()
 
-        self._ExtractTracePT(pt_zip_filename, pt_filename)
+        #self._ExtractTracePT(pt_zip_filename, pt_filename)
 
         self.PyTracer = pyptracer.PTracer()
-        self.PyTracer.Open(pt_filename)
+        self.PyTracer.Open(pt_filename, start_offset, end_offset)
 
     def _ExtractTracePT(self, pt_zip_filename, pt_filename ):
         if not os.path.isfile(pt_filename):
@@ -43,7 +48,7 @@ class PyPTracer:
         for byte in raw_bytes:
             raw_line += '%.2x ' % (byte % 256)
 
-    def LoadMemory(self, ip, use_address_map = True):
+    def LoadImageFile(self, ip, use_address_map = True):
         if ip in self.LoadedMemories:
             return self.LoadedMemories[ip]
 
@@ -131,7 +136,7 @@ class PyPTracer:
             errcode = self.PyTracer.GetDecodeStatus()
             if errcode != pyptracer.pt_error_code.pte_ok:
                 if errcode == pyptracer.pt_error_code.pte_nomap:
-                    if self.LoadMemory(insn.ip):
+                    if self.LoadImage(insn.ip):
                         move_forward = False
                         continue
                     else:
@@ -141,58 +146,64 @@ class PyPTracer:
             instruction_count += 1
             move_forward = True
 
-    def DecodeBlock(self):
+    def DecodeBlock(self, log_filename = ''):
+        load_image = False
         hit_functions = {}
         move_forward = True
 
         block_count = 0
         instruction_count = 0
         error_count = {}
-        block_ip_to_offset_map = {}
+        self.BlockIPLocations = {}
+        self.BlockOffsets = []
+
+        start_datetime = datetime.now()
         while 1:
             block = self.PyTracer.DecodeBlock(move_forward)
             if not block:
                 break
 
-            offset = self.PyTracer.GetOffset()
+            offset = self.PyTracer.GetSyncOffset()
+            self.BlockOffsets.append(offset)
 
-            if not block.ip in block_ip_to_offset_map:
-                block_ip_to_offset_map[block.ip] = []
-            block_ip_to_offset_map[block.ip].append(offset)
+            if not block.ip in self.BlockIPLocations:
+                self.BlockIPLocations[block.ip] = []
+            self.BlockIPLocations[block.ip].append(offset)
 
             instruction_count += block.ninsn
             if block_count % 1000 == 0:
+                time_diff = datetime.now() - start_datetime
+                if time_diff.seconds > 0:
+                    speed = block_count/time_diff.seconds
+                else:
+                    speed = 0
+
                 size = self.PyTracer.GetSize()
-                print('%d @ %d/%d (%f%%) ninsn=%d' % (block_count, offset, size, (offset*100)/size, block.ninsn))
-                pickle.dump(block_ip_to_offset_map, open( "block_ip_to_offset_map.p", "wb" ) )
+                relative_offset = offset - self.StartOffset
+                print('%d +%d @ %d/%d (%f%%) speed: %d blocks/sec' % (self.StartOffset, block_count, relative_offset, size, (relative_offset*100)/size, speed))
 
             errcode = self.PyTracer.GetDecodeStatus()
             if errcode != pyptracer.pt_error_code.pte_ok:
                 if not block.ip in error_count:
-                    if errcode == pyptracer.pt_error_code.pte_nomap:
-                        if self.LoadMemory(block.ip):
+                    if errcode == pyptracer.pt_error_code.pte_nomap and self.LoadImage:
+                        error_count[block.ip] = 1
+                        if self.LoadImageFile(block.ip):
                             move_forward = False
-                            error_count[block.ip] = 1
                             continue
                         else:
                             print('* block.ip=%x ~ %x errorcode= %s' % (block.ip, block.end_ip, errcode))
                             self.PrintDisassembly(block.ip)
-                    else:
-                        error_count[block.ip] += 1
+                else:
+                    error_count[block.ip] += 1
 
             block_count += 1
             move_forward = True
 
         offset = self.PyTracer.GetOffset()
         size = self.PyTracer.GetSize()
-        print('%d @ %d/%d (%f%%)' % (block_count, offset, size, (offset*100)/size))
-        print('instruction_count = %d' % instruction_count)
+        relative_offset = offset - self.StartOffset
+        print('%d +%d @ %d/%d (%f%%) ' % (self.StartOffset, block_count, relative_offset, size, (relative_offset*100)/size))
 
-if __name__ == '__main__':
-    pytracer = PyPTracer(
-        '../TestFiles/trace.zip', 
-        '../TestFiles/trace.pt',
-        '../TestFiles/notepad.exe.dmp',
-        dump_symbols = False,
-        disassembler = "capstone")
-    pytracer.DecodeBlock()
+        if log_filename:
+            pickle.dump(self.BlockIPLocations, open( log_filename, "wb" ) )
+

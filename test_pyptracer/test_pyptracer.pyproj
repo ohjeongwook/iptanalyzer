@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>968bdd29-f1a3-4553-bb51-56085d15a258</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>test_pyptracer.py</StartupFile>
+    <StartupFile>decode_blocks.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -23,7 +23,14 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="test_pyptracer.py" />
+    <Compile Include="dump_block_offsets.py" />
+    <Compile Include="pyptracertool.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="decode_blocks_test.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="decode_blocks.py" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="Global|PythonCore|3.7" />
