@@ -258,8 +258,10 @@ pt_insn* PTracer::DecodeInstruction(bool moveForward) {
     }
 
     m_status = pt_insn_get_offset(m_insnDecoder, &m_offset);
-    m_decodeStatus = pt_insn_next(m_insnDecoder, &m_insn, sizeof(m_insn));
-    return &m_insn;
+
+    pt_insn* p_insn = new pt_insn();
+    m_decodeStatus = pt_insn_next(m_insnDecoder, p_insn, sizeof(pt_insn));
+    return p_insn;
 }
 
 pt_block* PTracer::DecodeBlock(bool moveForward) {
