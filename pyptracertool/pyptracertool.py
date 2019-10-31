@@ -136,7 +136,7 @@ class Decoder:
             errcode = self.PyTracer.GetDecodeStatus()
             if errcode != pyptracer.pt_error_code.pte_ok:
                 if errcode == pyptracer.pt_error_code.pte_nomap:
-                    if self.LoadImage(insn.ip):
+                    if self.LoadImageFile(insn.ip):
                         move_forward = False
                         continue
                     else:

@@ -8,15 +8,17 @@ import pyptracertool
 import windbgtool.debugger
 
 class BlockAnalyzer:
-    def __init__(self, cache_dirname, dump_filename):
-        self.BlockAddresses = {}
+    def __init__(self, cache_dirname, pt_filename, dump_filename):
+        self.PTFilename = pt_filename
+        self.DumpFilename = dump_filename
+
+        self.BlockOffsets = {}
         self.ReadDirectory(cache_dirname)
-        print(len(self.BlockAddresses))
 
         self.Debugger = windbgtool.debugger.DbgEngine()
         self.Debugger.LoadDump(dump_filename)
         self.Debugger.EnumerateModules()
-
+        
         self.Modules = {}
         self.AddressToSymbols = {}
         self.SymbolsToAddress = {}
@@ -27,9 +29,17 @@ class BlockAnalyzer:
             return
 
         address = self.SymbolsToAddress[symbol]
+        for start_offset in self.BlockOffsets[address]:
+            print('start_offset = %x' % (start_offset))
 
-        for offset in self.BlockAddresses[address]:
-            print('offset = %x' % (offset))
+            """
+            pytracer = pyptracertool.Decoder(self.PTFilename, 
+                                             self.DumpFilename, 
+                                             dump_symbols = True, 
+                                             load_image = True, 
+                                             start_offset = start_offset, end_offset = start_offset + 1024*10)
+            pytracer.DecodeInstruction()
+            """
 
     def FindOffsets(self, symbol):
         for block_address in self.BlockAddresses.keys():
@@ -53,7 +63,7 @@ class BlockAnalyzer:
             self.LoadModuleSymbols(address_info['Module Name'])
 
     def ResolveSymbols(self):
-        for block_address in self.BlockAddresses.keys():
+        for block_address in self.BlockOffsets.keys():
             self.LoadSymbols(block_address)
 
     def ReadDirectory(self, dirname):
@@ -63,19 +73,16 @@ class BlockAnalyzer:
             self.Read(os.path.join(dirname, basename))
 
     def Read(self, filename):
-        print(filename)
+        for (address, offsets) in pickle.load(open(filename, "rb")).items():
+            if not address in self.BlockOffsets:
+                self.BlockOffsets[address] = []
 
-        block_offsets = pickle.load(open(filename, "rb"))
-
-        for (address, offsets) in block_offsets.items():
-            if not address in self.BlockAddresses:
-                self.BlockAddresses[address] = 1
-            else:
-                self.BlockAddresses[address] += 1
-
+            for offset in offsets:
+                self.BlockOffsets[address].append(offset)
     
 if __name__ == '__main__':
     cache_folder = 'Tmp'
+    pt_filename = '../TestFiles/trace.pt'
     dump_filename = '../TestFiles/notepad.exe.dmp'
-    block_analyzer = BlockAnalyzer(cache_folder, dump_filename)
+    block_analyzer = BlockAnalyzer(cache_folder, pt_filename, dump_filename)
     block_analyzer.DumpSymbols('KERNELBASE!CreateFileW')

@@ -24,7 +24,10 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="blockanalyzer.py" />
+    <Compile Include="block_analyzer.py" />
+    <Compile Include="decode_instructions.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="pyptracertool.py">
       <SubType>Code</SubType>
     </Compile>
