@@ -23,7 +23,7 @@
 pip install pybind11
 ```
 
-## test_pyptracer
+## pyptracertool
 
 * Install capstone, windbgtool 
 
