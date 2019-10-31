@@ -29,3 +29,5 @@
 *.dmp
 *.p
 __pycache__/
+/TestFiles/0x104b9bec.txt
+/TestFiles/0x104b9bec.pt
