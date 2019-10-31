@@ -4,24 +4,23 @@ import pickle
 
 import capstone
 
-import pyptracertool
+import decoder
 import windbgtool.debugger
 
 class BlockAnalyzer:
     def __init__(self, cache_dirname, pt_filename, dump_filename):
         self.PTFilename = pt_filename
         self.DumpFilename = dump_filename
+        self.BlockIPMap = {}
+        self.LoadedModules = {}
+        self.AddressToSymbols = {}
+        self.SymbolsToAddress = {}
 
-        self.BlockOffsets = {}
         self.ReadDirectory(cache_dirname)
 
         self.Debugger = windbgtool.debugger.DbgEngine()
         self.Debugger.LoadDump(dump_filename)
-        self.Debugger.EnumerateModules()
-        
-        self.Modules = {}
-        self.AddressToSymbols = {}
-        self.SymbolsToAddress = {}
+        self.Debugger.EnumerateModules()       
         self.ResolveSymbols()
 
     def DumpSymbols(self, symbol):
@@ -29,11 +28,11 @@ class BlockAnalyzer:
             return
 
         address = self.SymbolsToAddress[symbol]
-        for start_offset in self.BlockOffsets[address]:
+        for start_offset in self.BlockIPMap[address]:
             print('start_offset = %x' % (start_offset))
 
             """
-            pytracer = pyptracertool.Decoder(self.PTFilename, 
+            pytracer = decoder.PTImager(self.PTFilename, 
                                              self.DumpFilename, 
                                              dump_symbols = True, 
                                              load_image = True, 
@@ -47,10 +46,9 @@ class BlockAnalyzer:
                 print(self.AddressToSymbols[block_address])
 
     def LoadModuleSymbols(self, module_name):
-        if module_name in self.Modules:
+        if module_name in self.LoadedModules:
             return
-
-        self.Modules[module_name] = True
+        self.LoadedModules[module_name] = True
 
         print('LoadModuleSymbols: ' + module_name)
         for (address, symbol) in self.Debugger.EnumerateModuleSymbols([module_name, ]).items():
@@ -63,7 +61,7 @@ class BlockAnalyzer:
             self.LoadModuleSymbols(address_info['Module Name'])
 
     def ResolveSymbols(self):
-        for block_address in self.BlockOffsets.keys():
+        for block_address in self.BlockIPMap.keys():
             self.LoadSymbols(block_address)
 
     def ReadDirectory(self, dirname):
@@ -74,11 +72,11 @@ class BlockAnalyzer:
 
     def Read(self, filename):
         for (address, offsets) in pickle.load(open(filename, "rb")).items():
-            if not address in self.BlockOffsets:
-                self.BlockOffsets[address] = []
+            if not address in self.BlockIPMap:
+                self.BlockIPMap[address] = []
 
             for offset in offsets:
-                self.BlockOffsets[address].append(offset)
+                self.BlockIPMap[address].append(offset)
     
 if __name__ == '__main__':
     cache_folder = 'Tmp'

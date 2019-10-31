@@ -9,17 +9,17 @@ from datetime import datetime, timedelta
 
 import capstone
 
-import pyptracertool
+import decoder
 import windbgtool.debugger
 
 if __name__ == '__main__':
     cache_folder = 'Tmp'
     pt_filename = '../TestFiles/trace.pt'
     dump_filename = '../TestFiles/notepad.exe.dmp'
-    start_offset = 0x1c
-    end_offset = start_offset + 1024*2
+    start_offset = 0x283d2178 - 1024*5
+    end_offset = start_offset + 1024*10
 
-    pytracer = pyptracertool.Decoder(pt_filename, 
+    pytracer = decoder.PTImager(pt_filename, 
                                      dump_filename, 
                                      dump_symbols = True, 
                                      load_image = True, 
