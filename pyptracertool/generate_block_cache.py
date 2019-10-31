@@ -15,7 +15,8 @@ import windbgtool.debugger
 def DecodeBlock(pt_filename, dump_filename, block_range):
     (start_offset, end_offset) = block_range
     pytracer = decoder.PTLogAnalyzer(pt_filename, dump_filename, dump_symbols = False, load_image = True, start_offset = start_offset, end_offset = end_offset)
-    pytracer.DecodeBlock('%d.p' % start_offset)
+    pytracer.DecodeBlock()
+    pytracer.WriteBlockIPMap('%d.p' % start_offset)
 
 if __name__ == '__main__':
     import argparse

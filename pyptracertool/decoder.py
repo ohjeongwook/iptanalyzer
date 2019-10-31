@@ -32,8 +32,6 @@ class PTLogAnalyzer:
             if dump_symbols:
                 self.Debugger.EnumerateModules()
 
-        #self._ExtractTracePT(pt_zip_filename, pt_filename)
-
         self.PyTracer = pyptracer.PTracer()
         self.PyTracer.Open(pt_filename, start_offset, end_offset)
 
@@ -207,9 +205,8 @@ class PTLogAnalyzer:
 
             block_count += 1
             move_forward = True
-
         self.RecordBlockOffsets()
 
-        if log_filename:
-            pickle.dump(self.BlockIPMap, open(log_filename, "wb" ) )
+    def WriteBlockIPMap(self, filename):
+        pickle.dump(self.BlockIPMap, open(filename, "wb" ) )
 
