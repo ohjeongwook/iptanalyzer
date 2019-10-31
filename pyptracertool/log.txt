@@ -1,0 +1,156 @@
+Broken lm line: 
+Broken lm line: Unloadedmodules:
+Broken lm line: 00007ffb`84c2000000007ffb`84f54000MsftEdit.dll
+Broken lm line: 00007ffb`b1f1000000007ffb`b1f4a000xmllite.dll
+Broken lm line: 00007ffb`9dae000000007ffb`9dcc0000wpdshext.dll
+0 @ 273054948/2048 (13332761.132812%)
+ntdll!RtlpLowFragHeapAllocFromContext (7ffbb7ccdc20): mov dword ptr [rsp + 0x20], r9d
+ntdll!RtlAppendUnicodeToString (7ffbb7cf64b0): mov rax, rsp
+ntdll!memmove (7ffbb7d66200): mov r11, rcx
+ntdll!RtlConvertSidToUnicodeString (7ffbb7cf5b90): mov qword ptr [rsp + 0x18], rbx
+ntdll!RtlValidSid (7ffbb7cf63f0): mov rdx, rcx
+ntdll!wcscpy_s (7ffbb7d5b240): push rbx
+ntdll!RtlIntegerToUnicode (7ffbb7cf5d60): mov qword ptr [rsp + 8], rbx
+ntdll!memmove (7ffbb7d66200): mov r11, rcx
+ntdll!_security_check_cookie (7ffbb7d4f830): cmp rcx, qword ptr [rip + 0xebca9]
+ntdll!RtlIntegerToUnicode (7ffbb7cf5d60): mov qword ptr [rsp + 8], rbx
+ntdll!memmove (7ffbb7d66200): mov r11, rcx
+ntdll!_security_check_cookie (7ffbb7d4f830): cmp rcx, qword ptr [rip + 0xebca9]
+ntdll!RtlIntegerToUnicode (7ffbb7cf5d60): mov qword ptr [rsp + 8], rbx
+ntdll!memmove (7ffbb7d66200): mov r11, rcx
+1000 @ 273055189/2048 (13332772.900391%)
+ntdll!_security_check_cookie (7ffbb7d4f830): cmp rcx, qword ptr [rip + 0xebca9]
+ntdll!RtlIntegerToUnicode (7ffbb7cf5d60): mov qword ptr [rsp + 8], rbx
+ntdll!memmove (7ffbb7d66200): mov r11, rcx
+ntdll!_security_check_cookie (7ffbb7d4f830): cmp rcx, qword ptr [rip + 0xebca9]
+ntdll!RtlIntegerToUnicode (7ffbb7cf5d60): mov qword ptr [rsp + 8], rbx
+ntdll!memmove (7ffbb7d66200): mov r11, rcx
+ntdll!_security_check_cookie (7ffbb7d4f830): cmp rcx, qword ptr [rip + 0xebca9]
+ntdll!RtlIntegerToUnicode (7ffbb7cf5d60): mov qword ptr [rsp + 8], rbx
+ntdll!memmove (7ffbb7d66200): mov r11, rcx
+ntdll!_security_check_cookie (7ffbb7d4f830): cmp rcx, qword ptr [rip + 0xebca9]
+ntdll!RtlCopyUnicodeString (7ffbb7cf6430): mov qword ptr [rsp + 8], rbx
+ntdll!memmove (7ffbb7d66200): mov r11, rcx
+ntdll!_security_check_cookie (7ffbb7d4f830): cmp rcx, qword ptr [rip + 0xebca9]
+2000 @ 273055226/2048 (13332774.707031%)
+ntdll!_security_check_cookie (7ffbb7d4f830): cmp rcx, qword ptr [rip + 0xebca9]
+ntdll!RtlCopyUnicodeString (7ffbb7cf6430): mov qword ptr [rsp + 8], rbx
+ntdll!memmove (7ffbb7d66200): mov r11, rcx
+ntdll!RtlFreeAnsiString (7ffbb7d03240): push rbx
+ntdll!NtdllpFreeStringRoutine (7ffbb7d31d80): mov rax, qword ptr gs:[0x60]
+ntdll!RtlFreeHeap (7ffbb7cd2480): mov dword ptr [rsp + 0x10], edx
+ntdll!RtlGetCurrentServiceSessionId (7ffbb7cd2a80): mov rax, qword ptr gs:[0x60]
+ntdll!RtlpHpStackLoggingEnabled (7ffbb7cd2a50): sub rsp, 0x38
+ntdll!RtlAppendUnicodeToString (7ffbb7cf64b0): mov rax, rsp
+ntdll!memmove (7ffbb7d66200): mov r11, rcx
+ntdll!RtlAppendUnicodeStringToString (7ffbb7d02790): mov rax, rsp
+ntdll!memmove (7ffbb7d66200): mov r11, rcx
+KERNELBASE!ConstructKernelKeyPath (7ffbb49e30e0): mov qword ptr [rsp + 8], rbx
+ntdll!NtOpenKeyEx (7ffbb7d61a80): mov r10, rcx
+ntdll!RtlFreeHeap (7ffbb7cd2480): mov dword ptr [rsp + 0x10], edx
+ntdll!RtlGetCurrentServiceSessionId (7ffbb7cd2a80): mov rax, qword ptr gs:[0x60]
+ntdll!RtlpHpStackLoggingEnabled (7ffbb7cd2a50): sub rsp, 0x38
+KERNELBASE!_security_check_cookie (7ffbb4a47990): cmp rcx, qword ptr [rip + 0x1d3719]
+ntdll!NtQueryValueKey (7ffbb7d5fa30): mov r10, rcx
+ntdll!RtlNtStatusToDosError (7ffbb7d198c0): mov dword ptr [rsp + 8], ecx
+KERNELBASE!_security_check_cookie (7ffbb4a47990): cmp rcx, qword ptr [rip + 0x1d3719]
+SHCore!_security_check_cookie (7ffbb542bf30): cmp rcx, qword ptr [rip + 0x5b361]
+3000 @ 273055399/2048 (13332783.154297%)
+oleaut32!SysAllocStringByteLen (7ffbb5708a50): mov qword ptr [rsp + 8], rbx
+kernel32!TlsGetValueStub (7ffbb5025250): jmp 0x7ffbb5033660
+kernel32!TlsGetValue (7ffbb5033660): cmp ecx, 0x40
+oleaut32!APP_DATA::AllocCachedMem (7ffbb570b330): sub rsp, 0x28
+SHCore!SHGetValueW (7ffbb540bf40): mov qword ptr [rsp + 8], rbx
+SHCore!_SHRegQueryValueW (7ffbb540c010): mov qword ptr [rsp + 0x18], rbx
+KERNELBASE!RegQueryValueExW (7ffbb49e20e0): mov qword ptr [rsp + 0x10], rbx
+KERNELBASE!MapPredefinedHandleInternal (7ffbb49e22e0): mov qword ptr [rsp + 0x20], rbx
+ntdll!RtlInitUnicodeStringEx (7ffbb7cc9e60): xor eax, eax
+KERNELBASE!LocalBaseRegQueryValue (7ffbb49e26b0): push rbp
+KERNELBASE!memset (7ffbb4a4aedf): jmp qword ptr [rip + 0x1111c3]
+ntdll!memset (7ffbb7d66540): mov rax, rcx
+KERNELBASE!BaseRegGetKeySemantics (7ffbb49e3d50): mov qword ptr [rsp + 8], rbx
+ntdll!ZwQueryKey (7ffbb7d5fa10): mov r10, rcx
+ntdll!RtlInitUnicodeStringEx (7ffbb7cc9e60): xor eax, eax
+ntdll!RtlAppendUnicodeStringToString (7ffbb7d02790): mov rax, rsp
+ntdll!RtlEqualUnicodeString (7ffbb7d0b5f0): mov qword ptr [rsp + 8], rbx
+4000 @ 273055531/2048 (13332789.599609%)
+KERNELBASE!wcsrchr (7ffbb4a47dbc): jmp qword ptr [rip + 0x112fb6]
+ntdll!wcsrchr (7ffbb7d555f0): mov r9, rcx
+KERNELBASE!BaseRegOpenClassKeyFromLocation (7ffbb49e13a0): push rbp
+ntdll!RtlAllocateHeap (7ffbb7ccd010): mov qword ptr [rsp + 8], rbx
+ntdll!RtlpAllocateHeapInternal (7ffbb7ccd090): mov qword ptr [rsp + 0x10], rbx
+ntdll!RtlpLowFragHeapAllocFromContext (7ffbb7ccdc20): mov dword ptr [rsp + 0x20], r9d
+5000 @ 273055596/2048 (13332792.773438%)
+ntdll!ZwQueryKey (7ffbb7d5fa10): mov r10, rcx
+ntdll!RtlFormatCurrentUserKeyPath (7ffbb7cf47b0): mov r11, rsp
+ntdll!NtQueryInformationToken (7ffbb7d5fb70): mov r10, rcx
+ntdll!RtlLengthSidAsUnicodeString (7ffbb7cf48c0): mov qword ptr [rsp + 8], rbx
+ntdll!RtlValidSid (7ffbb7cf63f0): mov rdx, rcx
+ntdll!NtdllpAllocateStringRoutine (7ffbb7ccc8d0): mov rax, qword ptr gs:[0x60]
+ntdll!RtlAllocateHeap (7ffbb7ccd010): mov qword ptr [rsp + 8], rbx
+ntdll!RtlpAllocateHeapInternal (7ffbb7ccd090): mov qword ptr [rsp + 0x10], rbx
+ntdll!RtlpLowFragHeapAllocFromContext (7ffbb7ccdc20): mov dword ptr [rsp + 0x20], r9d
+ntdll!RtlAppendUnicodeToString (7ffbb7cf64b0): mov rax, rsp
+ntdll!memmove (7ffbb7d66200): mov r11, rcx
+ntdll!RtlConvertSidToUnicodeString (7ffbb7cf5b90): mov qword ptr [rsp + 0x18], rbx
+ntdll!RtlValidSid (7ffbb7cf63f0): mov rdx, rcx
+ntdll!wcscpy_s (7ffbb7d5b240): push rbx
+ntdll!RtlIntegerToUnicode (7ffbb7cf5d60): mov qword ptr [rsp + 8], rbx
+ntdll!memmove (7ffbb7d66200): mov r11, rcx
+ntdll!_security_check_cookie (7ffbb7d4f830): cmp rcx, qword ptr [rip + 0xebca9]
+6000 @ 273055672/2048 (13332796.484375%)
+ntdll!RtlIntegerToUnicode (7ffbb7cf5d60): mov qword ptr [rsp + 8], rbx
+ntdll!memmove (7ffbb7d66200): mov r11, rcx
+ntdll!_security_check_cookie (7ffbb7d4f830): cmp rcx, qword ptr [rip + 0xebca9]
+ntdll!RtlIntegerToUnicode (7ffbb7cf5d60): mov qword ptr [rsp + 8], rbx
+ntdll!memmove (7ffbb7d66200): mov r11, rcx
+ntdll!_security_check_cookie (7ffbb7d4f830): cmp rcx, qword ptr [rip + 0xebca9]
+ntdll!RtlIntegerToUnicode (7ffbb7cf5d60): mov qword ptr [rsp + 8], rbx
+ntdll!memmove (7ffbb7d66200): mov r11, rcx
+ntdll!_security_check_cookie (7ffbb7d4f830): cmp rcx, qword ptr [rip + 0xebca9]
+ntdll!RtlIntegerToUnicode (7ffbb7cf5d60): mov qword ptr [rsp + 8], rbx
+ntdll!memmove (7ffbb7d66200): mov r11, rcx
+ntdll!_security_check_cookie (7ffbb7d4f830): cmp rcx, qword ptr [rip + 0xebca9]
+7000 @ 273055707/2048 (13332798.193359%)
+ntdll!RtlIntegerToUnicode (7ffbb7cf5d60): mov qword ptr [rsp + 8], rbx
+ntdll!memmove (7ffbb7d66200): mov r11, rcx
+ntdll!_security_check_cookie (7ffbb7d4f830): cmp rcx, qword ptr [rip + 0xebca9]
+ntdll!RtlCopyUnicodeString (7ffbb7cf6430): mov qword ptr [rsp + 8], rbx
+ntdll!memmove (7ffbb7d66200): mov r11, rcx
+ntdll!_security_check_cookie (7ffbb7d4f830): cmp rcx, qword ptr [rip + 0xebca9]
+ntdll!_security_check_cookie (7ffbb7d4f830): cmp rcx, qword ptr [rip + 0xebca9]
+ntdll!RtlCopyUnicodeString (7ffbb7cf6430): mov qword ptr [rsp + 8], rbx
+ntdll!memmove (7ffbb7d66200): mov r11, rcx
+ntdll!RtlFreeAnsiString (7ffbb7d03240): push rbx
+ntdll!NtdllpFreeStringRoutine (7ffbb7d31d80): mov rax, qword ptr gs:[0x60]
+ntdll!RtlFreeHeap (7ffbb7cd2480): mov dword ptr [rsp + 0x10], edx
+ntdll!RtlGetCurrentServiceSessionId (7ffbb7cd2a80): mov rax, qword ptr gs:[0x60]
+ntdll!RtlpHpStackLoggingEnabled (7ffbb7cd2a50): sub rsp, 0x38
+ntdll!RtlAppendUnicodeToString (7ffbb7cf64b0): mov rax, rsp
+ntdll!memmove (7ffbb7d66200): mov r11, rcx
+ntdll!RtlAppendUnicodeStringToString (7ffbb7d02790): mov rax, rsp
+ntdll!memmove (7ffbb7d66200): mov r11, rcx
+KERNELBASE!ConstructKernelKeyPath (7ffbb49e30e0): mov qword ptr [rsp + 8], rbx
+ntdll!NtOpenKeyEx (7ffbb7d61a80): mov r10, rcx
+8000 @ 273055820/2048 (13332803.710938%)
+ntdll!RtlFreeHeap (7ffbb7cd2480): mov dword ptr [rsp + 0x10], edx
+ntdll!RtlGetCurrentServiceSessionId (7ffbb7cd2a80): mov rax, qword ptr gs:[0x60]
+ntdll!RtlpHpStackLoggingEnabled (7ffbb7cd2a50): sub rsp, 0x38
+KERNELBASE!_security_check_cookie (7ffbb4a47990): cmp rcx, qword ptr [rip + 0x1d3719]
+ntdll!NtQueryValueKey (7ffbb7d5fa30): mov r10, rcx
+KERNELBASE!memmove (7ffbb4a4aed3): jmp qword ptr [rip + 0x1111c7]
+ntdll!memmove (7ffbb7d66200): mov r11, rcx
+ntdll!RtlNtStatusToDosError (7ffbb7d198c0): mov dword ptr [rsp + 8], ecx
+KERNELBASE!_security_check_cookie (7ffbb4a47990): cmp rcx, qword ptr [rip + 0x1d3719]
+SHCore!_security_check_cookie (7ffbb542bf30): cmp rcx, qword ptr [rip + 0x5b361]
+shlwapi!_security_check_cookie (7ffbb520a0f0): cmp rcx, qword ptr [rip + 0x41261]
+propsys!VariantChangeTypeForRead (7ffbb00d1d90): mov rax, rsp
+propsys!VariantToGUID (7ffbb00d3980): mov qword ptr [rsp + 8], rbx
+SHCore!GUIDFromStringW (7ffbb540e9e0): mov qword ptr [rsp + 8], rbx
+9000 @ 273055958/2048 (13332810.449219%)
+oleaut32!VariantClear (7ffbb578c090): add byte ptr [rax], al
+oleaut32!VariantClear (7ffbb578c090): add byte ptr [rax], al
+oleaut32!VariantClear:
+00007ffb`b578c090 48895c2408      mov     qword ptr [rsp+8],rbx
+
+	errorcode= pt_error_code.pte_nomap

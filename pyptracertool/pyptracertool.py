@@ -22,7 +22,7 @@ class Decoder:
         self.Disassembler = disassembler
         self.LoadedMemories = {}
         self.AddressToSymbols = {}
-        self.BlockIPLocations = {}
+        self.BlockIPMap = {}
 
         if dump_filename:
             self.Debugger = windbgtool.debugger.DbgEngine()
@@ -105,10 +105,15 @@ class Decoder:
             except:
                 pass
 
-    def DecodeInstruction(self):
-        hit_functions = {}
-        move_forward = True
+    def DumpSymbol(self, insn):
+        if self.Disassembler == "capstone":
+            self.PrintDisassembly(insn.ip, insn.GetRawBytes())
 
+        elif self.Disassembler == "windbg":
+            disasmline = self.Debugger.RunCmd('u %x L1' % (insn.ip))
+            print('\t'+disasmline)
+
+    def DecodeInstruction(self, move_forward = True):
         instruction_count = 0
         while 1:
             insn = self.PyTracer.DecodeInstruction(move_forward)
@@ -121,17 +126,7 @@ class Decoder:
                 print('%d @ %d/%d (%f%%)' % (instruction_count, offset, size, (offset*100)/size))
 
             if self.DumpInstructions or (self.DumpSymbols and insn.ip in self.AddressToSymbols):
-                if insn.ip in hit_functions:
-                    hit_functions[insn.ip] += 1
-                else:
-                    hit_functions[insn.ip] = 1
-
-                if self.Disassembler == "capstone":
-                    self.PrintDisassembly(insn.ip, insn.GetRawBytes())
-
-                elif self.Disassembler == "windbg":
-                    disasmline = self.Debugger.RunCmd('u %x L1' % (insn.ip))
-                    print('\t'+disasmline)
+                self.DumpSymbol(insn)
 
             errcode = self.PyTracer.GetDecodeStatus()
             if errcode != pyptracer.pt_error_code.pte_ok:
@@ -146,15 +141,12 @@ class Decoder:
             instruction_count += 1
             move_forward = True
 
-    def DecodeBlock(self, log_filename = ''):
+    def DecodeBlock(self, log_filename = '', move_forward = True):
         load_image = False
-        hit_functions = {}
-        move_forward = True
-
         block_count = 0
         instruction_count = 0
         error_count = {}
-        self.BlockIPLocations = {}
+        self.BlockIPMap = {}
         self.BlockOffsets = []
 
         start_datetime = datetime.now()
@@ -163,12 +155,16 @@ class Decoder:
             if not block:
                 break
 
-            offset = self.PyTracer.GetSyncOffset()
-            self.BlockOffsets.append(offset)
+            sync_offset = self.PyTracer.GetSyncOffset()
 
-            if not block.ip in self.BlockIPLocations:
-                self.BlockIPLocations[block.ip] = []
-            self.BlockIPLocations[block.ip].append(offset)
+            self.BlockOffsets.append(sync_offset)
+            if not block.ip in self.BlockIPMap:
+                self.BlockIPMap[block.ip] = {}
+
+            self.BlockIPMap[block.ip][sync_offset]=1
+
+            if self.DumpInstructions or (self.DumpSymbols and block.ip in self.AddressToSymbols):
+                print('%x: %s' % (sync_offset, self.AddressToSymbols[block.ip]))
 
             instruction_count += block.ninsn
             if block_count % 1000 == 0:
@@ -179,7 +175,7 @@ class Decoder:
                     speed = 0
 
                 size = self.PyTracer.GetSize()
-                relative_offset = offset - self.StartOffset
+                relative_offset = sync_offset - self.StartOffset
                 print('%d +%d @ %d/%d (%f%%) speed: %d blocks/sec' % (self.StartOffset, block_count, relative_offset, size, (relative_offset*100)/size, speed))
 
             errcode = self.PyTracer.GetDecodeStatus()
@@ -199,11 +195,11 @@ class Decoder:
             block_count += 1
             move_forward = True
 
-        offset = self.PyTracer.GetOffset()
+        sync_offset = self.PyTracer.GetOffset()
         size = self.PyTracer.GetSize()
-        relative_offset = offset - self.StartOffset
+        relative_offset = sync_offset - self.StartOffset
         print('%d +%d @ %d/%d (%f%%) ' % (self.StartOffset, block_count, relative_offset, size, (relative_offset*100)/size))
 
         if log_filename:
-            pickle.dump(self.BlockIPLocations, open( log_filename, "wb" ) )
+            pickle.dump(self.BlockIPMap, open(log_filename, "wb" ) )
 

@@ -248,13 +248,13 @@ pt_insn* PTracer::DecodeInstruction(bool moveForward) {
             if (m_status < 0)
                 return NULL;
         }
+    }
 
-        for (;;) {
-            struct pt_event event;
-            m_status = pt_insn_event(m_insnDecoder, &event, sizeof(event));
-            if (m_status <= 0)
-                break;
-        }
+    for (;;) {
+        struct pt_event event;
+        m_status = pt_insn_event(m_insnDecoder, &event, sizeof(event));
+        if (m_status <= 0)
+            break;
     }
 
     m_status = pt_insn_get_offset(m_insnDecoder, &m_offset);
@@ -285,16 +285,16 @@ pt_block* PTracer::DecodeBlock(bool moveForward) {
 
             pt_blk_get_sync_offset(m_blockDecoder, &m_syncOffset);
         }
+    }
 
-        m_status = pt_blk_get_offset(m_blockDecoder, &m_offset);
+    m_status = pt_blk_get_offset(m_blockDecoder, &m_offset);
 
-        for (;;) {
-            struct pt_event event;
-            m_status = pt_blk_event(m_blockDecoder, &event, sizeof(event));
-            if (m_status <= 0)
-            {
-                break;
-            }
+    for (;;) {
+        struct pt_event event;
+        m_status = pt_blk_event(m_blockDecoder, &event, sizeof(event));
+        if (m_status <= 0)
+        {
+            break;
         }
     }
 

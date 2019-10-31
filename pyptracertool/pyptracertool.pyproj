@@ -5,7 +5,7 @@
     <ProjectGuid>968bdd29-f1a3-4553-bb51-56085d15a258</ProjectGuid>
     <ProjectHome>
     </ProjectHome>
-    <StartupFile>decode_blocks.py</StartupFile>
+    <StartupFile>generate_block_cache.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -25,16 +25,16 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="block_analyzer.py" />
+    <Compile Include="decode_blocks.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="decode_instructions.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="pyptracertool.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="decode_blocks_test.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="decode_blocks.py" />
+    <Compile Include="generate_block_cache.py" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="Global|PythonCore|3.7" />

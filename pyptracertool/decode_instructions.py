@@ -16,7 +16,7 @@ if __name__ == '__main__':
     cache_folder = 'Tmp'
     pt_filename = '../TestFiles/trace.pt'
     dump_filename = '../TestFiles/notepad.exe.dmp'
-    start_offset = 28357508
+    start_offset = 0x1c
     end_offset = start_offset + 1024*2
 
     pytracer = pyptracertool.Decoder(pt_filename, 
@@ -25,4 +25,4 @@ if __name__ == '__main__':
                                      load_image = True, 
                                      start_offset = start_offset,
                                      end_offset = end_offset)
-    pytracer.DecodeInstruction()
+    pytracer.DecodeInstruction(move_forward = False)
