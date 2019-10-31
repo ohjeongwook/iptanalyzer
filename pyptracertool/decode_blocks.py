@@ -18,7 +18,7 @@ if __name__ == '__main__':
     start_offset = 0x283d2178 - 1024
     end_offset = start_offset + 1024*20
 
-    pytracer = decoder.PTImager(pt_filename, 
+    pytracer = decoder.PTLogAnalyzer(pt_filename, 
                                      dump_filename, 
                                      dump_symbols = True, 
                                      load_image = True, 

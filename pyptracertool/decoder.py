@@ -12,7 +12,7 @@ import capstone
 import pyptracer
 import windbgtool.debugger
 
-class PTImager:
+class PTLogAnalyzer:
     def __init__(self, pt_filename, dump_filename = '', start_offset = 0, end_offset = 0, load_image = False, dump_instructions = False, dump_symbols = True, disassembler = "capstone"):
         self.StartOffset = start_offset
         self.EndOffset = end_offset

@@ -32,7 +32,7 @@ class BlockAnalyzer:
             print('start_offset = %x' % (start_offset))
 
             """
-            pytracer = decoder.PTImager(self.PTFilename, 
+            pytracer = decoder.PTLogAnalyzer(self.PTFilename, 
                                              self.DumpFilename, 
                                              dump_symbols = True, 
                                              load_image = True, 

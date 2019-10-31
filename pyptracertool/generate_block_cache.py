@@ -14,7 +14,7 @@ import windbgtool.debugger
 
 def DecodeBlock(pt_filename, dump_filename, block_range):
     (start_offset, end_offset) = block_range
-    pytracer = decoder.PTImager(pt_filename, dump_filename, dump_symbols = False, load_image = True, start_offset = start_offset, end_offset = end_offset)
+    pytracer = decoder.PTLogAnalyzer(pt_filename, dump_filename, dump_symbols = False, load_image = True, start_offset = start_offset, end_offset = end_offset)
     pytracer.DecodeBlock('%d.p' % start_offset)
 
 if __name__ == '__main__':
@@ -29,7 +29,7 @@ if __name__ == '__main__':
     pt_filename = '../TestFiles/trace.pt'
     dump_filename = '../TestFiles/notepad.exe.dmp'
 
-    pytracer = decoder.PTImager(pt_filename, dump_filename, dump_symbols = False)
+    pytracer = decoder.PTLogAnalyzer(pt_filename, dump_filename, dump_symbols = False)
     pytracer.DecodeBlock()
 
     cpu_count = multiprocessing.cpu_count()
