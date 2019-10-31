@@ -9,7 +9,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pyptracer", "pyptracer\pypt
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PTracer", "PTracer\PTracer.vcxproj", "{1E1E288F-17D6-4C70-9FED-326C8CCE6AAA}"
 EndProject
-Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "test_pyptracer", "test_pyptracer\test_pyptracer.pyproj", "{968BDD29-F1A3-4553-BB51-56085D15A258}"
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "pyptracertool", "pyptracertool\pyptracertool.pyproj", "{968BDD29-F1A3-4553-BB51-56085D15A258}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

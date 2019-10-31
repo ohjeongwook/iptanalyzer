@@ -12,9 +12,9 @@ import capstone
 import pyptracertool
 import windbgtool.debugger
 
-def DecodeBlock(pt_filename, dmp_filename, block_range):
+def DecodeBlock(pt_filename, dump_filename, block_range):
     (start_offset, end_offset) = block_range
-    pytracer = pyptracertool.Decoder(pt_filename, dmp_filename, dump_symbols = True, load_image = True, start_offset = start_offset, end_offset = end_offset)
+    pytracer = pyptracertool.Decoder(pt_filename, dump_filename, dump_symbols = True, load_image = True, start_offset = start_offset, end_offset = end_offset)
     pytracer.DecodeBlock('%d.p' % start_offset)
 
 if __name__ == '__main__':
@@ -27,9 +27,9 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     pt_filename = '../TestFiles/trace.pt'
-    dmp_filename = '../TestFiles/notepad.exe.dmp'
+    dump_filename = '../TestFiles/notepad.exe.dmp'
 
-    pytracer = pyptracertool.Decoder(pt_filename, dmp_filename, dump_symbols = False)
+    pytracer = pyptracertool.Decoder(pt_filename, dump_filename, dump_symbols = False)
     pytracer.DecodeBlock()
 
     cpu_count = multiprocessing.cpu_count()
@@ -46,7 +46,7 @@ if __name__ == '__main__':
 
     procs = []
     for block_range in block_ranges:
-        proc = multiprocessing.Process(target=DecodeBlock, args=(pt_filename, dmp_filename, block_range,))
+        proc = multiprocessing.Process(target=DecodeBlock, args=(pt_filename, dump_filename, block_range,))
         procs.append(proc)
         proc.start()
 

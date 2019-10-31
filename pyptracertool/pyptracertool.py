@@ -79,9 +79,9 @@ class Decoder:
 
         self.LoadedMemories[base_address] = False
 
-        dmp_filename = '%x.dmp' % base_address
-        self.Debugger.RunCmd('.writemem %s %x L?%x' % (dmp_filename, base_address, region_size))
-        self.PyTracer.AddImage(base_address, dmp_filename)
+        dump_filename = '%x.dmp' % base_address
+        self.Debugger.RunCmd('.writemem %s %x L?%x' % (dump_filename, base_address, region_size))
+        self.PyTracer.AddImage(base_address, dump_filename)
         self.LoadedMemories[ip] = True
         self.LoadedMemories[base_address] = True
 

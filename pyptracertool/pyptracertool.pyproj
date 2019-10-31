@@ -3,14 +3,15 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>968bdd29-f1a3-4553-bb51-56085d15a258</ProjectGuid>
-    <ProjectHome>.</ProjectHome>
+    <ProjectHome>
+    </ProjectHome>
     <StartupFile>decode_blocks.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
-    <Name>test_pyptracer</Name>
-    <RootNamespace>test_pyptracer</RootNamespace>
+    <Name>pyptracertool</Name>
+    <RootNamespace>pyptracertool</RootNamespace>
     <IsWindowsApplication>False</IsWindowsApplication>
     <InterpreterId>Global|PythonCore|3.7</InterpreterId>
   </PropertyGroup>
@@ -23,7 +24,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="dump_block_offsets.py" />
+    <Compile Include="blockanalyzer.py" />
     <Compile Include="pyptracertool.py">
       <SubType>Code</SubType>
     </Compile>
