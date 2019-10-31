@@ -24,8 +24,8 @@
 /PyPTracer/PyPTracer.vcxproj.user
 /PyPTracer/PyPTracer.vcxproj.filters
 /x64/Release
-/test_pyptracer/trace.pt
+/pyptracertool/trace.pt
 /TestFiles/trace.pt
 *.dmp
 *.p
-/test_pyptracer/__pycache__
+__pycache__/
