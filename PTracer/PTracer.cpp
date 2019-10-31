@@ -287,8 +287,6 @@ pt_block* PTracer::DecodeBlock(bool moveForward) {
         }
     }
 
-    m_status = pt_blk_get_offset(m_blockDecoder, &m_offset);
-
     for (;;) {
         struct pt_event event;
         m_status = pt_blk_event(m_blockDecoder, &event, sizeof(event));
@@ -298,6 +296,7 @@ pt_block* PTracer::DecodeBlock(bool moveForward) {
         }
     }
 
+    m_status = pt_blk_get_offset(m_blockDecoder, &m_offset);
     pt_block* p_block = new pt_block();
     m_decodeStatus = pt_blk_next(m_blockDecoder, p_block, sizeof(pt_block));
     return p_block;
