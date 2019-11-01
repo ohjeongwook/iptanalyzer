@@ -13,21 +13,28 @@ import decoder
 import windbgtool.debugger
 
 if __name__ == '__main__':
-    cache_folder = 'Tmp'
-    pt_filename = '../TestFiles/trace.pt'
-    dump_filename = '../TestFiles/notepad.exe.dmp'
-    start_offset = 0x13aba74
-    end_offset = start_offset + 0x20cd + 10
+    import argparse
 
-    pytracer = decoder.PTLogAnalyzer(pt_filename,
-                                     dump_filename,
+    def auto_int(x):
+        return int(x, 0)
+
+    parser = argparse.ArgumentParser(description='PyPTracer')
+    parser.add_argument('-p', action = "store", dest = "pt")
+    parser.add_argument('-d', action = "store", dest = "dump")
+    parser.add_argument('-s', dest = "start_offset", default = 0, type = auto_int)
+    parser.add_argument('-e', dest = "end_offset", default = 0, type = auto_int)
+    parser.add_argument('-i', dest = "instruction_offset", default = 0, type = auto_int)
+
+    args = parser.parse_args()
+
+    pytracer = decoder.PTLogAnalyzer(args.pt, args.dump,
                                      dump_symbols = False,
                                      dump_instructions = False,
                                      load_image = True,
-                                     start_offset = start_offset,
-                                     end_offset = end_offset,
+                                     start_offset = args.start_offset,
+                                     end_offset = args.end_offset,
                                      disassembler = "windbg")
 
-    for insn in pytracer.DecodeInstruction(move_forward = False, instruction_offset = 0x13ada69):
+    for insn in pytracer.DecodeInstruction(move_forward = False, instruction_offset = args.instruction_offset):
         disasmline = pytracer.GetDisasmLine(insn)
         print('Instruction: %s' % (disasmline))

@@ -22,15 +22,17 @@ if __name__ == '__main__':
     import argparse
     import multiprocessing
 
+    def auto_int(x):
+        return int(x, 0)
+
     parser = argparse.ArgumentParser(description='PyPTracer')
-    parser.add_argument('--offset', type=int)
+    parser.add_argument('-p', action = "store", dest = "pt")
+    parser.add_argument('-d', action = "store", dest = "dump")
+    parser.add_argument('-o', dest = "offset", default = 0, type = auto_int)
 
     args = parser.parse_args()
 
-    pt_filename = '../TestFiles/trace.pt'
-    dump_filename = '../TestFiles/notepad.exe.dmp'
-
-    pytracer = decoder.PTLogAnalyzer(pt_filename, dump_filename, dump_symbols = False)
+    pytracer = decoder.PTLogAnalyzer(args.pt, args.dump, dump_symbols = False, start_offset = args.offset)
     pytracer.DecodeBlock()
 
     cpu_count = multiprocessing.cpu_count()

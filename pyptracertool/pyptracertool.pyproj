@@ -24,12 +24,15 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="block_analyzer.py" />
+    <Compile Include="block.py" />
     <Compile Include="decoder.py" />
     <Compile Include="decode_blocks.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="decode_instructions.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="find_blocks.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="generate_block_cache.py" />

@@ -23,7 +23,7 @@ class PTLogAnalyzer:
         self.Disassembler = disassembler
         self.LoadedMemories = {}
         self.AddressToSymbols = {}
-        self.BlockIPMap = {}
+        self.BlockOffsets = {}
 
         if dump_filename:
             self.Debugger = windbgtool.debugger.DbgEngine()
@@ -177,23 +177,23 @@ class PTLogAnalyzer:
         offset = self.PyTracer.GetOffset()
 
         self.BlockSyncOffsets.append(sync_offset)
-        if not block.ip in self.BlockIPMap:
-            self.BlockIPMap[block.ip] = {}
+        if not block.ip in self.BlockOffsets:
+            self.BlockOffsets[block.ip] = {}
 
-        if not sync_offset in self.BlockIPMap[block.ip]:
-            self.BlockIPMap[block.ip][sync_offset]={}
+        if not sync_offset in self.BlockOffsets[block.ip]:
+            self.BlockOffsets[block.ip][sync_offset]={}
 
-        if not offset in self.BlockIPMap[block.ip][sync_offset]:
-            self.BlockIPMap[block.ip][sync_offset][offset] = 1
+        if not offset in self.BlockOffsets[block.ip][sync_offset]:
+            self.BlockOffsets[block.ip][sync_offset][offset] = 1
         else:
-            self.BlockIPMap[block.ip][sync_offset][offset] += 1
+            self.BlockOffsets[block.ip][sync_offset][offset] += 1
 
     def DecodeBlock(self, log_filename = '', move_forward = True, block_offset = 0):
         load_image = False
         block_count = 0
         instruction_count = 0
         error_count = {}
-        self.BlockIPMap = {}
+        self.BlockOffsets = {}
         self.BlockSyncOffsets = []
 
         blocks = []
@@ -234,6 +234,6 @@ class PTLogAnalyzer:
 
         return blocks
 
-    def WriteBlockIPMap(self, filename):
-        pickle.dump(self.BlockIPMap, open(filename, "wb" ) )
+    def WriteBlockOffsets(self, filename):
+        pickle.dump(self.BlockOffsets, open(filename, "wb" ) )
 

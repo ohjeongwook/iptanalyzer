@@ -7,7 +7,7 @@ import capstone
 import decoder
 import windbgtool.debugger
 
-class BlockAnalyzer:
+class Analyzer:
     def __init__(self, cache_dirname, pt_filename, dump_filename):
         self.PTFilename = pt_filename
         self.DumpFilename = dump_filename
@@ -20,27 +20,31 @@ class BlockAnalyzer:
 
         self.Debugger = windbgtool.debugger.DbgEngine()
         self.Debugger.LoadDump(dump_filename)
-        self.Debugger.EnumerateModules()       
-        self.ResolveSymbols()
+        self.Debugger.EnumerateModules()
 
-    def DumpSymbols(self, symbol):
+    def DumpInstructions(self, start_offset, end_offset, instruction_offset):
+        pytracer = decoder.PTLogAnalyzer(self.PTFilename, 
+                                            self.DumpFilename, 
+                                            dump_symbols = False, 
+                                            load_image = True, 
+                                            start_offset = start_offset, 
+                                            end_offset = start_offset + 1024*10)
+
+        for insn in pytracer.DecodeInstruction(move_forward = False, instruction_offset = instruction_offset):
+            disasmline = pytracer.GetDisasmLine(insn)
+            print('Instruction: %s' % (disasmline))
+
+    def DumpSymbolLocations(self, symbol, dump_instructions = False):
         if not symbol in self.SymbolsToAddress:
             return
 
         address = self.SymbolsToAddress[symbol]
         for sync_offset in self.BlockIPMap[address]:
-            print('sync_offset = %x' % (sync_offset))
             for offset in self.BlockIPMap[address][sync_offset]:
-                print('\toffset = %x' % (offset))
+                print('> sync_offset = %x / offset = %x' % (sync_offset, offset))
 
-            """
-            pytracer = decoder.PTLogAnalyzer(self.PTFilename, 
-                                             self.DumpFilename, 
-                                             dump_symbols = True, 
-                                             load_image = True, 
-                                             start_offset = start_offset, end_offset = start_offset + 1024*10)
-            pytracer.DecodeInstruction()
-            """
+                if dump_instructions:
+                    self.DumpInstructions(sync_offset, offset+1, offset)
 
     def FindOffsets(self, symbol):
         for block_address in self.BlockAddresses.keys():
@@ -82,11 +86,4 @@ class BlockAnalyzer:
                     self.BlockIPMap[address][sync_offset] = {}
 
                 for (offset, v2) in v.items():
-                    self.BlockIPMap[address][sync_offset][offset] = v2
-    
-if __name__ == '__main__':
-    cache_folder = 'Tmp'
-    pt_filename = '../TestFiles/trace.pt'
-    dump_filename = '../TestFiles/notepad.exe.dmp'
-    block_analyzer = BlockAnalyzer(cache_folder, pt_filename, dump_filename)
-    block_analyzer.DumpSymbols('KERNELBASE!CreateFileW')
+                    self.BlockIPMap[address][sync_offset][offset] = v
