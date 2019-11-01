@@ -13,9 +13,10 @@ import pyptracer
 import windbgtool.debugger
 
 class PTLogAnalyzer:
-    def __init__(self, pt_filename, dump_filename = '', start_offset = 0, end_offset = 0, load_image = False, dump_instructions = False, dump_symbols = True, disassembler = "capstone"):
+    def __init__(self, pt_filename, dump_filename = '', start_offset = 0, end_offset = 0, load_image = False, dump_instructions = False, dump_symbols = True, disassembler = "capstone", progress_report_interval = 0):
         self.StartOffset = start_offset
         self.EndOffset = end_offset
+        self.ProgressReportInterval = progress_report_interval
         self.DumpInstructions = dump_instructions
         self.DumpSymbols = dump_symbols
         self.LoadImage = load_image
@@ -54,7 +55,10 @@ class PTLogAnalyzer:
 
         address_info = self.Debugger.GetAddressInfo(ip)
         if self.DumpSymbols and address_info and 'Module Name' in address_info:
-            for (address, symbol) in self.Debugger.EnumerateModuleSymbols([address_info['Module Name'], ]).items():
+            module_name = address_info['Module Name']
+
+            print('Loading symbols for %s' % module_name)
+            for (address, symbol) in self.Debugger.EnumerateModuleSymbols([module_name, ]).items():
                 self.AddressToSymbols[address] = symbol
 
         base_address = region_size = None
@@ -109,41 +113,66 @@ class PTLogAnalyzer:
         if self.Disassembler == "capstone":
             return self.GetCapstoneDisasmLine(insn.ip, insn.GetRawBytes())
         elif self.Disassembler == "windbg":
-            return self.Debugger.RunCmd('u %x L1' % (insn.ip))
+            try:
+                return self.Debugger.RunCmd('u %x L1' % (insn.ip))
+            except:
+                pass
 
         return ''
 
-    def DecodeInstruction(self, move_forward = True):
+    # True:  Handled error
+    # False: No errors or repeated and ignored error
+    def ProcessError(self, insn):
+        errcode = self.PyTracer.GetDecodeStatus()
+        if errcode != pyptracer.pt_error_code.pte_ok:
+            if errcode == pyptracer.pt_error_code.pte_nomap:
+                if self.LoadImageFile(insn.ip):
+                    return True
+                else:
+                    disasmline = self.GetDisasmLine(insn.ip)
+                    print('\t%s errorcode= %s' % (disasmline, errcode))
+
+        return False 
+
+    def DecodeInstruction(self, move_forward = True, instruction_offset = 0):
         instruction_count = 0
+        instructions = []
         while 1:
             insn = self.PyTracer.DecodeInstruction(move_forward)
             if not insn:
                 break
 
-            if instruction_count % 1000 == 0:
+            if self.ProcessError(insn):
+                move_forward = False
+            else:
                 offset = self.PyTracer.GetOffset()
-                size = self.PyTracer.GetSize()
-                print('DecodeInstruction: %x + %x @ %d/%d (%f%%)' % (self.StartOffset, instruction_count, offset, size, (offset*100)/size))
 
-            if self.DumpInstructions or (self.DumpSymbols and insn.ip in self.AddressToSymbols):
-                offset = self.PyTracer.GetOffset()
-                disasmline = self.GetDisasmLine(insn)
-                print('%x: %s' % (offset, disasmline))
+                if self.ProgressReportInterval > 0 and instruction_count % self.ProgressReportInterval == 0:
+                    size = self.PyTracer.GetSize()
+                    progress_offset = offset - self.StartOffset
+                    print('DecodeInstruction: offset: %x progress: %x/%x (%f%%)' % (
+                        offset,
+                        progress_offset,
+                        size, 
+                        (progress_offset*100)/size))
 
-            errcode = self.PyTracer.GetDecodeStatus()
-            if errcode != pyptracer.pt_error_code.pte_ok:
-                if errcode == pyptracer.pt_error_code.pte_nomap:
-                    if self.LoadImageFile(insn.ip):
-                        move_forward = False
-                        continue
-                    else:
-                        disasmline = self.GetDisasmLine(insn.ip)
-                        print('\t%s errorcode= %s' % (disasmline, errcode))
+                if self.DumpInstructions or (self.DumpSymbols and insn.ip in self.AddressToSymbols):
+                    disasmline = self.GetDisasmLine(insn)
+                    print('%x: %s' % (offset, disasmline))
 
-            instruction_count += 1
-            move_forward = True
+                if instruction_offset > 0:
+                    if instruction_offset == offset:
+                        instructions.append(insn)
 
-    def RecordBlockOffsets(self):
+                    if instruction_offset < offset:
+                        break
+
+                instruction_count += 1
+                move_forward = True
+
+        return instructions
+
+    def RecordBlockOffsets(self, block):
         sync_offset = self.PyTracer.GetSyncOffset()
         offset = self.PyTracer.GetOffset()
 
@@ -159,22 +188,7 @@ class PTLogAnalyzer:
         else:
             self.BlockIPMap[block.ip][sync_offset][offset] += 1
 
-        if self.DumpInstructions or (self.DumpSymbols and block.ip in self.AddressToSymbols):
-            print('%x (%x): %s' % (sync_offset, offset, self.AddressToSymbols[block.ip]))
-
-        instruction_count += block.ninsn
-        if block_count % 1000 == 0:
-            time_diff = datetime.now() - self.StartTime
-            if time_diff.seconds > 0:
-                speed = block_count/time_diff.seconds
-            else:
-                speed = 0
-
-            size = self.PyTracer.GetSize()
-            relative_offset = sync_offset - self.StartOffset
-            print('DecodeBlock: %x +%x @ %d/%d (%f%%) speed: %d blocks/sec' % (self.StartOffset, block_count, relative_offset, size, (relative_offset*100)/size, speed))
-
-    def DecodeBlock(self, log_filename = '', move_forward = True):
+    def DecodeBlock(self, log_filename = '', move_forward = True, block_offset = 0):
         load_image = False
         block_count = 0
         instruction_count = 0
@@ -182,30 +196,43 @@ class PTLogAnalyzer:
         self.BlockIPMap = {}
         self.BlockSyncOffsets = []
 
+        blocks = []
         self.StartTime = datetime.now()
         while 1:
             block = self.PyTracer.DecodeBlock(move_forward)
             if not block:
                 break
 
-            self.RecordBlockOffsets()               
-            errcode = self.PyTracer.GetDecodeStatus()
-            if errcode != pyptracer.pt_error_code.pte_ok:
-                if not block.ip in error_count:
-                    if errcode == pyptracer.pt_error_code.pte_nomap and self.LoadImage:
-                        error_count[block.ip] = 1
-                        if self.LoadImageFile(block.ip):
-                            move_forward = False
-                            continue
-                        else:
-                            print('* block.ip=%x ~ %x errorcode= %s' % (block.ip, block.end_ip, errcode))
-                            self.GetDisasmLine(block.ip)
-                else:
-                    error_count[block.ip] += 1
+            if self.ProcessError(block):
+                move_forward = False
+            else:
+                offset = self.PyTracer.GetOffset()
 
-            block_count += 1
-            move_forward = True
-        self.RecordBlockOffsets()
+                if self.ProgressReportInterval > 0 and instruction_count % self.ProgressReportInterval == 0:
+                    time_diff = datetime.now() - self.StartTime
+                    if time_diff.seconds > 0:
+                        speed = block_count/time_diff.seconds
+                    else:
+                        speed = 0
+                    size = self.PyTracer.GetSize()
+                    relative_offset = sync_offset - self.StartOffset
+                    print('DecodeBlock: %x +%x @ %d/%d (%f%%) speed: %d blocks/sec' % (self.StartOffset, block_count, relative_offset, size, (relative_offset*100)/size, speed))
+
+                if self.DumpInstructions or (self.DumpSymbols and block.ip in self.AddressToSymbols):
+                    print('%x (%x): %s' % (sync_offset, offset, self.AddressToSymbols[block.ip]))
+
+                self.RecordBlockOffsets(block)
+                if block_offset > 0:
+                    if block_offset == offset:
+                        blocks.append(block)
+
+                    if block_offset < offset:
+                        break
+
+                block_count += 1
+                move_forward = True
+
+        return blocks
 
     def WriteBlockIPMap(self, filename):
         pickle.dump(self.BlockIPMap, open(filename, "wb" ) )

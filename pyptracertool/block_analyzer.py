@@ -28,8 +28,10 @@ class BlockAnalyzer:
             return
 
         address = self.SymbolsToAddress[symbol]
-        for start_offset in self.BlockIPMap[address]:
-            print('start_offset = %x' % (start_offset))
+        for sync_offset in self.BlockIPMap[address]:
+            print('sync_offset = %x' % (sync_offset))
+            for offset in self.BlockIPMap[address][sync_offset]:
+                print('\toffset = %x' % (offset))
 
             """
             pytracer = decoder.PTLogAnalyzer(self.PTFilename, 
@@ -71,12 +73,16 @@ class BlockAnalyzer:
             self.Read(os.path.join(dirname, basename))
 
     def Read(self, filename):
-        for (address, offsets) in pickle.load(open(filename, "rb")).items():
+        for (address, offset_map) in pickle.load(open(filename, "rb")).items():
             if not address in self.BlockIPMap:
-                self.BlockIPMap[address] = []
+                self.BlockIPMap[address] = {}
 
-            for offset in offsets:
-                self.BlockIPMap[address].append(offset)
+            for (sync_offset, v) in offset_map.items():
+                if not sync_offset in self.BlockIPMap[address]:
+                    self.BlockIPMap[address][sync_offset] = {}
+
+                for (offset, v2) in v.items():
+                    self.BlockIPMap[address][sync_offset][offset] = v2
     
 if __name__ == '__main__':
     cache_folder = 'Tmp'
