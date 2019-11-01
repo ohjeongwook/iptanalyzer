@@ -246,9 +246,13 @@ pt_insn* PTracer::DecodeInstruction(bool moveForward) {
             m_status = pt_insn_sync_forward(m_insnDecoder);
 
             if (m_status < 0)
+            {
                 return NULL;
+            }
         }
     }
+
+    pt_insn_get_sync_offset(m_insnDecoder, &m_syncOffset);
 
     for (;;) {
         struct pt_event event;
@@ -259,8 +263,10 @@ pt_insn* PTracer::DecodeInstruction(bool moveForward) {
 
     m_status = pt_insn_get_offset(m_insnDecoder, &m_offset);
 
+
     pt_insn* p_insn = new pt_insn();
     m_decodeStatus = pt_insn_next(m_insnDecoder, p_insn, sizeof(pt_insn));
+
     return p_insn;
 }
 
