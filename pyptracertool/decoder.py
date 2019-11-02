@@ -24,6 +24,7 @@ class PTLogAnalyzer:
         self.LoadedMemories = {}
         self.AddressToSymbols = {}
         self.BlockOffsets = {}
+        self.ErrorLocations = {}
 
         if dump_filename:
             self.Debugger = windbgtool.debugger.DbgEngine()
@@ -122,15 +123,16 @@ class PTLogAnalyzer:
 
     # True:  Handled error
     # False: No errors or repeated and ignored error
-    def ProcessError(self, insn):
+    def ProcessError(self, ip):
         errcode = self.PyTracer.GetDecodeStatus()
         if errcode != pyptracer.pt_error_code.pte_ok:
             if errcode == pyptracer.pt_error_code.pte_nomap:
-                if self.LoadImageFile(insn.ip):
+                if ip in self.ErrorLocations:
+                    return False
+
+                self.ErrorLocations[ip] = 1
+                if self.LoadImage and self.LoadImageFile(ip):
                     return True
-                else:
-                    disasmline = self.GetDisasmLine(insn.ip)
-                    print('\t%s errorcode= %s' % (disasmline, errcode))
 
         return False 
 
@@ -142,7 +144,7 @@ class PTLogAnalyzer:
             if not insn:
                 break
 
-            if self.ProcessError(insn):
+            if self.ProcessError(insn.ip):
                 move_forward = False
             else:
                 offset = self.PyTracer.GetOffset()
@@ -191,7 +193,7 @@ class PTLogAnalyzer:
     def DecodeBlock(self, log_filename = '', move_forward = True, block_offset = 0):
         load_image = False
         block_count = 0
-        instruction_count = 0
+        block_count = 0
         error_count = {}
         self.BlockOffsets = {}
         self.BlockSyncOffsets = []
@@ -203,12 +205,13 @@ class PTLogAnalyzer:
             if not block:
                 break
 
-            if self.ProcessError(block):
+            if self.ProcessError(block.ip):
                 move_forward = False
             else:
+                sync_offset = self.PyTracer.GetSyncOffset()
                 offset = self.PyTracer.GetOffset()
 
-                if self.ProgressReportInterval > 0 and instruction_count % self.ProgressReportInterval == 0:
+                if self.ProgressReportInterval > 0 and block_count % self.ProgressReportInterval == 0:
                     time_diff = datetime.now() - self.StartTime
                     if time_diff.seconds > 0:
                         speed = block_count/time_diff.seconds
@@ -236,4 +239,3 @@ class PTLogAnalyzer:
 
     def WriteBlockOffsets(self, filename):
         pickle.dump(self.BlockOffsets, open(filename, "wb" ) )
-
