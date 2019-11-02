@@ -16,7 +16,7 @@ def DecodeBlock(pt_filename, dump_filename, block_range):
     (start_offset, end_offset) = block_range
     pytracer = decoder.PTLogAnalyzer(pt_filename, dump_filename, dump_symbols = False, load_image = True, start_offset = start_offset, end_offset = end_offset)
     pytracer.DecodeBlock()
-    pytracer.WriteBlockIPMap('%d.p' % start_offset)
+    pytracer.WriteBlockOffsets('%d.p' % start_offset)
 
 if __name__ == '__main__':
     import argparse
@@ -32,7 +32,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    pytracer = decoder.PTLogAnalyzer(args.pt, args.dump, dump_symbols = False, start_offset = args.offset)
+    pytracer = decoder.PTLogAnalyzer(args.pt, args.dump, dump_symbols = False, start_offset = args.offset, progress_report_interval = 100)
     pytracer.DecodeBlock()
 
     cpu_count = multiprocessing.cpu_count()
@@ -49,7 +49,7 @@ if __name__ == '__main__':
 
     procs = []
     for block_range in block_ranges:
-        proc = multiprocessing.Process(target=DecodeBlock, args=(pt_filename, dump_filename, block_range,))
+        proc = multiprocessing.Process(target=DecodeBlock, args=(args.pt, args.dump, block_range,))
         procs.append(proc)
         proc.start()
 
