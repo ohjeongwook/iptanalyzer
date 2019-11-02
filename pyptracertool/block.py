@@ -34,11 +34,22 @@ class Analyzer:
             disasmline = pytracer.GetDisasmLine(insn)
             print('Instruction: %s' % (disasmline))
 
+    def _NormalizeSymbol(self, symbol):
+        (module, function) = symbol.split('!')
+        return module.lower() + '!' + function
+
     def DumpSymbolLocations(self, symbol, dump_instructions = False):
+        symbol = self._NormalizeSymbol(symbol)
         if not symbol in self.SymbolsToAddress:
+            print('Symbol [%s] is not found' % (symbol))
             return
 
         address = self.SymbolsToAddress[symbol]
+        print('Searching %s: %x' % (symbol, address))
+
+        if not address in self.BlockIPMap:
+            return
+
         for sync_offset in self.BlockIPMap[address]:
             for offset in self.BlockIPMap[address][sync_offset]:
                 print('> sync_offset = %x / offset = %x' % (sync_offset, offset))
@@ -52,14 +63,16 @@ class Analyzer:
                 print(self.AddressToSymbols[block_address])
 
     def LoadModuleSymbols(self, module_name):
+        module_name = module_name.lower()
         if module_name in self.LoadedModules:
             return
-        self.LoadedModules[module_name] = True
 
-        print('LoadModuleSymbols: ' + module_name)
         for (address, symbol) in self.Debugger.EnumerateModuleSymbols([module_name, ]).items():
+            symbol = self._NormalizeSymbol(symbol)
             self.AddressToSymbols[address] = symbol
             self.SymbolsToAddress[symbol] = address
+
+        self.LoadedModules[module_name] = True
 
     def LoadSymbols(self, address):
         address_info = self.Debugger.GetAddressInfo(address)
