@@ -8,16 +8,15 @@ import decoder
 import windbgtool.debugger
 
 class Analyzer:
-    def __init__(self, cache_dirname, pt_filename, dump_filename):
+    def __init__(self, cache_filename, pt_filename, dump_filename):
         self.PTFilename = pt_filename
         self.DumpFilename = dump_filename
-        self.BlockIPMap = {}
+        self.BlockOffsets = {}
         self.LoadedModules = {}
         self.AddressToSymbols = {}
         self.SymbolsToAddress = {}
 
-        self.ReadDirectory(cache_dirname)
-
+        self.BlockOffsets = pickle.load(open(cache_filename, "rb"))
         self.Debugger = windbgtool.debugger.DbgEngine()
         self.Debugger.LoadDump(dump_filename)
         self.Debugger.EnumerateModules()
@@ -47,11 +46,11 @@ class Analyzer:
         address = self.SymbolsToAddress[symbol]
         print('Searching %s: %x' % (symbol, address))
 
-        if not address in self.BlockIPMap:
+        if not address in self.BlockOffsets:
             return
 
-        for sync_offset in self.BlockIPMap[address]:
-            for offset in self.BlockIPMap[address][sync_offset]:
+        for sync_offset in self.BlockOffsets[address]:
+            for offset in self.BlockOffsets[address][sync_offset]:
                 print('> sync_offset = %x / offset = %x' % (sync_offset, offset))
 
                 if dump_instructions:
@@ -80,23 +79,5 @@ class Analyzer:
             self.LoadModuleSymbols(address_info['Module Name'])
 
     def ResolveSymbols(self):
-        for block_address in self.BlockIPMap.keys():
+        for block_address in self.BlockOffsets.keys():
             self.LoadSymbols(block_address)
-
-    def ReadDirectory(self, dirname):
-        for basename in os.listdir(dirname):
-            if not basename.endswith('.p'):
-                continue
-            self.Read(os.path.join(dirname, basename))
-
-    def Read(self, filename):
-        for (address, offset_map) in pickle.load(open(filename, "rb")).items():
-            if not address in self.BlockIPMap:
-                self.BlockIPMap[address] = {}
-
-            for (sync_offset, v) in offset_map.items():
-                if not sync_offset in self.BlockIPMap[address]:
-                    self.BlockIPMap[address][sync_offset] = {}
-
-                for (offset, v2) in v.items():
-                    self.BlockIPMap[address][sync_offset][offset] = v

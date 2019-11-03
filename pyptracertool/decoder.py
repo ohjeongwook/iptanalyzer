@@ -6,6 +6,7 @@ import pickle
 import pprint
 from zipfile import ZipFile
 from datetime import datetime, timedelta
+import tempfile
 
 import capstone
 
@@ -13,7 +14,7 @@ import pyptracer
 import windbgtool.debugger
 
 class PTLogAnalyzer:
-    def __init__(self, pt_filename, dump_filename = '', start_offset = 0, end_offset = 0, load_image = False, dump_instructions = False, dump_symbols = True, disassembler = "capstone", progress_report_interval = 0):
+    def __init__(self, pt_filename, dump_filename = '', start_offset = 0, end_offset = 0, load_image = False, dump_instructions = False, dump_symbols = True, disassembler = "capstone", progress_report_interval = 0, temp_foldername = ''):
         self.StartOffset = start_offset
         self.EndOffset = end_offset
         self.ProgressReportInterval = progress_report_interval
@@ -25,6 +26,11 @@ class PTLogAnalyzer:
         self.AddressToSymbols = {}
         self.BlockOffsets = {}
         self.ErrorLocations = {}
+
+        if temp_foldername:
+            self.TempFolderName = temp_foldername
+        else:
+            self.TempFolderName = tempfile.gettempdir()
 
         if dump_filename:
             self.Debugger = windbgtool.debugger.DbgEngine()
@@ -82,7 +88,7 @@ class PTLogAnalyzer:
 
         self.LoadedMemories[base_address] = False
 
-        dump_filename = '%x.dmp' % base_address
+        dump_filename = os.path.join(self.TempFolderName, '%x.dmp' % base_address)
         self.Debugger.RunCmd('.writemem %s %x L?%x' % (dump_filename, base_address, region_size))
         self.PyTracer.AddImage(base_address, dump_filename)
         self.LoadedMemories[ip] = True
