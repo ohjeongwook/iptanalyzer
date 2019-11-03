@@ -35,3 +35,4 @@ __pycache__/
 /pyptracertool/block_analyzer.txt
 /pyptracertool/pyptracer.pyd
 /pyptracertool/libipt.dll
+TestFiles/blocks.cache
