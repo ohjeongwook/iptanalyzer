@@ -34,7 +34,7 @@ class Analyzer:
             print('Instruction: %s' % (disasmline))
 
     def _NormalizeSymbol(self, symbol):
-        (module, function) = symbol.split('!')
+        (module, function) = symbol.split('!', 1)
         return module.lower() + '!' + function
 
     def DumpSymbolLocations(self, symbol, dump_instructions = False):
