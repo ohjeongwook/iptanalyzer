@@ -32,6 +32,8 @@ private:
     vector<char> m_buffer;
     struct pt_config m_config;
 
+    uint64_t m_currentCR3;
+
     struct pt_image_section_cache* m_iscache = NULL;
     struct pt_image* m_image = NULL;
 
@@ -63,4 +65,6 @@ public:
     pt_insn* DecodeInstruction(bool moveForward = true);
     pt_block* DecodeBlock(bool moveForward = true);
     pt_error_code GetDecodeStatus();
+
+    uint64_t GetCurrentCR3();
 };

@@ -261,6 +261,15 @@ pt_insn* PTracer::DecodeInstruction(bool moveForward) {
         {
             break;
         }
+
+        if (event.type == ptev_paging)
+        {
+            m_currentCR3 = event.variant.paging.cr3;
+        }
+        else if (event.type == ptev_async_paging)
+        {
+            m_currentCR3 = event.variant.async_paging.cr3;
+        }
     }
 
     m_status = pt_insn_get_offset(m_insnDecoder, &m_offset);
@@ -302,6 +311,14 @@ pt_block* PTracer::DecodeBlock(bool moveForward) {
         {
             break;
         }
+
+        if (event.type == ptev_paging)
+        {
+            m_currentCR3 = event.variant.paging.cr3;
+        }else if (event.type == ptev_async_paging)
+        {
+            m_currentCR3 = event.variant.async_paging.cr3;
+        }
     }
 
     m_status = pt_blk_get_offset(m_blockDecoder, &m_offset);
@@ -313,4 +330,9 @@ pt_block* PTracer::DecodeBlock(bool moveForward) {
 pt_error_code PTracer::GetDecodeStatus()
 {
     return pt_errcode(m_decodeStatus);
+}
+
+uint64_t PTracer::GetCurrentCR3()
+{
+    return m_currentCR3;
 }

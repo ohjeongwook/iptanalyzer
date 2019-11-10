@@ -19,7 +19,8 @@ PYBIND11_MODULE(pyptracer, m) {
         .def("AddImage", &PTracer::AddImage)
         .def("DecodeInstruction", &PTracer::DecodeInstruction)
         .def("DecodeBlock", &PTracer::DecodeBlock)
-        .def("GetDecodeStatus", &PTracer::GetDecodeStatus);
+        .def("GetDecodeStatus", &PTracer::GetDecodeStatus)
+        .def("GetCurrentCR3", &PTracer::GetCurrentCR3);
 
     py::class_<pt_insn>(m, "pt_insn")
         .def_readwrite("ip", &pt_insn::ip)
