@@ -3,7 +3,8 @@ import pickle
 
 class Merger:
     def __init__(self):
-        self.BlockOffsets = {}
+        self.BlockIPsToOffsets = {}
+        self.BlockOffsetsToIPs = {}
 
     def ReadDirectory(self, dirname):
         for basename in os.listdir(dirname):
@@ -12,19 +13,36 @@ class Merger:
             self.Read(os.path.join(dirname, basename))
 
     def Read(self, filename):
-        for (address, offset_map) in pickle.load(open(filename, "rb")).items():
-            if not address in self.BlockOffsets:
-                self.BlockOffsets[address] = {}
+        [block_ips_to_offset, block_offsets_to_ips] = pickle.load(open(filename, "rb"))
 
-            for (sync_offset, v) in offset_map.items():
-                if not sync_offset in self.BlockOffsets[address]:
-                    self.BlockOffsets[address][sync_offset] = {}
+        for (cr3, address_to_offsets) in block_ips_to_offset.items():
+            if not cr3 in self.BlockIPsToOffsets:
+                self.BlockIPsToOffsets[cr3] = {}
 
-                for (offset, v2) in v.items():
-                    self.BlockOffsets[address][sync_offset][offset] = v
+            for (address, offset_map) in address_to_offsets.items():
+                if not address in self.BlockIPsToOffsets[cr3]:
+                    self.BlockIPsToOffsets[cr3][address] = {}
+
+                for (sync_offset, v) in offset_map.items():
+                    if not sync_offset in self.BlockIPsToOffsets[cr3][address]:
+                        self.BlockIPsToOffsets[cr3][address][sync_offset] = {}
+
+                    for (offset, v2) in v.items():
+                        self.BlockIPsToOffsets[cr3][address][sync_offset][offset] = v
+
+        for (cr3, offsets_to_addresses) in block_offsets_to_ips.items():
+            if not cr3 in self.BlockOffsetsToIPs:
+                self.BlockOffsetsToIPs[cr3] = {}
+
+            for (offset, addresses) in offsets_to_addresses.items():
+                if not offset in self.BlockOffsetsToIPs[cr3]:
+                    self.BlockOffsetsToIPs[cr3][offset] = []
+
+                for address in addresses:
+                    self.BlockOffsetsToIPs[cr3][offset].append(address)
 
     def Write(self, filename):
-        pickle.dump(self.BlockOffsets, open(filename, "wb" ) )
+        pickle.dump([self.BlockIPsToOffsets, self.BlockOffsetsToIPs], open(filename, "wb" ) )
 
 if __name__ == '__main__':
     import argparse

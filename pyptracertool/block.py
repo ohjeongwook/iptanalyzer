@@ -11,12 +11,11 @@ class Analyzer:
     def __init__(self, cache_filename, pt_filename, dump_filename):
         self.PTFilename = pt_filename
         self.DumpFilename = dump_filename
-        self.BlockOffsets = {}
         self.LoadedModules = {}
         self.AddressToSymbols = {}
         self.SymbolsToAddress = {}
 
-        self.BlockOffsets = pickle.load(open(cache_filename, "rb"))
+        [self.BlockIPsToOffsets, self.BlockOffsetsToIPs] = pickle.load(open(cache_filename, "rb"))
         self.Debugger = windbgtool.debugger.DbgEngine()
         self.Debugger.LoadDump(dump_filename)
         self.Debugger.EnumerateModules()
@@ -37,7 +36,18 @@ class Analyzer:
         (module, function) = symbol.split('!', 1)
         return module.lower() + '!' + function
 
-    def DumpSymbolLocations(self, symbol, dump_instructions = False):
+    def DumpBlocks(self, cr3 = 0, dump_instructions = False):
+        if cr3 in self.BlockOffsetsToIPs:
+            offsets = list(self.BlockOffsetsToIPs[cr3].keys())            
+            offsets.sort()
+
+            for offset in offsets:
+                for address_info in self.BlockOffsetsToIPs[cr3][offset]:
+                    address = address_info['IP']
+                    symbol = self.ResolveSymbol(address)
+                    print('> %x (%s)' % (address, symbol))
+
+    def DumpSymbolLocations(self, symbol, cr3 = 0, dump_instructions = False):
         symbol = self._NormalizeSymbol(symbol)
         if not symbol in self.SymbolsToAddress:
             print('Symbol [%s] is not found' % (symbol))
@@ -46,11 +56,14 @@ class Analyzer:
         address = self.SymbolsToAddress[symbol]
         print('Searching %s: %x' % (symbol, address))
 
-        if not address in self.BlockOffsets:
+        if not cr3 in self.BlockIPsToOffsets:
             return
 
-        for sync_offset in self.BlockOffsets[address]:
-            for offset in self.BlockOffsets[address][sync_offset]:
+        if not address in self.BlockIPsToOffsets[cr3]:
+            return
+
+        for sync_offset in self.BlockIPsToOffsets[cr3][address]:
+            for offset in self.BlockIPsToOffsets[cr3][address][sync_offset]:
                 print('> sync_offset = %x / offset = %x' % (sync_offset, offset))
 
                 if dump_instructions:
@@ -62,6 +75,7 @@ class Analyzer:
                 print(self.AddressToSymbols[block_address])
 
     def LoadModuleSymbols(self, module_name):
+        module_name = module_name.split('.')[0]
         module_name = module_name.lower()
         if module_name in self.LoadedModules:
             return
@@ -78,6 +92,17 @@ class Analyzer:
         if address_info and 'Module Name' in address_info:
             self.LoadModuleSymbols(address_info['Module Name'])
 
-    def ResolveSymbols(self):
-        for block_address in self.BlockOffsets.keys():
+    def ResolveSymbols(self, cr3):
+        for block_address in self.BlockIPsToOffsets[cr3].keys():
             self.LoadSymbols(block_address)
+
+    def ResolveSymbol(self, address):
+        if address in self.AddressToSymbols:
+            symbol = self.AddressToSymbols[address]
+        else:
+            self.LoadSymbols(address)
+            if address in self.AddressToSymbols:
+                symbol = self.AddressToSymbols[address]
+            else:
+                symbol = ''
+        return symbol

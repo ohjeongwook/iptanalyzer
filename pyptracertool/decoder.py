@@ -24,7 +24,6 @@ class PTLogAnalyzer:
         self.Disassembler = disassembler
         self.LoadedMemories = {}
         self.AddressToSymbols = {}
-        self.BlockOffsets = {}
         self.ErrorLocations = {}
         self.AddressList = None
 
@@ -178,28 +177,40 @@ class PTLogAnalyzer:
 
         return instructions
 
-    def RecordBlockOffsets(self, block):
+    def RecordBlockOffsets(self, block, cr3 = 0):
         sync_offset = self.PyTracer.GetSyncOffset()
         offset = self.PyTracer.GetOffset()
 
+        if not cr3 in self.BlockIPsToOffsets:
+            self.BlockIPsToOffsets[cr3] = {}
+
         self.BlockSyncOffsets.append(sync_offset)
-        if not block.ip in self.BlockOffsets:
-            self.BlockOffsets[block.ip] = {}
+        if not block.ip in self.BlockIPsToOffsets[cr3]:
+            self.BlockIPsToOffsets[cr3][block.ip] = {}
 
-        if not sync_offset in self.BlockOffsets[block.ip]:
-            self.BlockOffsets[block.ip][sync_offset]={}
+        if not sync_offset in self.BlockIPsToOffsets[cr3][block.ip]:
+            self.BlockIPsToOffsets[cr3][block.ip][sync_offset]={}
 
-        if not offset in self.BlockOffsets[block.ip][sync_offset]:
-            self.BlockOffsets[block.ip][sync_offset][offset] = 1
+        if not offset in self.BlockIPsToOffsets[cr3][block.ip][sync_offset]:
+            self.BlockIPsToOffsets[cr3][block.ip][sync_offset][offset] = 1
         else:
-            self.BlockOffsets[block.ip][sync_offset][offset] += 1
+            self.BlockIPsToOffsets[cr3][block.ip][sync_offset][offset] += 1
+
+        if not cr3 in self.BlockOffsetsToIPs:
+            self.BlockOffsetsToIPs[cr3] = {}
+
+        if not offset in self.BlockOffsetsToIPs[cr3]:
+            self.BlockOffsetsToIPs[cr3][offset] = []
+
+        self.BlockOffsetsToIPs[cr3][offset].append({'IP': block.ip, 'SyncOffset': sync_offset})
 
     def DecodeBlock(self, log_filename = '', move_forward = True, block_offset = 0):
         load_image = False
         block_count = 0
         block_count = 0
         error_count = {}
-        self.BlockOffsets = {}
+        self.BlockIPsToOffsets = {}
+        self.BlockOffsetsToIPs = {}
         self.BlockSyncOffsets = []
 
         blocks = []
@@ -228,7 +239,7 @@ class PTLogAnalyzer:
                 if self.DumpInstructions:
                     print('%x (%x): %s' % (sync_offset, offset, self.AddressToSymbols[block.ip]))
 
-                self.RecordBlockOffsets(block)
+                self.RecordBlockOffsets(block, self.PyTracer.GetCurrentCR3())
                 if block_offset > 0:
                     if block_offset == offset:
                         blocks.append(block)
@@ -242,4 +253,4 @@ class PTLogAnalyzer:
         return blocks
 
     def WriteBlockOffsets(self, filename):
-        pickle.dump(self.BlockOffsets, open(filename, "wb" ) )
+        pickle.dump([self.BlockIPsToOffsets, self.BlockOffsetsToIPs], open(filename, "wb" ) )

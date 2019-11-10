@@ -35,6 +35,7 @@
     <Compile Include="decode_instructions.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="enumerate_blocks.py" />
     <Compile Include="find_blocks.py">
       <SubType>Code</SubType>
     </Compile>
