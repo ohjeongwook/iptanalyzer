@@ -24,10 +24,10 @@ class Analyzer:
     def DumpInstructions(self, start_offset, end_offset, instruction_offset):
         pytracer = decoder.PTLogAnalyzer(self.PTFilename, 
                                             self.DumpFilename, 
-                                            dump_symbols = False, 
-                                            load_image = True, 
+                                            dump_symbols = True,
+                                            load_image = True,
                                             start_offset = start_offset, 
-                                            end_offset = start_offset + 1024*10)
+                                            end_offset = end_offset)
 
         for insn in pytracer.DecodeInstruction(move_forward = False, instruction_offset = instruction_offset):
             disasmline = pytracer.GetDisasmLine(insn)
@@ -54,7 +54,7 @@ class Analyzer:
                 print('> sync_offset = %x / offset = %x' % (sync_offset, offset))
 
                 if dump_instructions:
-                    self.DumpInstructions(sync_offset, offset+1, offset)
+                    self.DumpInstructions(sync_offset, offset+2, offset)
 
     def FindOffsets(self, symbol):
         for block_address in self.BlockAddresses.keys():
