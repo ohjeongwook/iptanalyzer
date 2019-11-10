@@ -11,9 +11,11 @@ if __name__ == '__main__':
     parser.add_argument('-p', action = "store", dest = "pt")
     parser.add_argument('-d', action = "store", dest = "dump")
     parser.add_argument('-C', dest = "cr3", default = 0, type = auto_int)
+    parser.add_argument('-s', dest = "start", default = 0, type = auto_int)
+    parser.add_argument('-e', dest = "end", default = 0, type = auto_int)
 
     args = parser.parse_args()
 
     block_analyzer = block.Analyzer(args.cache, args.pt, args.dump)
 
-    block_analyzer.DumpBlocks(cr3 = args.cr3, dump_instructions = True)
+    block_analyzer.DumpBlocks(cr3 = args.cr3, start = args.start, end = args.end, dump_instructions = True)

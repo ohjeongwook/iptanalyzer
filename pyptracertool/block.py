@@ -36,16 +36,24 @@ class Analyzer:
         (module, function) = symbol.split('!', 1)
         return module.lower() + '!' + function
 
-    def DumpBlocks(self, cr3 = 0, dump_instructions = False):
-        if cr3 in self.BlockOffsetsToIPs:
-            offsets = list(self.BlockOffsetsToIPs[cr3].keys())            
-            offsets.sort()
+    def DumpBlocks(self, cr3 = 0, start = 0, end = 0, dump_instructions = False):
+        if not cr3 in self.BlockOffsetsToIPs:
+            return
 
-            for offset in offsets:
-                for address_info in self.BlockOffsetsToIPs[cr3][offset]:
-                    address = address_info['IP']
-                    symbol = self.ResolveSymbol(address)
-                    print('> %x (%s)' % (address, symbol))
+        offsets = list(self.BlockOffsetsToIPs[cr3].keys())            
+        offsets.sort()
+
+        for offset in offsets:
+            for address_info in self.BlockOffsetsToIPs[cr3][offset]:
+                address = address_info['IP']
+                sync_offset = address_info['SyncOffset']
+
+                if start > 0 and end > 0:
+                    if address < start or end < address:
+                        continue
+
+                symbol = self.ResolveSymbol(address)
+                print('> %.16x (%s) (sync_offset=%x, offset=%x)' % (address, symbol, sync_offset, offset))
 
     def DumpSymbolLocations(self, symbol, cr3 = 0, dump_instructions = False):
         symbol = self._NormalizeSymbol(symbol)
