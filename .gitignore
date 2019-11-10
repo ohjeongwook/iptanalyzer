@@ -4,9 +4,9 @@
 
 /.vs
 /PTracer/x64/Debug
-/RunPTracer/x64/Debug
-/RunPTracer/RunPTracer.vcxproj.user
-/RunPTracer/RunPTracer.vcxproj.filters
+/PTracerTest/x64/Debug
+/PTracerTest/PTracerTest.vcxproj.user
+/PTracerTest/PTracerTest.vcxproj.filters
 /PTracer/PTracer.vcxproj.user
 /PTracer/PTracer.vcxproj.filters
 /x64/Debug
