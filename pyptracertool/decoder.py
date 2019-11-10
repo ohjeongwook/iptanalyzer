@@ -26,6 +26,7 @@ class PTLogAnalyzer:
         self.AddressToSymbols = {}
         self.BlockOffsets = {}
         self.ErrorLocations = {}
+        self.AddressList = None
 
         if temp_foldername:
             self.TempFolderName = temp_foldername
@@ -37,7 +38,7 @@ class PTLogAnalyzer:
             self.Debugger.LoadDump(dump_filename)
             self.AddressList = self.Debugger.GetAddressList()
 
-            if dump_symbols:
+            if self.DumpSymbols:
                 self.Debugger.EnumerateModules()
 
         self.PyTracer = pyptracer.PTracer()
@@ -62,21 +63,19 @@ class PTLogAnalyzer:
 
         address_info = self.Debugger.GetAddressInfo(ip)
         if self.DumpSymbols and address_info and 'Module Name' in address_info:
-            module_name = address_info['Module Name']
-
-            print('Loading symbols for %s' % module_name)
+            module_name = address_info['Module Name'].split('.')[0]
             for (address, symbol) in self.Debugger.EnumerateModuleSymbols([module_name, ]).items():
                 self.AddressToSymbols[address] = symbol
 
         base_address = region_size = None
-
-        if use_address_map:
+        if use_address_map and self.AddressList:
             for mem_info in self.AddressList:
                 if mem_info['BaseAddr'] <= ip and ip <= mem_info['EndAddr']:
                     base_address = mem_info['BaseAddr']
                     region_size = mem_info['RgnSize']
                     break
-        else:
+        
+        if (base_address == None or region_size == None) and address_info:
             base_address = int(address_info['Base Address'], 16)
             region_size = int(address_info['Region Size'], 16)
 
@@ -93,7 +92,6 @@ class PTLogAnalyzer:
         self.PyTracer.AddImage(base_address, dump_filename)
         self.LoadedMemories[ip] = True
         self.LoadedMemories[base_address] = True
-
         return True
 
     def GetCapstoneDisasmLine(self, ip, raw_bytes = ''):
@@ -137,6 +135,7 @@ class PTLogAnalyzer:
                     return False
 
                 self.ErrorLocations[ip] = 1
+
                 if self.LoadImage and self.LoadImageFile(ip):
                     return True
 
@@ -154,7 +153,6 @@ class PTLogAnalyzer:
                 move_forward = False
             else:
                 offset = self.PyTracer.GetOffset()
-
                 if self.ProgressReportInterval > 0 and instruction_count % self.ProgressReportInterval == 0:
                     size = self.PyTracer.GetSize()
                     progress_offset = offset - self.StartOffset
@@ -164,7 +162,7 @@ class PTLogAnalyzer:
                         size, 
                         (progress_offset*100)/size))
 
-                if self.DumpInstructions or (self.DumpSymbols and insn.ip in self.AddressToSymbols):
+                if self.DumpInstructions:
                     disasmline = self.GetDisasmLine(insn)
                     print('%x: %s' % (offset, disasmline))
 
@@ -227,7 +225,7 @@ class PTLogAnalyzer:
                     relative_offset = sync_offset - self.StartOffset
                     print('DecodeBlock: %x +%x @ %d/%d (%f%%) speed: %d blocks/sec' % (self.StartOffset, block_count, relative_offset, size, (relative_offset*100)/size, speed))
 
-                if self.DumpInstructions or (self.DumpSymbols and block.ip in self.AddressToSymbols):
+                if self.DumpInstructions:
                     print('%x (%x): %s' % (sync_offset, offset, self.AddressToSymbols[block.ip]))
 
                 self.RecordBlockOffsets(block)
