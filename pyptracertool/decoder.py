@@ -171,6 +171,8 @@ class PTLogAnalyzer:
 
                     if instruction_offset < offset:
                         break
+                else:
+                    instructions.append(insn)
 
                 instruction_count += 1
                 move_forward = True
