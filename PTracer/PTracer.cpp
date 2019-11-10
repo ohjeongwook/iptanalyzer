@@ -258,7 +258,9 @@ pt_insn* PTracer::DecodeInstruction(bool moveForward) {
         struct pt_event event;
         m_status = pt_insn_event(m_insnDecoder, &event, sizeof(event));
         if (m_status <= 0)
+        {
             break;
+        }
     }
 
     m_status = pt_insn_get_offset(m_insnDecoder, &m_offset);
