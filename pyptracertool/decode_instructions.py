@@ -19,8 +19,8 @@ if __name__ == '__main__':
         return int(x, 0)
 
     parser = argparse.ArgumentParser(description='PyPTracer')
-    parser.add_argument('-p', action = "store", dest = "pt")
-    parser.add_argument('-d', action = "store", dest = "dump")
+    parser.add_argument('-p', action = "store", default = "", dest = "pt")
+    parser.add_argument('-d', action = "store", default = "", dest = "dump")
     parser.add_argument('-s', dest = "start_offset", default = 0, type = auto_int)
     parser.add_argument('-e', dest = "end_offset", default = 0, type = auto_int)
     parser.add_argument('-i', dest = "instruction_offset", default = 0, type = auto_int)
