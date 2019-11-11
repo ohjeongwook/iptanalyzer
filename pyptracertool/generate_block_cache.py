@@ -14,9 +14,12 @@ import windbgtool.debugger
 
 def DecodeBlock(pt_filename, dump_filename, block_range, block_offsets_filename = '', temp_foldername = '.'):
     (start_offset, end_offset) = block_range
+
+    print("DecodeBlock: %x ~ %x" % (start_offset, end_offset))
     pytracer = decoder.PTLogAnalyzer(pt_filename, dump_filename, dump_symbols = False, load_image = True, start_offset = start_offset, end_offset = end_offset, temp_foldername = temp_foldername)
     pytracer.DecodeBlock()
 
+    print("DecodeBlock: Writing to %s (%x ~ %x)" % (block_offsets_filename, start_offset, end_offset))
     if block_offsets_filename:
         pytracer.WriteBlockOffsets(block_offsets_filename)
 
@@ -31,8 +34,8 @@ if __name__ == '__main__':
         return int(x, 0)
 
     parser = argparse.ArgumentParser(description='PyPTracer')
-    parser.add_argument('-p', action = "store", dest = "pt")
-    parser.add_argument('-d', action = "store", dest = "dump")
+    parser.add_argument('-p', action = "store", default = "", dest = "pt")
+    parser.add_argument('-d', action = "store", default = "", dest = "dump")
     parser.add_argument('-c', action = "store", default="blocks.cache", dest = "block_cache")
     parser.add_argument('-t', action = "store", default=tempfile.gettempdir(), dest = "temp")
     parser.add_argument('-o', dest = "offset", default = 0, type = auto_int)
@@ -46,6 +49,7 @@ if __name__ == '__main__':
     offsets_count = len(pytracer.BlockSyncOffsets)
     chunk_size = int(offsets_count / cpu_count)
 
+    print("Analyzing blocks...")
     block_ranges = []
     for start_index in range(0, offsets_count, chunk_size):
         end_index = start_index + chunk_size
@@ -54,10 +58,11 @@ if __name__ == '__main__':
         else:
             block_ranges.append((pytracer.BlockSyncOffsets[start_index], 0))
 
+    print("Launching block analyzers...")
     procs = []
     block_offsets_filenames = []
     for block_range in block_ranges:
-        block_offsets_filename = os.path.join(args.temp, '%d.p' % block_range[0])
+        block_offsets_filename = os.path.join(args.temp, 'block-%.16x-%.16x.cache' % (block_range[0], block_range[1]))
         block_offsets_filenames.append(block_offsets_filename)
         proc = multiprocessing.Process(target=DecodeBlock, args=(args.pt, args.dump, block_range, block_offsets_filename, args.temp))
         procs.append(proc)
@@ -66,6 +71,7 @@ if __name__ == '__main__':
     for proc in procs:
         proc.join()
 
+    print("Merging block cache files...")
     merger = cache.Merger()
     for filename in block_offsets_filenames:
         merger.Read(filename)
