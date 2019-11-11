@@ -79,6 +79,7 @@ class PTLogAnalyzer:
             region_size = int(address_info['Region Size'], 16)
 
         if base_address == None or region_size == None:
+            print('LoadImageFile failed to find base address for %x' % ip)
             return False
 
         if base_address in self.LoadedMemories:
@@ -87,7 +88,8 @@ class PTLogAnalyzer:
         self.LoadedMemories[base_address] = False
 
         dump_filename = os.path.join(self.TempFolderName, '%x.dmp' % base_address)
-        self.Debugger.RunCmd('.writemem %s %x L?%x' % (dump_filename, base_address, region_size))
+        writemem_cmd = '.writemem "%s" %x L?%x' % (dump_filename, base_address, region_size)
+        self.Debugger.RunCmd(writemem_cmd)
         self.PyTracer.AddImage(base_address, dump_filename)
         self.LoadedMemories[ip] = True
         self.LoadedMemories[base_address] = True
@@ -248,6 +250,8 @@ class PTLogAnalyzer:
 
                     if block_offset < offset:
                         break
+                else:
+                    blocks.append(block)
 
                 block_count += 1
                 move_forward = True
