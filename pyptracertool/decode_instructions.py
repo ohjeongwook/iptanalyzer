@@ -23,6 +23,8 @@ if __name__ == '__main__':
     parser.add_argument('-d', action = "store", default = "", dest = "dump")
     parser.add_argument('-s', dest = "start_offset", default = 0, type = auto_int)
     parser.add_argument('-e', dest = "end_offset", default = 0, type = auto_int)
+    parser.add_argument('-S', dest = "start_address", default = 0, type = auto_int)
+    parser.add_argument('-E', dest = "end_address", default = 0, type = auto_int)
     parser.add_argument('-i', dest = "instruction_offset", default = 0, type = auto_int)
 
     args = parser.parse_args()
@@ -33,8 +35,9 @@ if __name__ == '__main__':
                                      load_image = True,
                                      start_offset = args.start_offset,
                                      end_offset = args.end_offset,
+                                     progress_report_interval = 0,
                                      disassembler = "windbg")
 
-    for insn in pytracer.DecodeInstruction(move_forward = False, instruction_offset = args.instruction_offset):
+    for insn in pytracer.DecodeInstruction(move_forward = False, instruction_offset = args.instruction_offset, start_address = args.start_address, end_address = args.end_address):
         disasmline = pytracer.GetDisasmLine(insn)
         print('Instruction: %s' % (disasmline))
