@@ -86,7 +86,6 @@ class PTLogAnalyzer:
             return self.LoadedMemories[base_address]
 
         self.LoadedMemories[base_address] = False
-
         dump_filename = os.path.join(self.TempFolderName, '%x.dmp' % base_address)
         writemem_cmd = '.writemem "%s" %x L?%x' % (dump_filename, base_address, region_size)
         self.Debugger.RunCmd(writemem_cmd)
@@ -142,9 +141,8 @@ class PTLogAnalyzer:
 
         return False 
 
-    def DecodeInstruction(self, move_forward = True, instruction_offset = 0):
+    def DecodeInstruction(self, move_forward = True, instruction_offset = 0, start_address = 0, end_address = 0):
         instruction_count = 0
-        instructions = []
         while 1:
             insn = self.PyTracer.DecodeInstruction(move_forward)
             if not insn:
@@ -163,23 +161,26 @@ class PTLogAnalyzer:
                         size, 
                         (progress_offset*100)/size))
 
-                if self.DumpInstructions:
-                    disasmline = self.GetDisasmLine(insn)
-                    print('%x: %s' % (offset, disasmline))
-
                 if instruction_offset > 0:
                     if instruction_offset == offset:
-                        instructions.append(insn)
+                        yield insn
+
+                        if self.DumpInstructions:
+                            disasmline = self.GetDisasmLine(insn)
+                            print('%x: %s' % (offset, disasmline))
 
                     if instruction_offset < offset:
                         break
                 else:
-                    instructions.append(insn)
+                    if (start_address == 0 and end_address == 0) or start_address <= insn.ip and insn.ip <= end_address:
+                        yield insn
+
+                        if self.DumpInstructions:
+                            disasmline = self.GetDisasmLine(insn)
+                            print('%x: %s' % (offset, disasmline))
 
                 instruction_count += 1
                 move_forward = True
-
-        return instructions
 
     def RecordBlockOffsets(self, block, cr3 = 0):
         sync_offset = self.PyTracer.GetSyncOffset()
