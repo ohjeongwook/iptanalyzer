@@ -36,7 +36,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="enumerate_blocks.py" />
-    <Compile Include="find_blocks.py">
+    <Compile Include="find_api_calls.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="generate_block_cache.py" />
