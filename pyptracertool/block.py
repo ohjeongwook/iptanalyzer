@@ -21,13 +21,8 @@ class Analyzer:
         self.Debugger.EnumerateModules()
 
     def DumpInstructions(self, start_offset, end_offset, instruction_offset):
-        pytracer = decoder.PTLogAnalyzer(self.PTFilename, 
-                                            self.DumpFilename, 
-                                            dump_symbols = True,
-                                            load_image = True,
-                                            start_offset = start_offset, 
-                                            end_offset = end_offset)
-
+        pytracer = decoder.PTLogAnalyzer(self.DumpFilename, dump_symbols = True, load_image = True)
+        pytracer.OpenPTLog(self.PTFilename, start_offset = start_offset, end_offset = end_offset)
         for insn in pytracer.EnumerateInstructions(move_forward = False, instruction_offset = instruction_offset):
             disasmline = pytracer.GetDisasmLine(insn)
             print('Instruction: %s' % (disasmline))
