@@ -6,14 +6,28 @@ import pickle
 import pprint
 from zipfile import ZipFile
 from datetime import datetime, timedelta
+import logging
+import uuid
+import traceback
 
 import capstone
 
 import decoder
 import windbgtool.debugger
 
+def SetLogFile(filename):
+    fh = logging.FileHandler(filename, 'w')
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    fh.setFormatter(formatter)
+
+    log = logging.getLogger()
+    for hdlr in log.handlers[:]:
+        log.removeHandler(hdlr)
+    log.addHandler(fh)
+
 def DecodeBlockProcess(pt_filename, dump_filename, queue, temp_foldername):
-    pytracer = decoder.PTLogAnalyzer(dump_filename, dump_symbols = False, load_image = True, temp_foldername = temp_foldername)
+    log_filename = str(uuid.uuid1()) + '.log'
+    logging.basicConfig(level=logging.DEBUG, filename = log_filename, filemode = 'w', format = '%(name)s - %(levelname)s - %(message)s')
 
     while True:
         msg = queue.get()
@@ -22,13 +36,25 @@ def DecodeBlockProcess(pt_filename, dump_filename, queue, temp_foldername):
 
         (start_offset, end_offset, block_offsets_filename) = msg
 
-        print("DecodeBlockProcess: %x ~ %x" % (start_offset, end_offset))
-        pytracer.OpenPTLog(pt_filename, start_offset = start_offset, end_offset = end_offset)
-        pytracer.DecodeBlocks()
+        SetLogFile('DecodeBlockProcess-%.16x-%.16x.log' % (start_offset, end_offset))
+        logging.debug("# DecodeBlockProcess: %.16x ~ %.16x" % (start_offset, end_offset))
 
-        print("DecodeBlockProcess: Writing to %s (%x ~ %x)" % (block_offsets_filename, start_offset, end_offset))
+        pytracer = decoder.PTLogAnalyzer(dump_filename, dump_symbols = False, load_image = True, temp_foldername = temp_foldername)
+        pytracer.OpenPTLog(pt_filename, start_offset = start_offset, end_offset = end_offset)
+
+        try:
+            pytracer.DecodeBlocks()
+        except:
+            tb = traceback.format_exc()
+            logging.debug("# DecodeBlockProcess DecodeBlocks Exception: %s" % tb)
+
+        logging.debug("# DecodeBlockProcess: Writing %.16x ~ %.16x to %s" % (start_offset, end_offset, block_offsets_filename))
         if block_offsets_filename:
-            pytracer.WriteBlockOffsets(block_offsets_filename)
+            try:
+                pytracer.WriteBlockOffsets(block_offsets_filename)
+            except:
+                tb = traceback.format_exc()
+                logging.debug("# DecodeBlockProcess WriteBlockOffsets Exception: %s" % tb)
 
 if __name__ == '__main__':
     import argparse
@@ -92,7 +118,6 @@ if __name__ == '__main__':
     print("Merging block cache files...")
     merger = cache.Merger()
     for filename in block_offsets_filenames:
-        print("Merging %s" % filename)
         merger.Read(filename)
         #os.unlink(filename)
     merger.Write(args.block_cache)

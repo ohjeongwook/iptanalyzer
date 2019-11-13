@@ -7,6 +7,7 @@ import pprint
 from zipfile import ZipFile
 from datetime import datetime, timedelta
 import tempfile
+import logging
 
 import capstone
 
@@ -42,6 +43,8 @@ class PTLogAnalyzer:
 
             if self.DumpSymbols:
                 self.Debugger.EnumerateModules()
+        else:
+            self.Debugger = None
 
     def OpenPTLog(self, pt_filename, start_offset = 0, end_offset = 0):
         self.StartOffset = start_offset
@@ -55,7 +58,7 @@ class PTLogAnalyzer:
 
     def _ExtractTracePT(self, pt_zip_filename, pt_filename ):
         if not os.path.isfile(pt_filename):
-            print("* Extracting test trace file:")
+            logging.info("* Extracting test trace file:")
             with ZipFile(pt_zip_filename, 'r') as zf:
                zf.extractall()
 
@@ -89,7 +92,7 @@ class PTLogAnalyzer:
             region_size = int(address_info['Region Size'], 16)
 
         if base_address == None or region_size == None:
-            print('LoadImageFile failed to find base address for %x' % ip)
+            logging.error('LoadImageFile failed to find base address for %x' % ip)
             return False
 
         if base_address in self.LoadedMemories:
@@ -165,7 +168,7 @@ class PTLogAnalyzer:
                 if self.ProgressReportInterval > 0 and instruction_count % self.ProgressReportInterval == 0:
                     size = self.PyTracer.GetSize()
                     progress_offset = offset - self.StartOffset
-                    print('EnumerateInstructions: offset: %x progress: %x/%x (%f%%)' % (
+                    logging.info('EnumerateInstructions: offset: %x progress: %x/%x (%f%%)' % (
                         offset,
                         progress_offset,
                         size, 
@@ -177,7 +180,7 @@ class PTLogAnalyzer:
 
                         if self.DumpInstructions:
                             disasmline = self.GetDisasmLine(insn)
-                            print('%x: %s' % (offset, disasmline))
+                            logging.info('%x: %s' % (offset, disasmline))
 
                     if instruction_offset < offset:
                         break
@@ -187,7 +190,7 @@ class PTLogAnalyzer:
 
                         if self.DumpInstructions:
                             disasmline = self.GetDisasmLine(insn)
-                            print('%x: %s' % (offset, disasmline))
+                            logging.info('%x: %s' % (offset, disasmline))
 
                 instruction_count += 1
                 move_forward = True
@@ -196,6 +199,7 @@ class PTLogAnalyzer:
         sync_offset = self.PyTracer.GetSyncOffset()
         offset = self.PyTracer.GetOffset()
 
+        logging.debug("RecordBlockOffsets: %.16x ~ %.16x (cr3: %.16x/ ip: %.16x)" % (sync_offset, offset, cr3, block.ip))
         if not cr3 in self.BlockIPsToOffsets:
             self.BlockIPsToOffsets[cr3] = {}
 
@@ -227,8 +231,10 @@ class PTLogAnalyzer:
         while 1:
             block = self.PyTracer.DecodeBlock(move_forward)
             if not block:
+                logging.debug("DecodeBlocks: block==None")
                 break
 
+            logging.debug("DecodeBlocks: %.16x" % block.ip)
             if self.ProcessError(block.ip):
                 move_forward = False
             else:
@@ -259,10 +265,10 @@ class PTLogAnalyzer:
                         speed = 0
                     size = self.PyTracer.GetSize()
                     relative_offset = sync_offset - self.StartOffset
-                    print('DecodeBlock: %x +%x @ %d/%d (%f%%) speed: %d blocks/sec' % (self.StartOffset, block_count, relative_offset, size, (relative_offset*100)/size, speed))
+                    logging.info('DecodeBlock: %x +%x @ %d/%d (%f%%) speed: %d blocks/sec' % (self.StartOffset, block_count, relative_offset, size, (relative_offset*100)/size, speed))
 
                 if self.DumpInstructions:
-                    print('%x (%x): %s' % (sync_offset, offset, self.AddressToSymbols[block.ip]))
+                    logging.info('%x (%x): %s' % (sync_offset, offset, self.AddressToSymbols[block.ip]))
 
                 self.RecordBlockOffsets(block, self.PyTracer.GetCurrentCR3())
 
