@@ -14,9 +14,7 @@ import pyptracer
 import windbgtool.debugger
 
 class PTLogAnalyzer:
-    def __init__(self, pt_filename, dump_filename = '', start_offset = 0, end_offset = 0, load_image = False, dump_instructions = False, dump_symbols = True, disassembler = "capstone", progress_report_interval = 0, temp_foldername = ''):
-        self.StartOffset = start_offset
-        self.EndOffset = end_offset
+    def __init__(self, dump_filename = '', load_image = False, dump_instructions = False, dump_symbols = True, disassembler = "capstone", progress_report_interval = 0, temp_foldername = ''):
         self.ProgressReportInterval = progress_report_interval
         self.DumpInstructions = dump_instructions
         self.DumpSymbols = dump_symbols
@@ -26,6 +24,9 @@ class PTLogAnalyzer:
         self.AddressToSymbols = {}
         self.ErrorLocations = {}
         self.AddressList = None
+        self.BlockIPsToOffsets = {}
+        self.BlockOffsetsToIPs = {}
+        self.BlockSyncOffsets = []
 
         if temp_foldername:
             self.TempFolderName = temp_foldername
@@ -40,8 +41,13 @@ class PTLogAnalyzer:
             if self.DumpSymbols:
                 self.Debugger.EnumerateModules()
 
+    def OpenPTLog(self, pt_filename, start_offset = 0, end_offset = 0):
+        self.StartOffset = start_offset
+        self.EndOffset = end_offset
+        self.LoadedMemories = {}
+
         self.PyTracer = pyptracer.PTracer()
-        self.PyTracer.Open(pt_filename, start_offset, end_offset)
+        self.PyTracer.Open(pt_filename, self.StartOffset , self.EndOffset)
 
     def _ExtractTracePT(self, pt_zip_filename, pt_filename ):
         if not os.path.isfile(pt_filename):
@@ -87,7 +93,7 @@ class PTLogAnalyzer:
 
         self.LoadedMemories[base_address] = False
         dump_filename = os.path.join(self.TempFolderName, '%x.dmp' % base_address)
-        writemem_cmd = '.writemem "%s" %x L?%x' % (dump_filename, base_address, region_size)
+        writemem_cmd = '.writemem %s %x L?%x' % (dump_filename, base_address, region_size)
         self.Debugger.RunCmd(writemem_cmd)
         self.PyTracer.AddImage(base_address, dump_filename)
         self.LoadedMemories[ip] = True
@@ -141,7 +147,7 @@ class PTLogAnalyzer:
 
         return False 
 
-    def DecodeInstruction(self, move_forward = True, instruction_offset = 0, start_address = 0, end_address = 0):
+    def EnumerateInstructions(self, move_forward = True, instruction_offset = 0, start_address = 0, end_address = 0):
         instruction_count = 0
         while 1:
             insn = self.PyTracer.DecodeInstruction(move_forward)
@@ -155,7 +161,7 @@ class PTLogAnalyzer:
                 if self.ProgressReportInterval > 0 and instruction_count % self.ProgressReportInterval == 0:
                     size = self.PyTracer.GetSize()
                     progress_offset = offset - self.StartOffset
-                    print('DecodeInstruction: offset: %x progress: %x/%x (%f%%)' % (
+                    print('EnumerateInstructions: offset: %x progress: %x/%x (%f%%)' % (
                         offset,
                         progress_offset,
                         size, 
@@ -209,16 +215,26 @@ class PTLogAnalyzer:
 
         self.BlockOffsetsToIPs[cr3][offset].append({'IP': block.ip, 'SyncOffset': sync_offset})
 
-    def DecodeBlock(self, log_filename = '', move_forward = True, block_offset = 0):
-        load_image = False
-        block_count = 0
-        block_count = 0
-        error_count = {}
+    def DecodeBlocks(self, move_forward = True):
         self.BlockIPsToOffsets = {}
         self.BlockOffsetsToIPs = {}
         self.BlockSyncOffsets = []
 
-        blocks = []
+        while 1:
+            block = self.PyTracer.DecodeBlock(move_forward)
+            if not block:
+                break
+
+            if self.ProcessError(block.ip):
+                move_forward = False
+            else:
+                self.RecordBlockOffsets(block, self.PyTracer.GetCurrentCR3())
+                move_forward = True
+
+    def EnumerateBlocks(self, log_filename = '', move_forward = True, block_offset = 0):
+        self.BlockIPsToOffsets = {}
+        self.BlockOffsetsToIPs = {}
+        self.BlockSyncOffsets = []
         self.StartTime = datetime.now()
         while 1:
             block = self.PyTracer.DecodeBlock(move_forward)
@@ -245,19 +261,17 @@ class PTLogAnalyzer:
                     print('%x (%x): %s' % (sync_offset, offset, self.AddressToSymbols[block.ip]))
 
                 self.RecordBlockOffsets(block, self.PyTracer.GetCurrentCR3())
+
                 if block_offset > 0:
                     if block_offset == offset:
-                        blocks.append(block)
+                        yield block
 
                     if block_offset < offset:
                         break
                 else:
-                    blocks.append(block)
+                    yield block
 
-                block_count += 1
                 move_forward = True
-
-        return blocks
 
     def WriteBlockOffsets(self, filename):
         pickle.dump([self.BlockIPsToOffsets, self.BlockOffsetsToIPs], open(filename, "wb" ) )

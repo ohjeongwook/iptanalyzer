@@ -32,15 +32,14 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    pytracer = decoder.PTLogAnalyzer(args.pt, args.dump,
+    pytracer = decoder.PTLogAnalyzer(args.dump,
                                      dump_symbols = False,
                                      dump_instructions = False,
                                      load_image = True,
-                                     start_offset = args.start_offset,
-                                     end_offset = args.end_offset,
-                                     progress_report_interval = 0,
+                                     progress_report_interval = 1000,
                                      disassembler = "windbg")
 
-    for insn in pytracer.DecodeInstruction(move_forward = False, instruction_offset = args.instruction_offset, start_address = args.start_address, end_address = args.end_address):
+    pytracer.OpenPTLog(args.pt, start_offset = args.start_offset, end_offset = args.end_offset)
+    for insn in pytracer.EnumerateInstructions(move_forward = False, instruction_offset = args.instruction_offset, start_address = args.start_address, end_address = args.end_address):
         disasmline = pytracer.GetDisasmLine(insn)
         print('Instruction: %s' % (disasmline))

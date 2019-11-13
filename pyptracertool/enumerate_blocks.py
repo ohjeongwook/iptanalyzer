@@ -22,4 +22,4 @@ if __name__ == '__main__':
 
     block_analyzer = block.Analyzer(args.cache, args.pt, args.dump)
 
-    block_analyzer.DumpBlocks(cr3 = args.cr3, start = args.start_address, end = args.end_address, dump_instructions = True)
+    block_analyzer.DumpBlocks(cr3 = args.cr3, start_address = args.start_address, end_address = args.end_address, dump_instructions = True)

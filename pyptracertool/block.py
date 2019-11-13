@@ -28,7 +28,7 @@ class Analyzer:
                                             start_offset = start_offset, 
                                             end_offset = end_offset)
 
-        for insn in pytracer.DecodeInstruction(move_forward = False, instruction_offset = instruction_offset):
+        for insn in pytracer.EnumerateInstructions(move_forward = False, instruction_offset = instruction_offset):
             disasmline = pytracer.GetDisasmLine(insn)
             print('Instruction: %s' % (disasmline))
 
