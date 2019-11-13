@@ -8,12 +8,16 @@ class Merger:
 
     def ReadDirectory(self, dirname):
         for basename in os.listdir(dirname):
-            if not basename.endswith('.p'):
+            if not basename.endswith('.cache'):
                 continue
             self.Read(os.path.join(dirname, basename))
 
     def Read(self, filename):
-        [block_ips_to_offset, block_offsets_to_ips] = pickle.load(open(filename, "rb"))
+        try:
+            [block_ips_to_offset, block_offsets_to_ips] = pickle.load(open(filename, "rb"))
+        except:
+            print("Error loading " + filename)
+            return
 
         for (cr3, address_to_offsets) in block_ips_to_offset.items():
             if not cr3 in self.BlockIPsToOffsets:
