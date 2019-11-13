@@ -12,6 +12,16 @@ PTracer::PTracer()
 
 PTracer::~PTracer()
 {
+    if (m_iscache)
+    {
+        pt_iscache_free(m_iscache);
+    }
+
+    if (m_image)
+    {
+        pt_image_free(m_image);
+    }
+
     if (m_insnDecoder)
     {
         pt_insn_free_decoder(m_insnDecoder);
