@@ -20,9 +20,11 @@ class PTLogAnalyzer:
         self.DumpSymbols = dump_symbols
         self.LoadImage = load_image
         self.Disassembler = disassembler
+
         self.LoadedMemories = {}
-        self.AddressToSymbols = {}
         self.ErrorLocations = {}
+
+        self.AddressToSymbols = {}
         self.AddressList = None
         self.BlockIPsToOffsets = {}
         self.BlockOffsetsToIPs = {}
@@ -44,7 +46,9 @@ class PTLogAnalyzer:
     def OpenPTLog(self, pt_filename, start_offset = 0, end_offset = 0):
         self.StartOffset = start_offset
         self.EndOffset = end_offset
+
         self.LoadedMemories = {}
+        self.ErrorLocations = {}
 
         self.PyTracer = pyptracer.PTracer()
         self.PyTracer.Open(pt_filename, self.StartOffset , self.EndOffset)
