@@ -20,8 +20,13 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='PyPTracer')
     parser.add_argument('-p', action = "store", default = "", dest = "pt")
     parser.add_argument('-d', action = "store", default = "", dest = "dump")
-    parser.add_argument('-s', dest = "start_offset", default = 0, type = auto_int)
-    parser.add_argument('-e', dest = "end_offset", default = 0, type = auto_int)
+
+    parser.add_argument('-s', dest = "start_address", default = 0, type = auto_int)
+    parser.add_argument('-e', dest = "end_address", default = 0, type = auto_int)
+
+    parser.add_argument('-S', dest = "start_offset", default = 0, type = auto_int)
+    parser.add_argument('-E', dest = "end_offset", default = 0, type = auto_int)
+
     parser.add_argument('-b', dest = "block_offset", default = 0, type = auto_int)
 
     args = parser.parse_args()

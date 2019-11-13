@@ -36,7 +36,7 @@ class Analyzer:
         (module, function) = symbol.split('!', 1)
         return module.lower() + '!' + function
 
-    def DumpBlocks(self, cr3 = 0, start = 0, end = 0, dump_instructions = False):
+    def DumpBlocks(self, cr3 = 0, start_address = 0, end_address = 0, dump_instructions = False):
         if not cr3 in self.BlockOffsetsToIPs:
             return
 
@@ -48,8 +48,8 @@ class Analyzer:
                 address = address_info['IP']
                 sync_offset = address_info['SyncOffset']
 
-                if start > 0 and end > 0:
-                    if address < start or end < address:
+                if start_address > 0 and end_address > 0:
+                    if address < start_address or end_address < address:
                         continue
 
                 symbol = self.ResolveSymbol(address)
