@@ -38,12 +38,12 @@ if __name__ == '__main__':
         dump_symbols = False
         load_image = False
 
-    pytracer = decoder.PTLogAnalyzer(args.dump, 
+    ptlog_analyzer = decoder.PTLogAnalyzer(args.dump, 
                                      dump_symbols = dump_symbols, 
                                      load_image = load_image,
                                      disassembler = "windbg")
 
-    pytracer.OpenPTLog(args.pt, start_offset = args.start_offset, end_offset = args.end_offset)
+    ptlog_analyzer.OpenPTLog(args.pt, start_offset = args.start_offset, end_offset = args.end_offset)
 
-    for block in pytracer.EnumerateBlocks(move_forward = False, block_offset = args.block_offset):
+    for block in ptlog_analyzer.EnumerateBlocks(move_forward = False, block_offset = args.block_offset):
         print('block.ip: %.16x ~ %.16x (%.16x)' % (block.ip, block.end_ip, block.ninsn))

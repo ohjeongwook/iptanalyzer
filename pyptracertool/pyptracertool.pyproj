@@ -32,7 +32,7 @@
     <Compile Include="decode_blocks.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="decode_instructions.py">
+    <Compile Include="enumerate_instructions.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="enumerate_blocks.py" />
