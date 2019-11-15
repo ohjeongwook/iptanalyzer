@@ -19,7 +19,6 @@ class LogAnalyzer:
         self.DumpInstructions = dump_instructions
         self.DumpSymbols = dump_symbols
         self.LoadImage = load_image
-        self.Disassembler = disassembler
 
         self.LoadedMemories = {}
         self.ErrorLocations = {}
