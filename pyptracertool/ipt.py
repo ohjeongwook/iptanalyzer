@@ -12,7 +12,7 @@ import logging
 import pyptracer
 import windbgtool.debugger
 
-class PTLogAnalyzer:
+class LogAnalyzer:
     def __init__(self, dump_filename = '', load_image = False, dump_instructions = False, dump_symbols = True, progress_report_interval = 0, temp_foldername = ''):
         self.ProgressReportInterval = progress_report_interval
         self.DumpInstructions = dump_instructions

@@ -6,7 +6,7 @@ import pprint
 from zipfile import ZipFile
 from datetime import datetime, timedelta
 
-import decoder
+import ipt
 import windbgtool.debugger
 
 if __name__ == '__main__':
@@ -36,7 +36,7 @@ if __name__ == '__main__':
         dump_symbols = False
         load_image = False
 
-    ptlog_analyzer = decoder.PTLogAnalyzer(args.dump, 
+    ptlog_analyzer = ipt.LogAnalyzer(args.dump, 
                                      dump_symbols = dump_symbols, 
                                      load_image = load_image)
 

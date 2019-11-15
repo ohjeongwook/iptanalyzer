@@ -3,7 +3,7 @@ if __name__ == '__main__':
 
     import block
     import dump
-    import decoder
+    import ipt
 
     def auto_int(x):
         return int(x, 0)
@@ -26,7 +26,7 @@ if __name__ == '__main__':
         for (sync_offset, offset) in block_analyzer.EnumerateBlocks(address, cr3 = args.cr3):
             print('> sync_offset = %x / offset = %x' % (sync_offset, offset))
 
-            pt_log_analyzer = decoder.PTLogAnalyzer(args.dump, dump_symbols = True, load_image = True)
+            pt_log_analyzer = ipt.LogAnalyzer(args.dump, dump_symbols = True, load_image = True)
             pt_log_analyzer.OpenPTLog(args.pt, start_offset = sync_offset, end_offset = offset+2)
             for insn in pt_log_analyzer.EnumerateInstructions(move_forward = False, instruction_offset = offset):
                 disasmline = dump_loader.GetDisasmLine(insn.ip)

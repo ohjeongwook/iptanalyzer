@@ -10,7 +10,7 @@ import logging
 import uuid
 import traceback
 
-import decoder
+import ipt
 import windbgtool.debugger
 
 def SetLogFile(filename):
@@ -37,7 +37,7 @@ def DecodeBlockProcess(pt_filename, dump_filename, queue, temp_foldername):
         SetLogFile('DecodeBlockProcess-%.16x-%.16x.log' % (start_offset, end_offset))
         logging.debug("# DecodeBlockProcess: %.16x ~ %.16x" % (start_offset, end_offset))
 
-        pytracer = decoder.PTLogAnalyzer(dump_filename, dump_symbols = False, load_image = True, temp_foldername = temp_foldername)
+        pytracer = ipt.LogAnalyzer(dump_filename, dump_symbols = False, load_image = True, temp_foldername = temp_foldername)
         pytracer.OpenPTLog(pt_filename, start_offset = start_offset, end_offset = end_offset)
 
         try:
@@ -72,7 +72,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    pytracer = decoder.PTLogAnalyzer(args.dump, dump_symbols = False, progress_report_interval = 100)
+    pytracer = ipt.LogAnalyzer(args.dump, dump_symbols = False, progress_report_interval = 100)
     pytracer.OpenPTLog(args.pt, start_offset = 0)
     pytracer.DecodeBlocks()
 

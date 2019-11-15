@@ -28,7 +28,7 @@
     <Compile Include="cache.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="decoder.py" />
+    <Compile Include="ipt.py" />
     <Compile Include="dump.py">
       <SubType>Code</SubType>
     </Compile>

@@ -7,7 +7,7 @@ import pprint
 from zipfile import ZipFile
 from datetime import datetime, timedelta
 
-import decoder
+import ipt
 import windbgtool.debugger
 
 if __name__ == '__main__':
@@ -31,7 +31,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     dump_loader = dump.Loader(args.dump)
-    ptlog_analyzer = decoder.PTLogAnalyzer(args.dump,
+    ptlog_analyzer = ipt.LogAnalyzer(args.dump,
                                      dump_symbols = False,
                                      dump_instructions = False,
                                      load_image = True,
