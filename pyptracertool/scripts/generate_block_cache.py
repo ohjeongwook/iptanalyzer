@@ -12,6 +12,7 @@ import uuid
 import traceback
 
 import pyptracertool.ipt
+import pyptracertool.cache
 import windbgtool.debugger
 
 def SetLogFile(filename):
@@ -38,11 +39,11 @@ def DecodeBlockProcess(pt_filename, dump_filename, queue, temp_foldername):
         SetLogFile('DecodeBlockProcess-%.16x-%.16x.log' % (start_offset, end_offset))
         logging.debug("# DecodeBlockProcess: %.16x ~ %.16x" % (start_offset, end_offset))
 
-        pytracer = pyptracertool.ipt.LogAnalyzer(dump_filename, dump_symbols = False, load_image = True, temp_foldername = temp_foldername)
-        pytracer.OpenPTLog(pt_filename, start_offset = start_offset, end_offset = end_offset)
+        pt_log_analyzer = pyptracertool.ipt.LogAnalyzer(dump_filename, dump_symbols = False, load_image = True, temp_foldername = temp_foldername)
+        pt_log_analyzer.OpenPTLog(pt_filename, start_offset = start_offset, end_offset = end_offset)
 
         try:
-            pytracer.DecodeBlocks()
+            pt_log_analyzer.DecodeBlocks()
         except:
             tb = traceback.format_exc()
             logging.debug("# DecodeBlockProcess DecodeBlocks Exception: %s" % tb)
@@ -50,7 +51,8 @@ def DecodeBlockProcess(pt_filename, dump_filename, queue, temp_foldername):
         logging.debug("# DecodeBlockProcess: Writing %.16x ~ %.16x to %s" % (start_offset, end_offset, block_offsets_filename))
         if block_offsets_filename:
             try:
-                pytracer.WriteBlockOffsets(block_offsets_filename)
+                pyptracertool.cache.Writer(pt_log_analyzer.BlockIPsToOffsets, pt_log_analyzer.BlockOffsetsToIPs)
+                pyptracertool.cache.Save(block_offsets_filename)
             except:
                 tb = traceback.format_exc()
                 logging.debug("# DecodeBlockProcess WriteBlockOffsets Exception: %s" % tb)
@@ -59,7 +61,7 @@ if __name__ == '__main__':
     import argparse
     import tempfile
 
-    import cache
+    import pyptracertool.cache
 
     def auto_int(x):
         return int(x, 0)
@@ -115,7 +117,7 @@ if __name__ == '__main__':
         proc.join()
 
     print("Merging block cache files...")
-    merger = cache.Merger()
+    merger = pyptracertool.cache.Merger()
     for filename in block_offsets_filenames:
         merger.Read(filename)
         os.unlink(filename)

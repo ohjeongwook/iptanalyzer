@@ -243,5 +243,3 @@ class LogAnalyzer:
                 self.RecordBlockOffsets(block, self.PyTracer.GetCurrentCR3())
                 move_forward = True
 
-    def WriteBlockOffsets(self, filename):
-        pickle.dump([self.BlockIPsToOffsets, self.BlockOffsetsToIPs], open(filename, "wb" ) )

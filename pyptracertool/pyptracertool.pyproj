@@ -24,7 +24,6 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="pyptracertool\block.py" />
     <Compile Include="pyptracertool\cache.py">
       <SubType>Code</SubType>
     </Compile>

@@ -13,7 +13,7 @@ import windbgtool.debugger
 
 if __name__ == '__main__':
     import argparse
-    import pyptracertool.block
+    import pyptracertool.cache
     import pyptracertool.dump
 
     def auto_int(x):
@@ -44,7 +44,7 @@ if __name__ == '__main__':
         load_image = False
 
     if args.cache_file:
-        block_analyzer = pyptracertool.block.CacheReader(args.cache_file, args.pt_file)
+        block_analyzer = pyptracertool.cache.Reader(args.cache_file, args.pt_file)
         dump_loader = pyptracertool.dump.Loader(args.dump_file)
 
         for (sync_offset, offset, address) in block_analyzer.EnumerateBlockRange(cr3 = args.cr3, start_address = args.start_address, end_address = args.end_address):

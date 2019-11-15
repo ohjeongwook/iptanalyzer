@@ -5,7 +5,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 if __name__ == '__main__':
     import argparse
 
-    import pyptracertool.block
+    import pyptracertool.cache
     import pyptracertool.dump
     import pyptracertool.ipt
 
@@ -21,7 +21,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    block_analyzer = pyptracertool.block.CacheReader(args.cache_file, args.pt_file)
+    block_analyzer = pyptracertool.cache.Reader(args.cache_file, args.pt_file)
 
     dump_loader = pyptracertool.dump.Loader(args.dump_file)
     if args.symbol:
