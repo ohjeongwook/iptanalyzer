@@ -7,7 +7,7 @@ import capstone
 import decoder
 import windbgtool.debugger
 
-class Analyzer:
+class CacheReader:
     def __init__(self, cache_filename, pt_filename, dump_filename):
         self.PTFilename = pt_filename
         self.DumpFilename = dump_filename

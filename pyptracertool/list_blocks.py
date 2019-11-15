@@ -20,6 +20,6 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    block_analyzer = block.Analyzer(args.cache, args.pt, args.dump)
+    block_analyzer = block.CacheReader(args.cache, args.pt, args.dump)
 
     block_analyzer.DumpBlocks(cr3 = args.cr3, start_address = args.start_address, end_address = args.end_address, dump_instructions = True)
