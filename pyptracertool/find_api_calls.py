@@ -1,7 +1,9 @@
-import block
-    
 if __name__ == '__main__':
     import argparse
+
+    import block
+    import dump
+    import decoder
 
     def auto_int(x):
         return int(x, 0)
@@ -15,8 +17,17 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    block_analyzer = block.CacheReader(args.cache, args.pt, args.dump)
+    block_analyzer = block.CacheReader(args.cache, args.pt)
 
-    module_name = args.symbol.split('!')[0]
-    block_analyzer.LoadModuleSymbols(module_name)
-    block_analyzer.DumpSymbolLocations(args.symbol, cr3 = args.cr3, dump_instructions = True)
+    dump_loader = dump.Loader(args.dump)
+    if args.symbol:
+        address = dump_loader.ResolveSymbolAddress(args.symbol)
+
+        for (sync_offset, offset) in block_analyzer.EnumerateBlocks(address, cr3 = args.cr3):
+            print('> sync_offset = %x / offset = %x' % (sync_offset, offset))
+
+            pt_log_analyzer = decoder.PTLogAnalyzer(args.dump, dump_symbols = True, load_image = True)
+            pt_log_analyzer.OpenPTLog(args.pt, start_offset = sync_offset, end_offset = offset+2)
+            for insn in pt_log_analyzer.EnumerateInstructions(move_forward = False, instruction_offset = offset):
+                disasmline = pt_log_analyzer.GetDisasmLine(insn)
+                print('\tInstruction: %s' % (disasmline))

@@ -22,4 +22,6 @@ if __name__ == '__main__':
 
     block_analyzer = block.CacheReader(args.cache, args.pt, args.dump)
 
-    block_analyzer.DumpBlocks(cr3 = args.cr3, start_address = args.start_address, end_address = args.end_address, dump_instructions = True)
+    for (sync_offset, offset) in block_analyzer.EnumerateBlockRange(cr3 = args.cr3, start_address = args.start_address, end_address = args.end_address):
+        symbol = self.GetSymbol(address)
+        print('> %.16x (%s) (sync_offset=%x, offset=%x)' % (address, symbol, sync_offset, offset))
