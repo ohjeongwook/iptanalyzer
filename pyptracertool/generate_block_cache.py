@@ -117,5 +117,5 @@ if __name__ == '__main__':
     merger = cache.Merger()
     for filename in block_offsets_filenames:
         merger.Read(filename)
-        #os.unlink(filename)
+        os.unlink(filename)
     merger.Write(args.block_cache)
