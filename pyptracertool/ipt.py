@@ -65,7 +65,7 @@ class LogAnalyzer:
         for byte in raw_bytes:
             raw_line += '%.2x ' % (byte % 256)
 
-    def LoadImageFile(self, ip, use_address_map = True):
+    def AddImage(self, ip, use_address_map = True):
         if ip in self.LoadedMemories:
             return self.LoadedMemories[ip]
 
@@ -90,7 +90,7 @@ class LogAnalyzer:
             region_size = int(address_info['Region Size'], 16)
 
         if base_address == None or region_size == None:
-            logging.error('LoadImageFile failed to find base address for %x' % ip)
+            logging.error('AddImage failed to find base address for %x' % ip)
             return False
 
         if base_address in self.LoadedMemories:
@@ -116,7 +116,7 @@ class LogAnalyzer:
 
                 self.ErrorLocations[ip] = 1
 
-                if self.LoadImage and self.LoadImageFile(ip):
+                if self.LoadImage and self.AddImage(ip):
                     return True
 
         return False 
@@ -152,6 +152,48 @@ class LogAnalyzer:
                         yield insn
 
                 instruction_count += 1
+                move_forward = True
+
+    def EnumerateBlocks(self, log_filename = '', move_forward = True, block_offset = 0):
+        self.BlockIPsToOffsets = {}
+        self.BlockOffsetsToIPs = {}
+        self.BlockSyncOffsets = []
+        self.StartTime = datetime.now()
+        while 1:
+            block = self.PyTracer.DecodeBlock(move_forward)
+            if not block:
+                break
+
+            if self.ProcessError(block.ip):
+                move_forward = False
+            else:
+                sync_offset = self.PyTracer.GetSyncOffset()
+                offset = self.PyTracer.GetOffset()
+
+                if self.ProgressReportInterval > 0 and block_count % self.ProgressReportInterval == 0:
+                    time_diff = datetime.now() - self.StartTime
+                    if time_diff.seconds > 0:
+                        speed = block_count/time_diff.seconds
+                    else:
+                        speed = 0
+                    size = self.PyTracer.GetSize()
+                    relative_offset = sync_offset - self.StartOffset
+                    logging.info('DecodeBlock: %x +%x @ %d/%d (%f%%) speed: %d blocks/sec' % (self.StartOffset, block_count, relative_offset, size, (relative_offset*100)/size, speed))
+
+                if self.DumpInstructions:
+                    logging.info('%x (%x): %s' % (sync_offset, offset, self.AddressToSymbols[block.ip]))
+
+                self.RecordBlockOffsets(block, self.PyTracer.GetCurrentCR3())
+
+                if block_offset > 0:
+                    if block_offset == offset:
+                        yield block
+
+                    if block_offset < offset:
+                        break
+                else:
+                    yield block
+
                 move_forward = True
 
     def RecordBlockOffsets(self, block, cr3 = 0):
@@ -198,48 +240,6 @@ class LogAnalyzer:
                 move_forward = False
             else:
                 self.RecordBlockOffsets(block, self.PyTracer.GetCurrentCR3())
-                move_forward = True
-
-    def EnumerateBlocks(self, log_filename = '', move_forward = True, block_offset = 0):
-        self.BlockIPsToOffsets = {}
-        self.BlockOffsetsToIPs = {}
-        self.BlockSyncOffsets = []
-        self.StartTime = datetime.now()
-        while 1:
-            block = self.PyTracer.DecodeBlock(move_forward)
-            if not block:
-                break
-
-            if self.ProcessError(block.ip):
-                move_forward = False
-            else:
-                sync_offset = self.PyTracer.GetSyncOffset()
-                offset = self.PyTracer.GetOffset()
-
-                if self.ProgressReportInterval > 0 and block_count % self.ProgressReportInterval == 0:
-                    time_diff = datetime.now() - self.StartTime
-                    if time_diff.seconds > 0:
-                        speed = block_count/time_diff.seconds
-                    else:
-                        speed = 0
-                    size = self.PyTracer.GetSize()
-                    relative_offset = sync_offset - self.StartOffset
-                    logging.info('DecodeBlock: %x +%x @ %d/%d (%f%%) speed: %d blocks/sec' % (self.StartOffset, block_count, relative_offset, size, (relative_offset*100)/size, speed))
-
-                if self.DumpInstructions:
-                    logging.info('%x (%x): %s' % (sync_offset, offset, self.AddressToSymbols[block.ip]))
-
-                self.RecordBlockOffsets(block, self.PyTracer.GetCurrentCR3())
-
-                if block_offset > 0:
-                    if block_offset == offset:
-                        yield block
-
-                    if block_offset < offset:
-                        break
-                else:
-                    yield block
-
                 move_forward = True
 
     def WriteBlockOffsets(self, filename):
