@@ -24,27 +24,31 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="block.py" />
-    <Compile Include="cache.py">
+    <Compile Include="pyptracertool\block.py" />
+    <Compile Include="pyptracertool\cache.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ipt.py" />
-    <Compile Include="dump.py">
+    <Compile Include="pyptracertool\ipt.py" />
+    <Compile Include="pyptracertool\dump.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="enumerate_blocks.py">
+    <Compile Include="scripts\enumerate_blocks.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="enumerate_instructions.py">
+    <Compile Include="scripts\enumerate_instructions.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="find_api_calls.py">
+    <Compile Include="scripts\find_api_calls.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="generate_block_cache.py" />
+    <Compile Include="scripts\generate_block_cache.py" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="Global|PythonCore|3.7" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="pyptracertool\" />
+    <Folder Include="scripts\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

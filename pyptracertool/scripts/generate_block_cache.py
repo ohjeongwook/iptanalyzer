@@ -1,5 +1,6 @@
 import os
 import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 sys.path.append(r'..\x64\Debug')
 
 import pickle
@@ -10,7 +11,7 @@ import logging
 import uuid
 import traceback
 
-import ipt
+import pyptracertool.ipt
 import windbgtool.debugger
 
 def SetLogFile(filename):
@@ -37,7 +38,7 @@ def DecodeBlockProcess(pt_filename, dump_filename, queue, temp_foldername):
         SetLogFile('DecodeBlockProcess-%.16x-%.16x.log' % (start_offset, end_offset))
         logging.debug("# DecodeBlockProcess: %.16x ~ %.16x" % (start_offset, end_offset))
 
-        pytracer = ipt.LogAnalyzer(dump_filename, dump_symbols = False, load_image = True, temp_foldername = temp_foldername)
+        pytracer = pyptracertool.ipt.LogAnalyzer(dump_filename, dump_symbols = False, load_image = True, temp_foldername = temp_foldername)
         pytracer.OpenPTLog(pt_filename, start_offset = start_offset, end_offset = end_offset)
 
         try:
@@ -64,16 +65,16 @@ if __name__ == '__main__':
         return int(x, 0)
 
     parser = argparse.ArgumentParser(description='PyPTracer')
-    parser.add_argument('-p', action = "store", default = "", dest = "pt")
-    parser.add_argument('-d', action = "store", default = "", dest = "dump")
-    parser.add_argument('-c', action = "store", default="blocks.cache", dest = "block_cache")
+    parser.add_argument('-p', action = "store", default = "", dest = "pt_file")
+    parser.add_argument('-d', action = "store", default = "", dest = "dump_file")
+    parser.add_argument('-c', action = "store", default="blocks.cache", dest = "cache_file")
     parser.add_argument('-t', action = "store", default=tempfile.gettempdir(), dest = "temp")
     parser.add_argument('-o', dest = "offset", default = 0, type = auto_int)
 
     args = parser.parse_args()
 
-    pytracer = ipt.LogAnalyzer(args.dump, dump_symbols = False, progress_report_interval = 100)
-    pytracer.OpenPTLog(args.pt, start_offset = 0)
+    pytracer = pyptracertool.ipt.LogAnalyzer(args.dump_file, dump_symbols = False, progress_report_interval = 100)
+    pytracer.OpenPTLog(args.pt_file, start_offset = 0)
     pytracer.DecodeBlocks()
 
     import multiprocessing
@@ -86,7 +87,7 @@ if __name__ == '__main__':
     block_offsets_filenames = []
 
     for i in range(0, cpu_count, 1):
-        proc = multiprocessing.Process(target = DecodeBlockProcess, args=(args.pt, args.dump, pqueue, args.temp))
+        proc = multiprocessing.Process(target = DecodeBlockProcess, args=(args.pt_file, args.dump_file, pqueue, args.temp))
         procs.append(proc)
         proc.start()
 
@@ -118,4 +119,4 @@ if __name__ == '__main__':
     for filename in block_offsets_filenames:
         merger.Read(filename)
         os.unlink(filename)
-    merger.Write(args.block_cache)
+    merger.Write(args.cache_file)

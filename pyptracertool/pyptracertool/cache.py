@@ -55,11 +55,11 @@ if __name__ == '__main__':
         return int(x, 0)
 
     parser = argparse.ArgumentParser(description='PyPTracer')
-    parser.add_argument('-c', action = "store", dest = "cache")
+    parser.add_argument('-c', action = "store", dest = "cache_file")
     parser.add_argument('-o', action = "store", dest = "output")
 
     args = parser.parse_args()
 
     merger = Merger()
-    merger.ReadDirectory(args.cache)
+    merger.ReadDirectory(args.cache_file)
     merger.Write(args.output)
