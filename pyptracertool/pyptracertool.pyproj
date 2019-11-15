@@ -5,7 +5,7 @@
     <ProjectGuid>968bdd29-f1a3-4553-bb51-56085d15a258</ProjectGuid>
     <ProjectHome>
     </ProjectHome>
-    <StartupFile>decode_blocks.py</StartupFile>
+    <StartupFile>enumerate_blocks.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -29,7 +29,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="decoder.py" />
-    <Compile Include="decode_blocks.py">
+    <Compile Include="enumerate_blocks.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="enumerate_instructions.py">
