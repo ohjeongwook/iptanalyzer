@@ -9,13 +9,11 @@ from datetime import datetime, timedelta
 import tempfile
 import logging
 
-import capstone
-
 import pyptracer
 import windbgtool.debugger
 
 class PTLogAnalyzer:
-    def __init__(self, dump_filename = '', load_image = False, dump_instructions = False, dump_symbols = True, disassembler = "capstone", progress_report_interval = 0, temp_foldername = ''):
+    def __init__(self, dump_filename = '', load_image = False, dump_instructions = False, dump_symbols = True, progress_report_interval = 0, temp_foldername = ''):
         self.ProgressReportInterval = progress_report_interval
         self.DumpInstructions = dump_instructions
         self.DumpSymbols = dump_symbols
@@ -107,37 +105,6 @@ class PTLogAnalyzer:
         self.LoadedMemories[base_address] = True
         return True
 
-    def GetCapstoneDisasmLine(self, ip, raw_bytes = ''):
-        symbol = ''
-        if ip in self.AddressToSymbols:
-            symbol = self.AddressToSymbols[ip]
-
-        md = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_64)
-
-        if raw_bytes:
-            for disas in md.disasm(bytearray(raw_bytes), ip):
-                return '%s (%x): %s %s' % (symbol, disas.address, disas.mnemonic, disas.op_str)
-        else:
-            try:
-                disasmline = self.Debugger.RunCmd('u %x L1' % (ip))
-                return disasmline
-            except:
-                pass
-
-        return ''
-
-    def GetDisasmLine(self, insn):
-        offset = self.PyTracer.GetOffset()
-        if self.Disassembler == "capstone":
-            return self.GetCapstoneDisasmLine(insn.ip, insn.GetRawBytes())
-        elif self.Disassembler == "windbg":
-            try:
-                return self.Debugger.RunCmd('u %x L1' % (insn.ip))
-            except:
-                pass
-
-        return ''
-
     # True:  Handled error
     # False: No errors or repeated and ignored error
     def ProcessError(self, ip):
@@ -178,19 +145,11 @@ class PTLogAnalyzer:
                     if instruction_offset == offset:
                         yield insn
 
-                        if self.DumpInstructions:
-                            disasmline = self.GetDisasmLine(insn)
-                            logging.info('%x: %s' % (offset, disasmline))
-
                     if instruction_offset < offset:
                         break
                 else:
                     if (start_address == 0 and end_address == 0) or start_address <= insn.ip and insn.ip <= end_address:
                         yield insn
-
-                        if self.DumpInstructions:
-                            disasmline = self.GetDisasmLine(insn)
-                            logging.info('%x: %s' % (offset, disasmline))
 
                 instruction_count += 1
                 move_forward = True

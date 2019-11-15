@@ -1,4 +1,3 @@
-import capstone
 import windbgtool.debugger
 
 class Loader:
@@ -60,3 +59,5 @@ class Loader:
 
         return address
 
+    def GetDisasmLine(self, ip):
+        return self.Debugger.RunCmd('u %x L1' % (ip))

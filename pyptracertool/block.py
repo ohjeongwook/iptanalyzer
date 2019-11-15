@@ -22,7 +22,7 @@ class CacheReader:
                 if start_address > 0 and end_address > 0:
                     if address < start_address or end_address < address:
                         continue
-                yield (sync_offset, offset)
+                yield (sync_offset, offset, address)
 
     def EnumerateBlocks(self, address = None, cr3 = 0):
         if not cr3 in self.BlockIPsToOffsets:

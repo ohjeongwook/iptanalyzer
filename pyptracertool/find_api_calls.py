@@ -29,5 +29,5 @@ if __name__ == '__main__':
             pt_log_analyzer = decoder.PTLogAnalyzer(args.dump, dump_symbols = True, load_image = True)
             pt_log_analyzer.OpenPTLog(args.pt, start_offset = sync_offset, end_offset = offset+2)
             for insn in pt_log_analyzer.EnumerateInstructions(move_forward = False, instruction_offset = offset):
-                disasmline = pt_log_analyzer.GetDisasmLine(insn)
+                disasmline = dump_loader.GetDisasmLine(insn.ip)
                 print('\tInstruction: %s' % (disasmline))

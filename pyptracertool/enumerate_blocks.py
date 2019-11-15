@@ -6,8 +6,6 @@ import pprint
 from zipfile import ZipFile
 from datetime import datetime, timedelta
 
-import capstone
-
 import decoder
 import windbgtool.debugger
 
@@ -40,8 +38,7 @@ if __name__ == '__main__':
 
     ptlog_analyzer = decoder.PTLogAnalyzer(args.dump, 
                                      dump_symbols = dump_symbols, 
-                                     load_image = load_image,
-                                     disassembler = "windbg")
+                                     load_image = load_image)
 
     ptlog_analyzer.OpenPTLog(args.pt, start_offset = args.start_offset, end_offset = args.end_offset)
 

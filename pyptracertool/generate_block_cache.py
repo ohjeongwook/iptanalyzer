@@ -10,8 +10,6 @@ import logging
 import uuid
 import traceback
 
-import capstone
-
 import decoder
 import windbgtool.debugger
 
