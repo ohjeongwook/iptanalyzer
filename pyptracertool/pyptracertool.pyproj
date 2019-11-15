@@ -38,7 +38,6 @@
     <Compile Include="enumerate_instructions.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="list_blocks.py" />
     <Compile Include="find_api_calls.py">
       <SubType>Code</SubType>
     </Compile>
