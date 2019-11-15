@@ -1,3 +1,4 @@
+import os
 import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 sys.path.append(r'..\x64\Debug')
@@ -12,6 +13,8 @@ import windbgtool.debugger
 
 if __name__ == '__main__':
     import argparse
+    import pyptracertool.block
+    import pyptracertool.dump
 
     def auto_int(x):
         return int(x, 0)
@@ -41,8 +44,8 @@ if __name__ == '__main__':
         load_image = False
 
     if args.cache_file:
-        block_analyzer = block.CacheReader(args.cache_file, args.pt_file)
-        dump_loader = dump.Loader(args.dump_file)
+        block_analyzer = pyptracertool.block.CacheReader(args.cache_file, args.pt_file)
+        dump_loader = pyptracertool.dump.Loader(args.dump_file)
 
         for (sync_offset, offset, address) in block_analyzer.EnumerateBlockRange(cr3 = args.cr3, start_address = args.start_address, end_address = args.end_address):
             symbol = dump_loader.GetSymbol(address)
