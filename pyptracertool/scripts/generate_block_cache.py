@@ -51,8 +51,8 @@ def DecodeBlockProcess(pt_filename, dump_filename, queue, temp_foldername):
         logging.debug("# DecodeBlockProcess: Writing %.16x ~ %.16x to %s" % (start_offset, end_offset, block_offsets_filename))
         if block_offsets_filename:
             try:
-                pyptracertool.cache.Writer(pt_log_analyzer.BlockIPsToOffsets, pt_log_analyzer.BlockOffsetsToIPs)
-                pyptracertool.cache.Save(block_offsets_filename)
+                cache_writer = pyptracertool.cache.Writer(pt_log_analyzer.BlockIPsToOffsets, pt_log_analyzer.BlockOffsetsToIPs)
+                cache_writer.Save(block_offsets_filename)
             except:
                 tb = traceback.format_exc()
                 logging.debug("# DecodeBlockProcess WriteBlockOffsets Exception: %s" % tb)
