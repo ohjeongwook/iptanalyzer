@@ -30,6 +30,7 @@ pip install pybind11
 * Install capstone, windbgtool 
 
 ```
+pip install pykd
 pip install capstone
 pip install git+https://github.com/ohjeongwook/windbgtool
 ```
