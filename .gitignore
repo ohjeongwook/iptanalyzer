@@ -38,3 +38,9 @@ __pycache__/
 TestFiles/blocks.cache
 /pyptracertool/pyptracertool/pyptracer.pyd
 /pyptracertool/pyptracertool/libipt.dll
+pyptracertool/PTracer.lib
+pyptracertool/PTracer.pdb
+pyptracertool/pyptracer.exp
+pyptracertool/pyptracer.ilk
+pyptracertool/pyptracer.lib
+pyptracertool/pyptracer.pdb
