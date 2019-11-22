@@ -60,4 +60,7 @@ class Loader:
         return address
 
     def GetDisasmLine(self, ip):
-        return self.Debugger.RunCmd('u %x L1' % (ip))
+        try:
+            return self.Debugger.RunCmd('u %x L1' % (ip))
+        except:
+            return ''
