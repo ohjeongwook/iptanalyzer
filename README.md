@@ -34,3 +34,8 @@ pip install pykd
 pip install capstone
 pip install git+https://github.com/ohjeongwook/windbgtool
 ```
+
+---
+## Fix Windbg DLL Compatibility Issues
+
+Please run script from [install_windbg_files.py](https://github.com/ohjeongwook/windbgtool/blob/master/installation/install_windbg_files.py) to fix PyKD WinDbg DLL compatibility issues
