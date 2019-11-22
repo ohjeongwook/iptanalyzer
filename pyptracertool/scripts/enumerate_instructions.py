@@ -41,5 +41,5 @@ if __name__ == '__main__':
 
     ptlog_analyzer.OpenPTLog(args.pt_file, start_offset = args.start_offset, end_offset = args.end_offset)
     for insn in ptlog_analyzer.EnumerateInstructions(move_forward = False, instruction_offset = args.instruction_offset, start_address = args.start_address, end_address = args.end_address):
-        disasmline = dump_loader.GetDisasmLine(insn)
+        disasmline = dump_loader.GetDisasmLine(insn.ip)
         print('Instruction: %s' % (disasmline))
