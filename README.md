@@ -15,8 +15,13 @@
    * This PC -> Right Click -> Properties -> Change Settings -> Advanced -> Environment Variables -> Add/modify "PYTHONHOME" variable
 
 ```
-ex) C:\Users\<user>\AppData\Local\Programs\Python\Python37
+ex) C:\Users\<user>\AppData\Local\Programs\Python\Python38
 ```
+
+```
+setx PYTHONHOME %USERPROFILE%\AppData\Local\Programs\Python\Python38
+```
+
 
 * [pybind11](https://pybind11.readthedocs.io/en/stable/)
    * Install pybind11 on the Python installation base
@@ -25,7 +30,7 @@ ex) C:\Users\<user>\AppData\Local\Programs\Python\Python37
 pip install pybind11
 ```
 
-## pyptracertool
+## pyiptanalyzertool
 
 * Install capstone, windbgtool 
 

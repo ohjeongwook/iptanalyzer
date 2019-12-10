@@ -8,18 +8,18 @@ import pprint
 from zipfile import ZipFile
 from datetime import datetime, timedelta
 
-import pyptracertool.ipt
+import pyiptanalyzertool.ipt
 import windbgtool.debugger
 
 if __name__ == '__main__':
     import argparse
-    import pyptracertool.cache
-    import pyptracertool.dump
+    import pyiptanalyzertool.cache
+    import pyiptanalyzertool.dump
 
     def auto_int(x):
         return int(x, 0)
 
-    parser = argparse.ArgumentParser(description='PyPTracer')
+    parser = argparse.ArgumentParser(description='Pyiptanalyzer')
     parser.add_argument('-p', action = "store", default = "", dest = "pt_file")
     parser.add_argument('-d', action = "store", default = "", dest = "dump_file")
 
@@ -44,8 +44,8 @@ if __name__ == '__main__':
         load_image = False
 
     if args.cache_file:
-        block_analyzer = pyptracertool.cache.Reader(args.cache_file, args.pt_file)
-        dump_loader = pyptracertool.dump.Loader(args.dump_file)
+        block_analyzer = pyiptanalyzertool.cache.Reader(args.cache_file, args.pt_file)
+        dump_loader = pyiptanalyzertool.dump.Loader(args.dump_file)
 
         for (sync_offset, offset, address) in block_analyzer.EnumerateBlockRange(cr3 = args.cr3, start_address = args.start_address, end_address = args.end_address):
             symbol = dump_loader.GetSymbol(address)
@@ -53,7 +53,7 @@ if __name__ == '__main__':
             disasm_line = dump_loader.GetDisasmLine(address)
             print('\t' + disasm_line)
     else:
-        ptlog_analyzer = pyptracertool.ipt.LogAnalyzer(args.dump_file, 
+        ptlog_analyzer = pyiptanalyzertool.ipt.LogAnalyzer(args.dump_file, 
                                          dump_symbols = dump_symbols, 
                                          load_image = load_image)
 

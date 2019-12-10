@@ -15,7 +15,7 @@ enum DecodingMode
     Block
 };
 
-class PTracer
+class iptanalyzer
 {
 private:
     int m_verboseLevel = 0;
@@ -50,8 +50,8 @@ private:
     int InitDecoding(DecodingMode decodingMode);
 
 public:
-    PTracer();
-    ~PTracer();
+    iptanalyzer();
+    ~iptanalyzer();
 
     void Open(const char* filename, uint64_t start_offset = 0, uint64_t endoffset = 0);
 

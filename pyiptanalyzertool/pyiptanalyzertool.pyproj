@@ -10,8 +10,8 @@
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
-    <Name>pyptracertool</Name>
-    <RootNamespace>pyptracertool</RootNamespace>
+    <Name>pyiptanalyzertool</Name>
+    <RootNamespace>pyiptanalyzertool</RootNamespace>
     <IsWindowsApplication>False</IsWindowsApplication>
     <InterpreterId>Global|PythonCore|3.7</InterpreterId>
   </PropertyGroup>
@@ -24,11 +24,11 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="pyptracertool\cache.py">
+    <Compile Include="pyiptanalyzertool\cache.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="pyptracertool\ipt.py" />
-    <Compile Include="pyptracertool\dump.py">
+    <Compile Include="pyiptanalyzertool\ipt.py" />
+    <Compile Include="pyiptanalyzertool\dump.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="scripts\enumerate_blocks.py">
@@ -46,7 +46,7 @@
     <InterpreterReference Include="Global|PythonCore|3.7" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="pyptracertool\" />
+    <Folder Include="pyiptanalyzertool\" />
     <Folder Include="scripts\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />

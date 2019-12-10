@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 import tempfile
 import logging
 
-import pyptracer
+import pyiptanalyzer
 import windbgtool.debugger
 
 class LogAnalyzer:
@@ -51,7 +51,7 @@ class LogAnalyzer:
         self.LoadedMemories = {}
         self.ErrorLocations = {}
 
-        self.PyTracer = pyptracer.PTracer()
+        self.PyTracer = pyiptanalyzer.iptanalyzer()
         self.PyTracer.Open(pt_filename, self.StartOffset , self.EndOffset)
 
     def _ExtractTracePT(self, pt_zip_filename, pt_filename ):
@@ -109,8 +109,8 @@ class LogAnalyzer:
     # False: No errors or repeated and ignored error
     def ProcessError(self, ip):
         errcode = self.PyTracer.GetDecodeStatus()
-        if errcode != pyptracer.pt_error_code.pte_ok:
-            if errcode == pyptracer.pt_error_code.pte_nomap:
+        if errcode != pyiptanalyzer.pt_error_code.pte_ok:
+            if errcode == pyiptanalyzer.pt_error_code.pte_nomap:
                 if ip in self.ErrorLocations:
                     return False
 

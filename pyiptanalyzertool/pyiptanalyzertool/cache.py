@@ -102,7 +102,7 @@ if __name__ == '__main__':
     def auto_int(x):
         return int(x, 0)
 
-    parser = argparse.ArgumentParser(description='PyPTracer')
+    parser = argparse.ArgumentParser(description='Pyiptanalyzer')
     parser.add_argument('-c', action = "store", dest = "cache_file")
     parser.add_argument('-o', action = "store", dest = "output")
 

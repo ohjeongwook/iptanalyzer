@@ -8,9 +8,9 @@ import pprint
 from zipfile import ZipFile
 from datetime import datetime, timedelta
 
-import pyptracertool.ipt
+import pyiptanalyzertool.ipt
 import windbgtool.debugger
-import pyptracertool.dump
+import pyiptanalyzertool.dump
 
 if __name__ == '__main__':
     import argparse
@@ -18,7 +18,7 @@ if __name__ == '__main__':
     def auto_int(x):
         return int(x, 0)
 
-    parser = argparse.ArgumentParser(description='PyPTracer')
+    parser = argparse.ArgumentParser(description='Pyiptanalyzer')
     parser.add_argument('-p', action = "store", default = "", dest = "pt_file")
     parser.add_argument('-d', action = "store", default = "", dest = "dump_file")
 
@@ -32,8 +32,8 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    dump_loader = pyptracertool.dump.Loader(args.dump_file)
-    ptlog_analyzer = pyptracertool.ipt.LogAnalyzer(args.dump_file,
+    dump_loader = pyiptanalyzertool.dump.Loader(args.dump_file)
+    ptlog_analyzer = pyiptanalyzertool.ipt.LogAnalyzer(args.dump_file,
                                      dump_symbols = False,
                                      dump_instructions = False,
                                      load_image = True,

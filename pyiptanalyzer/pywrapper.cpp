@@ -3,24 +3,24 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
-#include "PTracer.h"
+#include "iptanalyzer.h"
 #include "intel-pt.h"
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(pyptracer, m) {
-    py::class_<PTracer>(m, "PTracer")
+PYBIND11_MODULE(pyiptanalyzer, m) {
+    py::class_<iptanalyzer>(m, "iptanalyzer")
         .def(py::init())
-        .def("Open", &PTracer::Open)
-        .def("GetSyncOffset", &PTracer::GetSyncOffset)
-        .def("GetOffset", &PTracer::GetOffset)
-        .def("GetSize", &PTracer::GetSize)
-        .def("GetStatus", &PTracer::GetStatus)
-        .def("AddImage", &PTracer::AddImage)
-        .def("DecodeInstruction", &PTracer::DecodeInstruction)
-        .def("DecodeBlock", &PTracer::DecodeBlock)
-        .def("GetDecodeStatus", &PTracer::GetDecodeStatus)
-        .def("GetCurrentCR3", &PTracer::GetCurrentCR3);
+        .def("Open", &iptanalyzer::Open)
+        .def("GetSyncOffset", &iptanalyzer::GetSyncOffset)
+        .def("GetOffset", &iptanalyzer::GetOffset)
+        .def("GetSize", &iptanalyzer::GetSize)
+        .def("GetStatus", &iptanalyzer::GetStatus)
+        .def("AddImage", &iptanalyzer::AddImage)
+        .def("DecodeInstruction", &iptanalyzer::DecodeInstruction)
+        .def("DecodeBlock", &iptanalyzer::DecodeBlock)
+        .def("GetDecodeStatus", &iptanalyzer::GetDecodeStatus)
+        .def("GetCurrentCR3", &iptanalyzer::GetCurrentCR3);
 
     py::class_<pt_insn>(m, "pt_insn")
         .def_readwrite("ip", &pt_insn::ip)

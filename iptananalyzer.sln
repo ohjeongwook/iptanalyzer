@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29418.71
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PTracerTest", "PTracerTest\PTracerTest.vcxproj", "{08251DEB-D585-4C35-8114-AC4AA91610D8}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "iptanalyzer_tests", "iptanalyzer_tests\iptanalyzer_tests.vcxproj", "{08251DEB-D585-4C35-8114-AC4AA91610D8}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pyptracer", "pyptracer\pyptracer.vcxproj", "{AED12ED3-51EA-4FB7-9F2E-E25A2BC5EF52}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pyiptanalyzer", "pyiptanalyzer\pyiptanalyzer.vcxproj", "{AED12ED3-51EA-4FB7-9F2E-E25A2BC5EF52}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PTracer", "PTracer\PTracer.vcxproj", "{1E1E288F-17D6-4C70-9FED-326C8CCE6AAA}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "iptanalyzer", "iptanalyzer\iptanalyzer.vcxproj", "{1E1E288F-17D6-4C70-9FED-326C8CCE6AAA}"
 EndProject
-Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "pyptracertool", "pyptracertool\pyptracertool.pyproj", "{968BDD29-F1A3-4553-BB51-56085D15A258}"
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "pyiptanalyzertool", "pyiptanalyzertool\pyiptanalyzertool.pyproj", "{968BDD29-F1A3-4553-BB51-56085D15A258}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
