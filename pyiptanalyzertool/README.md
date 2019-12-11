@@ -1,3 +1,3 @@
 # pyiptanalyzertool
 
-Utilities using [pyiptanalyzer](../pyiptanalyzer).
+Utilities using [pyiptanalyzer](/pyiptanalyzer).
