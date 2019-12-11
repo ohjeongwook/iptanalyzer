@@ -13,7 +13,7 @@
     <Name>pyiptanalyzertool</Name>
     <RootNamespace>pyiptanalyzertool</RootNamespace>
     <IsWindowsApplication>False</IsWindowsApplication>
-    <InterpreterId>Global|PythonCore|3.7</InterpreterId>
+    <InterpreterId>Global|PythonCore|3.8</InterpreterId>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -43,7 +43,7 @@
     <Compile Include="scripts\generate_block_cache.py" />
   </ItemGroup>
   <ItemGroup>
-    <InterpreterReference Include="Global|PythonCore|3.7" />
+    <InterpreterReference Include="Global|PythonCore|3.8" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="pyiptanalyzertool\" />
