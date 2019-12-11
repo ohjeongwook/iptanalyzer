@@ -197,7 +197,7 @@ class LogAnalyzer:
                 move_forward = True
 
     def record_block_offsets(self, block, cr3 = 0):
-        sync_offset = self.PyTracer.GetSyncOffset()
+        sync_offset = self.PyTracer.get_sync_offset()
         offset = self.PyTracer.get_offset()
 
         logging.debug("record_block_offsets: %.16x ~ %.16x (cr3: %.16x/ ip: %.16x)" % (sync_offset, offset, cr3, block.ip))
