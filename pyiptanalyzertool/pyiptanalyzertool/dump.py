@@ -8,8 +8,8 @@ class Loader:
         self.SymbolsToAddress = {}
 
         self.Debugger = windbgtool.debugger.DbgEngine()
-        self.Debugger.LoadDump(self.DumpFilename)
-        self.Debugger.EnumerateModules()
+        self.Debugger.load_dump(self.DumpFilename)
+        self.Debugger.enumerate_modules()
     
     def __normalize_symbol(self, symbol):
         (module, function) = symbol.split('!', 1)
@@ -21,7 +21,7 @@ class Loader:
         if module_name in self.LoadedModules:
             return
 
-        for (address, symbol) in self.Debugger.EnumerateModuleSymbols([module_name, ]).items():
+        for (address, symbol) in self.Debugger.enumerate_module_symbols([module_name, ]).items():
             symbol = self.__normalize_symbol(symbol)
             self.AddressToSymbols[address] = symbol
             self.SymbolsToAddress[symbol] = address
@@ -29,7 +29,7 @@ class Loader:
         self.LoadedModules[module_name] = True
 
     def load_address_symbol(self, address):
-        address_info = self.Debugger.GetAddressInfo(address)
+        address_info = self.Debugger.get_address_info(address)
         if address_info and 'Module Name' in address_info:
             self.load_module_symbols(address_info['Module Name'])
 
@@ -61,6 +61,6 @@ class Loader:
 
     def get_disassembly_line(self, ip):
         try:
-            return self.Debugger.RunCmd('u %x L1' % (ip))
+            return self.Debugger.run_command('u %x L1' % (ip))
         except:
             return ''

@@ -36,11 +36,11 @@ class LogAnalyzer:
 
         if dump_filename:
             self.Debugger = windbgtool.debugger.DbgEngine()
-            self.Debugger.LoadDump(dump_filename)
-            self.AddressList = self.Debugger.GetAddressList()
+            self.Debugger.load_dump(dump_filename)
+            self.AddressList = self.Debugger.get_address_list()
 
             if self.DumpSymbols:
-                self.Debugger.EnumerateModules()
+                self.Debugger.enumerate_modules()
         else:
             self.Debugger = None
 
@@ -71,10 +71,10 @@ class LogAnalyzer:
 
         self.LoadedMemories[ip] = False
 
-        address_info = self.Debugger.GetAddressInfo(ip)
+        address_info = self.Debugger.get_address_info(ip)
         if self.DumpSymbols and address_info and 'Module Name' in address_info:
             module_name = address_info['Module Name'].split('.')[0]
-            for (address, symbol) in self.Debugger.EnumerateModuleSymbols([module_name, ]).items():
+            for (address, symbol) in self.Debugger.enumerate_module_symbols([module_name, ]).items():
                 self.AddressToSymbols[address] = symbol
 
         base_address = region_size = None
@@ -99,7 +99,7 @@ class LogAnalyzer:
         self.LoadedMemories[base_address] = False
         dump_filename = os.path.join(self.TempFolderName, '%x.dmp' % base_address)
         writemem_cmd = '.writemem %s %x L?%x' % (dump_filename, base_address, region_size)
-        self.Debugger.RunCmd(writemem_cmd)
+        self.Debugger.run_command(writemem_cmd)
         self.PyTracer.add_image(base_address, dump_filename)
         self.LoadedMemories[ip] = True
         self.LoadedMemories[base_address] = True
