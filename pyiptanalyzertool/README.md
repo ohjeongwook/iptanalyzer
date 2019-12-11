@@ -1,1 +1,3 @@
-pyptraertool - Python wrapper for libipt
+# pyiptanalyzertool
+
+Utilities using [pyiptanalyzer](../pyiptanalyzer).
