@@ -1,8 +1,8 @@
 # IPTAnalyzer
 
 * [iptanalyzer](iptanalyzer) is a thin layer upon Intel [libipt](https://github.com/intel/libipt)
-* [pyiptanalyzer](pyiptanalyzer) is a python wrapper around IPTAnalyzer
-   * It feature multiprocessing to process large IPT logs
+* [pyiptanalyzer](pyiptanalyzer) is a python wrapper around iptanalyzer
+   * It features multiprocessing to process large IPT logs
    * It caches major block offsets to be used in post-processing scripts
    * Some examples are under [pyiptanalyzertools](pyiptanalyzertools) folder
 
