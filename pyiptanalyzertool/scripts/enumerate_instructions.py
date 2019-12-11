@@ -39,10 +39,10 @@ if __name__ == '__main__':
                                      load_image = True,
                                      progress_report_interval = 0)
 
-    ptlog_analyzer.OpenPTLog(args.pt_file, start_offset = args.start_offset, end_offset = args.end_offset)
-    for insn in ptlog_analyzer.EnumerateInstructions(move_forward = False, instruction_offset = args.instruction_offset, start_address = args.start_address, end_address = args.end_address):
+    ptlog_analyzer.open_ipt_log(args.pt_file, start_offset = args.start_offset, end_offset = args.end_offset)
+    for insn in ptlog_analyzer.enumerate_instructions(move_forward = False, instruction_offset = args.instruction_offset, start_address = args.start_address, end_address = args.end_address):
         try:
-           disasmline = dump_loader.GetDisasmLine(insn.ip)
+           disasmline = dump_loader.get_disassembly_line(insn.ip)
            print('Instruction: %s' % (disasmline))
         except:
            pass

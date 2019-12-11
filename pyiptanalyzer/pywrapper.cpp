@@ -11,16 +11,16 @@ namespace py = pybind11;
 PYBIND11_MODULE(pyiptanalyzer, m) {
     py::class_<iptanalyzer>(m, "iptanalyzer")
         .def(py::init())
-        .def("Open", &iptanalyzer::Open)
-        .def("GetSyncOffset", &iptanalyzer::GetSyncOffset)
-        .def("GetOffset", &iptanalyzer::GetOffset)
-        .def("GetSize", &iptanalyzer::GetSize)
-        .def("GetStatus", &iptanalyzer::GetStatus)
-        .def("AddImage", &iptanalyzer::AddImage)
-        .def("DecodeInstruction", &iptanalyzer::DecodeInstruction)
-        .def("DecodeBlock", &iptanalyzer::DecodeBlock)
-        .def("GetDecodeStatus", &iptanalyzer::GetDecodeStatus)
-        .def("GetCurrentCR3", &iptanalyzer::GetCurrentCR3);
+        .def("open", &iptanalyzer::Open)
+        .def("get_sync_offset", &iptanalyzer::GetSyncOffset)
+        .def("get_offset", &iptanalyzer::GetOffset)
+        .def("get_size", &iptanalyzer::GetSize)
+        .def("get_status", &iptanalyzer::GetStatus)
+        .def("add_image", &iptanalyzer::AddImage)
+        .def("decode_instruction", &iptanalyzer::DecodeInstruction)
+        .def("decode_block", &iptanalyzer::DecodeBlock)
+        .def("get_decode_status", &iptanalyzer::GetDecodeStatus)
+        .def("get_current_cr3", &iptanalyzer::GetCurrentCR3);
 
     py::class_<pt_insn>(m, "pt_insn")
         .def_readwrite("ip", &pt_insn::ip)

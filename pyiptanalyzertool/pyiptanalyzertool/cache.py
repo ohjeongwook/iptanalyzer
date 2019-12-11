@@ -7,7 +7,7 @@ class Writer:
         self.BlockIPsToOffsets = block_ips_to_offsets
         self.BlockOffsetsToIPs = block_offsets_to_ips
 
-    def Save(self, filename):
+    def save(self, filename):
         pickle.dump([self.BlockIPsToOffsets, self.BlockOffsetsToIPs], open(filename, "wb" ) )
 
 class Reader:
@@ -15,7 +15,7 @@ class Reader:
         self.PTFilename = pt_filename
         [self.BlockIPsToOffsets, self.BlockOffsetsToIPs] = pickle.load(open(cache_filename, "rb"))
 
-    def EnumerateBlockRange(self, cr3 = 0, start_address = 0, end_address = 0):
+    def enumrate_block_range(self, cr3 = 0, start_address = 0, end_address = 0):
         if not cr3 in self.BlockOffsetsToIPs:
             return
 
@@ -32,7 +32,7 @@ class Reader:
                         continue
                 yield (sync_offset, offset, address)
 
-    def EnumerateBlocks(self, address = None, cr3 = 0):
+    def enumerate_blocks(self, address = None, cr3 = 0):
         if not cr3 in self.BlockIPsToOffsets:
             return
 
@@ -44,7 +44,7 @@ class Reader:
             for offset in self.BlockIPsToOffsets[cr3][address][sync_offset]:
                 yield (sync_offset, offset)
 
-    def FindOffsets(self, symbol):
+    def find_offsets(self, symbol):
         for block_address in self.BlockAddresses.keys():
             if block_address in self.AddressToSymbols:
                 print(self.AddressToSymbols[block_address])
@@ -54,13 +54,13 @@ class Merger:
         self.BlockIPsToOffsets = {}
         self.BlockOffsetsToIPs = {}
 
-    def ReadDirectory(self, dirname):
+    def read_directory(self, dirname):
         for basename in os.listdir(dirname):
             if not basename.endswith('.cache'):
                 continue
-            self.Read(os.path.join(dirname, basename))
+            self.read(os.path.join(dirname, basename))
 
-    def Read(self, filename):
+    def read(self, filename):
         try:
             [block_ips_to_offset, block_offsets_to_ips] = pickle.load(open(filename, "rb"))
         except:
@@ -93,7 +93,7 @@ class Merger:
                 for address in addresses:
                     self.BlockOffsetsToIPs[cr3][offset].append(address)
 
-    def Write(self, filename):
+    def write(self, filename):
         pickle.dump([self.BlockIPsToOffsets, self.BlockOffsetsToIPs], open(filename, "wb" ) )
 
 if __name__ == '__main__':
@@ -109,5 +109,5 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     merger = Merger()
-    merger.ReadDirectory(args.cache_file)
-    merger.Write(args.output)
+    merger.read_directory(args.cache_file)
+    merger.write(args.output)
