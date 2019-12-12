@@ -1,4 +1,4 @@
-# IPTAnalyzer
+# iptanalyzer
 
 * [iptanalyzer](iptanalyzer) is a thin layer upon Intel [libipt](https://github.com/intel/libipt)
 * [pyiptanalyzer](pyiptanalyzer) is a python wrapper around iptanalyzer
@@ -47,6 +47,8 @@ pip install pykd
 pip install capstone
 pip install git+https://github.com/ohjeongwook/windbgtool
 ```
+
+* Install WinDbg from [Windows SDK](https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk)
 
 ---
 ## Fix Windbg DLL Compatibility Issues
