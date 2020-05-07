@@ -2,15 +2,15 @@
 #include <iostream>
 #include <string>
 
-#include "iptanalyzer.h"
+#include "ipt.h"
 
-iptanalyzer::iptanalyzer()
+ipt::ipt()
 {
     m_startOffset = 0;
     InitImageCache();
 }
 
-iptanalyzer::~iptanalyzer()
+ipt::~ipt()
 {
     if (m_iscache)
     {
@@ -33,27 +33,27 @@ iptanalyzer::~iptanalyzer()
     }
 }
 
-uint64_t iptanalyzer::GetSyncOffset()
+uint64_t ipt::GetSyncOffset()
 {
     return m_startOffset + m_syncOffset;
 }
 
-uint64_t iptanalyzer::GetOffset()
+uint64_t ipt::GetOffset()
 {
     return m_startOffset + m_offset;
 }
 
-uint64_t iptanalyzer::GetSize()
+uint64_t ipt::GetSize()
 {
     return m_size;
 }
 
-pt_error_code iptanalyzer::GetStatus()
+pt_error_code ipt::GetStatus()
 {
     return pt_errcode(m_status);
 }
 
-const char* iptanalyzer::GetModeName(pt_exec_mode mode) {
+const char* ipt::GetModeName(pt_exec_mode mode) {
     switch (mode) {
     case ptem_unknown:
         return "unknown";
@@ -71,7 +71,7 @@ const char* iptanalyzer::GetModeName(pt_exec_mode mode) {
     return "unknown";
 }
 
-const char* iptanalyzer::GetEventTypeName(enum pt_event_type event_type) {
+const char* ipt::GetEventTypeName(enum pt_event_type event_type) {
     switch (event_type) {
     case ptev_enabled:
         return "ptev_enabled";
@@ -118,7 +118,7 @@ const char* iptanalyzer::GetEventTypeName(enum pt_event_type event_type) {
     return "unknown";
 }
 
-void iptanalyzer::BuildConfig(uint8_t* begin, uint8_t* end)
+void ipt::BuildConfig(uint8_t* begin, uint8_t* end)
 {
     memset(&m_config, 0, sizeof(m_config));
     m_config.size = sizeof(m_config);
@@ -133,7 +133,7 @@ void iptanalyzer::BuildConfig(uint8_t* begin, uint8_t* end)
     m_config.decode.context = NULL;
 }
 
-void iptanalyzer::Open(const char* filename, uint64_t start_offset, uint64_t end_offset)
+void ipt::Open(const char* filename, uint64_t start_offset, uint64_t end_offset)
 {
     int errcode = 0;
     m_startOffset = start_offset;
@@ -156,7 +156,7 @@ void iptanalyzer::Open(const char* filename, uint64_t start_offset, uint64_t end
 
     BuildConfig((uint8_t*)&m_buffer[0], (uint8_t*)&m_buffer[0] + m_size);
 }
-int iptanalyzer::InitImageCache()
+int ipt::InitImageCache()
 {
     m_iscache = pt_iscache_alloc(NULL);
     if (!m_iscache)
@@ -165,7 +165,7 @@ int iptanalyzer::InitImageCache()
     m_image = pt_image_alloc(NULL);
 }
 
-void iptanalyzer::AddImage(uint64_t base, const char* filename)
+void ipt::AddImage(uint64_t base, const char* filename)
 {
     ifstream file(filename, ios::binary | ios::ate);
     streamsize fileSize = file.tellg();
@@ -195,7 +195,7 @@ void iptanalyzer::AddImage(uint64_t base, const char* filename)
     }
 }
 
-int iptanalyzer::InitDecoding(DecodingMode decodingMode)
+int ipt::InitDecoding(DecodingMode decodingMode)
 {
     m_status = 0;
     m_offset = 0;
@@ -239,7 +239,7 @@ int iptanalyzer::InitDecoding(DecodingMode decodingMode)
     return 0;
 }
 
-pt_insn* iptanalyzer::DecodeInstruction(bool moveForward) {
+pt_insn* ipt::DecodeInstruction(bool moveForward) {
     if (!m_insnDecoder)
     {
         InitDecoding(Instruction);
@@ -291,7 +291,7 @@ pt_insn* iptanalyzer::DecodeInstruction(bool moveForward) {
     return p_insn;
 }
 
-pt_block* iptanalyzer::DecodeBlock(bool moveForward) {
+pt_block* ipt::DecodeBlock(bool moveForward) {
     if (!m_blockDecoder) {
         InitDecoding(Block);
         if (!m_blockDecoder) {
@@ -337,12 +337,12 @@ pt_block* iptanalyzer::DecodeBlock(bool moveForward) {
     return p_block;
 }
 
-pt_error_code iptanalyzer::GetDecodeStatus()
+pt_error_code ipt::GetDecodeStatus()
 {
     return pt_errcode(m_decodeStatus);
 }
 
-uint64_t iptanalyzer::GetCurrentCR3()
+uint64_t ipt::GetCurrentCR3()
 {
     return m_currentCR3;
 }

@@ -1,7 +1,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
-#include "iptanalyzer.h"
+#include "ipt.h"
 
 void main(int argc, char* argv[]) {
     const char* filename;
@@ -13,7 +13,7 @@ void main(int argc, char* argv[]) {
 
     filename = argv[1];
 
-    iptanalyzer ptracer = iptanalyzer();
+    ipt ptracer = ipt();
     ptracer.Open(filename, 0);
     // ptracer.AddImage(0x00007ffbb5ba1000, "..\\test_files\\00007ffb`b5ba1000.dmp");
     // ptracer.AddImage(0x00007ffbb7cc1000, "..\\test_files\\00007ffb`b7cc1000.dmp");

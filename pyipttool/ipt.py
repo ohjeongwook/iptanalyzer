@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 import tempfile
 import logging
 
-import pyiptanalyzer
+import pyipt
 import windbgtool.debugger
 
 class LogAnalyzer:
@@ -51,8 +51,8 @@ class LogAnalyzer:
         self.LoadedMemories = {}
         self.ErrorLocations = {}
 
-        self.PyTracer = pyiptanalyzer.iptanalyzer()
-        self.PyTracer.open(pt_filename, self.StartOffset , self.EndOffset)
+        self.ipt = pyipt.ipt()
+        self.ipt.open(pt_filename, self.StartOffset , self.EndOffset)
 
     def __extract_ipt(self, pt_zip_filename, pt_filename ):
         if not os.path.isfile(pt_filename):
@@ -100,7 +100,7 @@ class LogAnalyzer:
         dump_filename = os.path.join(self.TempFolderName, '%x.dmp' % base_address)
         writemem_cmd = '.writemem %s %x L?%x' % (dump_filename, base_address, region_size)
         self.Debugger.run_command(writemem_cmd)
-        self.PyTracer.add_image(base_address, dump_filename)
+        self.ipt.add_image(base_address, dump_filename)
         self.LoadedMemories[ip] = True
         self.LoadedMemories[base_address] = True
         return True
@@ -108,9 +108,9 @@ class LogAnalyzer:
     # True:  Handled error
     # False: No errors or repeated and ignored error
     def process_error(self, ip):
-        errcode = self.PyTracer.get_decode_status()
-        if errcode != pyiptanalyzer.pt_error_code.pte_ok:
-            if errcode == pyiptanalyzer.pt_error_code.pte_nomap:
+        errcode = self.ipt.get_decode_status()
+        if errcode != pyipt.pt_error_code.pte_ok:
+            if errcode == pyipt.pt_error_code.pte_nomap:
                 if ip in self.ErrorLocations:
                     return False
 
@@ -124,16 +124,16 @@ class LogAnalyzer:
     def enumerate_instructions(self, move_forward = True, instruction_offset = 0, start_address = 0, end_address = 0):
         instruction_count = 0
         while 1:
-            insn = self.PyTracer.decode_instruction(move_forward)
+            insn = self.ipt.decode_instruction(move_forward)
             if not insn:
                 break
 
             if self.process_error(insn.ip):
                 move_forward = False
             else:
-                offset = self.PyTracer.get_offset()
+                offset = self.ipt.get_offset()
                 if self.ProgressReportInterval > 0 and instruction_count % self.ProgressReportInterval == 0:
-                    size = self.PyTracer.get_size()
+                    size = self.ipt.get_size()
                     progress_offset = offset - self.StartOffset
                     logging.info('enumerate_instructions: offset: %x progress: %x/%x (%f%%)' % (
                         offset,
@@ -160,15 +160,15 @@ class LogAnalyzer:
         self.BlockSyncOffsets = []
         self.StartTime = datetime.now()
         while 1:
-            block = self.PyTracer.decode_block(move_forward)
+            block = self.ipt.decode_block(move_forward)
             if not block:
                 break
 
             if self.process_error(block.ip):
                 move_forward = False
             else:
-                sync_offset = self.PyTracer.get_sync_offset()
-                offset = self.PyTracer.get_sync_offset()
+                sync_offset = self.ipt.get_sync_offset()
+                offset = self.ipt.get_sync_offset()
 
                 if self.ProgressReportInterval > 0 and block_count % self.ProgressReportInterval == 0:
                     time_diff = datetime.now() - self.StartTime
@@ -176,14 +176,14 @@ class LogAnalyzer:
                         speed = block_count/time_diff.seconds
                     else:
                         speed = 0
-                    size = self.PyTracer.get_size()
+                    size = self.ipt.get_size()
                     relative_offset = sync_offset - self.StartOffset
                     logging.info('DecodeBlock: %x +%x @ %d/%d (%f%%) speed: %d blocks/sec' % (self.StartOffset, block_count, relative_offset, size, (relative_offset*100)/size, speed))
 
                 if self.DumpInstructions:
                     logging.info('%x (%x): %s' % (sync_offset, offset, self.AddressToSymbols[block.ip]))
 
-                self.record_block_offsets(block, self.PyTracer.get_current_cr3())
+                self.record_block_offsets(block, self.ipt.get_current_cr3())
 
                 if block_offset > 0:
                     if block_offset == offset:
@@ -197,8 +197,8 @@ class LogAnalyzer:
                 move_forward = True
 
     def record_block_offsets(self, block, cr3 = 0):
-        sync_offset = self.PyTracer.get_sync_offset()
-        offset = self.PyTracer.get_offset()
+        sync_offset = self.ipt.get_sync_offset()
+        offset = self.ipt.get_offset()
 
         logging.debug("record_block_offsets: %.16x ~ %.16x (cr3: %.16x/ ip: %.16x)" % (sync_offset, offset, cr3, block.ip))
         if not cr3 in self.BlockIPsToOffsets:
@@ -230,7 +230,7 @@ class LogAnalyzer:
         self.BlockSyncOffsets = []
 
         while 1:
-            block = self.PyTracer.decode_block(move_forward)
+            block = self.ipt.decode_block(move_forward)
             if not block:
                 logging.debug("DecodeBlocks: block==None")
                 break
@@ -239,6 +239,6 @@ class LogAnalyzer:
             if self.process_error(block.ip):
                 move_forward = False
             else:
-                self.record_block_offsets(block, self.PyTracer.get_current_cr3())
+                self.record_block_offsets(block, self.ipt.get_current_cr3())
                 move_forward = True
 
