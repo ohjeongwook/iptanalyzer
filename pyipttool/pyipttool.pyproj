@@ -5,7 +5,7 @@
     <ProjectGuid>968bdd29-f1a3-4553-bb51-56085d15a258</ProjectGuid>
     <ProjectHome>
     </ProjectHome>
-    <StartupFile>enumerate_blocks.py</StartupFile>
+    <StartupFile>dump_blocks.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -31,16 +31,16 @@
     <Compile Include="dump.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="enumerate_blocks.py">
+    <Compile Include="dump_blocks.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="enumerate_instructions.py">
+    <Compile Include="dump_instructions.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="find_api_calls.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="generate_block_cache.py" />
+    <Compile Include="decode_blocks.py" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="Global|PythonCore|3.8" />
