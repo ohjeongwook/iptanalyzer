@@ -13,6 +13,7 @@
    * It caches major block offsets to be used in post-processing scripts
    * Some examples are under [pyiptanalyzertool](pyiptanalyzertool) folder
 
+---
 ## Build Instruction
 
 ### libipt
@@ -24,7 +25,7 @@
    * libipt.lib (found under build directory: lib\Debug)
    * libipt.pdb (found under build directory: bin\Debug)
 
-### Python Environment
+### Setup Python Environment
 
 1. The project depends on PYTHONEHOME environment variable to find PYTHON insntallation, set IPTANALYZER_PYTHONHOME to the Python home directory
 
