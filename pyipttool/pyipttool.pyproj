@@ -10,8 +10,8 @@
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
-    <Name>pyiptanalyzertool</Name>
-    <RootNamespace>pyiptanalyzertool</RootNamespace>
+    <Name>pyipttool</Name>
+    <RootNamespace>pyipttool</RootNamespace>
     <IsWindowsApplication>False</IsWindowsApplication>
     <InterpreterId>Global|PythonCore|3.8</InterpreterId>
   </PropertyGroup>
@@ -24,30 +24,26 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="pyiptanalyzertool\cache.py">
+    <Compile Include="cache.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="pyiptanalyzertool\ipt.py" />
-    <Compile Include="pyiptanalyzertool\dump.py">
+    <Compile Include="ipt.py" />
+    <Compile Include="dump.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="scripts\enumerate_blocks.py">
+    <Compile Include="enumerate_blocks.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="scripts\enumerate_instructions.py">
+    <Compile Include="enumerate_instructions.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="scripts\find_api_calls.py">
+    <Compile Include="find_api_calls.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="scripts\generate_block_cache.py" />
+    <Compile Include="generate_block_cache.py" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="Global|PythonCore|3.8" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="pyiptanalyzertool\" />
-    <Folder Include="scripts\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

@@ -4,14 +4,14 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="pyiptanalyzertool-ohjeongwook",
+    name="pyipttool-ohjeongwook",
     version="0.0.1",
     author="Matt Oh",
     author_email="jeongoh@darungrim.com",
     description="WinDbg Tool",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/ohjeongwook/iptanalyzer",
+    url="https://github.com/ohjeongwook/ipt",
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",

@@ -11,8 +11,8 @@ import logging
 import uuid
 import traceback
 
-import pyiptanalyzertool.ipt
-import pyiptanalyzertool.cache
+import pyipttool.ipt
+import pyipttool.cache
 import windbgtool.debugger
 
 def set_log_file(filename):
@@ -39,7 +39,7 @@ def decode_block_process(pt_filename, dump_filename, queue, temp_foldername):
         set_log_file('decode_block_process-%.16x-%.16x.log' % (start_offset, end_offset))
         logging.debug("# decode_block_process: %.16x ~ %.16x" % (start_offset, end_offset))
 
-        pt_log_analyzer = pyiptanalyzertool.ipt.LogAnalyzer(dump_filename, dump_symbols = False, load_image = True, temp_foldername = temp_foldername)
+        pt_log_analyzer = pyipttool.ipt.LogAnalyzer(dump_filename, dump_symbols = False, load_image = True, temp_foldername = temp_foldername)
         pt_log_analyzer.open_ipt_log(pt_filename, start_offset = start_offset, end_offset = end_offset)
 
         try:
@@ -51,7 +51,7 @@ def decode_block_process(pt_filename, dump_filename, queue, temp_foldername):
         logging.debug("# decode_block_process: Writing %.16x ~ %.16x to %s" % (start_offset, end_offset, block_offsets_filename))
         if block_offsets_filename:
             try:
-                cache_writer = pyiptanalyzertool.cache.Writer(pt_log_analyzer.BlockIPsToOffsets, pt_log_analyzer.BlockOffsetsToIPs)
+                cache_writer = pyipttool.cache.Writer(pt_log_analyzer.BlockIPsToOffsets, pt_log_analyzer.BlockOffsetsToIPs)
                 cache_writer.save(block_offsets_filename)
             except:
                 tb = traceback.format_exc()
@@ -61,12 +61,12 @@ if __name__ == '__main__':
     import argparse
     import tempfile
 
-    import pyiptanalyzertool.cache
+    import pyipttool.cache
 
     def auto_int(x):
         return int(x, 0)
 
-    parser = argparse.ArgumentParser(description='Pyiptanalyzer')
+    parser = argparse.ArgumentParser(description='pyipt')
     parser.add_argument('-p', action = "store", default = "", dest = "pt_file")
     parser.add_argument('-d', action = "store", default = "", dest = "dump_file")
     parser.add_argument('-c', action = "store", default="blocks.cache", dest = "cache_file")
@@ -75,7 +75,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    pytracer = pyiptanalyzertool.ipt.LogAnalyzer(args.dump_file, dump_symbols = False, progress_report_interval = 100)
+    pytracer = pyipttool.ipt.LogAnalyzer(args.dump_file, dump_symbols = False, progress_report_interval = 100)
     pytracer.open_ipt_log(args.pt_file, start_offset = 0)
     pytracer.decode_blocks()
 
@@ -117,7 +117,7 @@ if __name__ == '__main__':
         proc.join()
 
     print("Merging block cache files...")
-    merger = pyiptanalyzertool.cache.Merger()
+    merger = pyipttool.cache.Merger()
     for filename in block_offsets_filenames:
         merger.read(filename)
         os.unlink(filename)

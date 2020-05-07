@@ -22,9 +22,9 @@
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{AED12ED3-51EA-4FB7-9F2E-E25A2BC5EF52}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>pyiptanalyzer</RootNamespace>
+    <RootNamespace>pyipt</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>pyiptanalyzer</ProjectName>
+    <ProjectName>pyipt</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -96,7 +96,7 @@
       <PreprocessorDefinitions>_DEBUG;PYPTRACER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)iptanalyzer;$(SolutionDir)Libs\libipt\include;%IPTANALYZER_PYTHONHOME%\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)ipt;$(SolutionDir)Libs\libipt\include;%IPTANALYZER_PYTHONHOME%\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -107,8 +107,8 @@
       <AdditionalDependencies>libipt.lib;python38.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);libipt.lib;</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y $(OutDir)*.pyd $(SolutionDir)\pyiptanalyzertool
-copy /Y $(SolutionDir)\Libs\libipt\lib\*.dll $(SolutionDir)\pyiptanalyzertool</Command>
+      <Command>copy /Y $(OutDir)*.pyd $(SolutionDir)\pyipttool
+copy /Y $(SolutionDir)\Libs\libipt\lib\*.dll $(SolutionDir)\pyipttool</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -120,7 +120,7 @@ copy /Y $(SolutionDir)\Libs\libipt\lib\*.dll $(SolutionDir)\pyiptanalyzertool</C
       <PreprocessorDefinitions>WIN32;_DEBUG;PYPTRACER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)iptanalyzer;$(SolutionDir)Libs\libipt\include;%IPTANALYZER_PYTHONHOME%\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)ipt;$(SolutionDir)Libs\libipt\include;%IPTANALYZER_PYTHONHOME%\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -130,8 +130,8 @@ copy /Y $(SolutionDir)\Libs\libipt\lib\*.dll $(SolutionDir)\pyiptanalyzertool</C
       <AdditionalDependencies>python38.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);libipt.lib;</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y $(OutDir)*.pyd $(SolutionDir)\pyiptanalyzertool
-copy /Y $(SolutionDir)\Libs\libipt\lib\*.dll $(SolutionDir)\pyiptanalyzertool</Command>
+      <Command>copy /Y $(OutDir)*.pyd $(SolutionDir)\pyipttool
+copy /Y $(SolutionDir)\Libs\libipt\lib\*.dll $(SolutionDir)\pyipttool</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -145,7 +145,7 @@ copy /Y $(SolutionDir)\Libs\libipt\lib\*.dll $(SolutionDir)\pyiptanalyzertool</C
       <PreprocessorDefinitions>WIN32;NDEBUG;PYPTRACER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)iptanalyzer;$(SolutionDir)Libs\libipt\include;%IPTANALYZER_PYTHONHOME%\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)ipt;$(SolutionDir)Libs\libipt\include;%IPTANALYZER_PYTHONHOME%\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -157,8 +157,8 @@ copy /Y $(SolutionDir)\Libs\libipt\lib\*.dll $(SolutionDir)\pyiptanalyzertool</C
       <AdditionalDependencies>python38.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);libipt.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y $(OutDir)*.pyd $(SolutionDir)\pyiptanalyzertool
-copy /Y $(SolutionDir)\Libs\libipt\lib\*.dll $(SolutionDir)\pyiptanalyzertool</Command>
+      <Command>copy /Y $(OutDir)*.pyd $(SolutionDir)\pyipttool
+copy /Y $(SolutionDir)\Libs\libipt\lib\*.dll $(SolutionDir)\pyipttool</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -172,7 +172,7 @@ copy /Y $(SolutionDir)\Libs\libipt\lib\*.dll $(SolutionDir)\pyiptanalyzertool</C
       <PreprocessorDefinitions>NDEBUG;PYPTRACER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)iptanalyzer;$(SolutionDir)Libs\libipt\include;%IPTANALYZER_PYTHONHOME%\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)ipt;$(SolutionDir)Libs\libipt\include;%IPTANALYZER_PYTHONHOME%\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -184,15 +184,15 @@ copy /Y $(SolutionDir)\Libs\libipt\lib\*.dll $(SolutionDir)\pyiptanalyzertool</C
       <AdditionalDependencies>python38.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);libipt.lib;</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y $(OutDir)*.pyd $(SolutionDir)\pyiptanalyzertool
-copy /Y $(SolutionDir)\Libs\libipt\lib\*.dll $(SolutionDir)\pyiptanalyzertool</Command>
+      <Command>copy /Y $(OutDir)*.pyd $(SolutionDir)\pyipttool
+copy /Y $(SolutionDir)\Libs\libipt\lib\*.dll $(SolutionDir)\pyipttool</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="pywrapper.cpp" />
+    <ClCompile Include="pyipt.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\iptanalyzer\iptanalyzer.vcxproj">
+    <ProjectReference Include="..\ipt\ipt.vcxproj">
       <Project>{1e1e288f-17d6-4c70-9fed-326c8cce6aaa}</Project>
     </ProjectReference>
   </ItemGroup>

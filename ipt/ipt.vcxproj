@@ -22,7 +22,7 @@
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{1E1E288F-17D6-4C70-9FED-326C8CCE6AAA}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>iptanalyzer</RootNamespace>
+    <RootNamespace>ipt</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -173,10 +173,10 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="iptanalyzer.cpp" />
+    <ClCompile Include="ipt.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="iptanalyzer.h" />
+    <ClInclude Include="ipt.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\README.md" />

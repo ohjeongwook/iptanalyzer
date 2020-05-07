@@ -1,17 +1,17 @@
-# iptanalyzer
+# ipt
 
 * What is Processor Trace for?
 
-> It can be used to automatically triage exploits. Usually PT logs are huge and it takes long time to process them. iptanalyzer will perform multiprocessing to create cache file to be used for post-mortem analysis.
+> It can be used to automatically triage exploits. Usually PT logs are huge and it takes long time to process them. ipt will perform multiprocessing to create cache file to be used for post-mortem analysis.
 
 ---
 # Tools
 
-* [iptanalyzer](iptanalyzer) is a thin layer upon Intel [libipt](https://github.com/intel/libipt)
-* [pyiptanalyzer](pyiptanalyzer) is a python wrapper around iptanalyzer
+* [ipt](ipt) is a thin layer upon Intel [libipt](https://github.com/intel/libipt)
+* [pyipt](pyipt) is a python wrapper around ipt
    * It features multiprocessing to process large IPT logs
    * It caches major block offsets to be used in post-processing scripts
-   * Some examples are under [pyiptanalyzertool](pyiptanalyzertool) folder
+   * Some examples are under [pyipttool](pyipttool) folder
 
 ---
 ## Build Instruction
@@ -27,17 +27,17 @@
 
 ### Setup Python Environment
 
-1. The project depends on PYTHONEHOME environment variable to find PYTHON insntallation, set IPTANALYZER_PYTHONHOME to the Python home directory
+1. The project depends on PYTHONEHOME environment variable to find PYTHON insntallation, set ipt_PYTHONHOME to the Python home directory
 
-   * This PC -> Right Click -> Properties -> Change Settings -> Advanced -> Environment Variables -> Add/modify "IPTANALYZER_PYTHONHOME" variable
+   * This PC -> Right Click -> Properties -> Change Settings -> Advanced -> Environment Variables -> Add/modify "ipt_PYTHONHOME" variable
 
 ```
 ex) C:\Users\<user>\AppData\Local\Programs\Python\Python38
 ```
 
-   * Or, you can use setx to set IPTANALYZER_PYTHONHOME variable.
+   * Or, you can use setx to set ipt_PYTHONHOME variable.
 ```
-setx IPTANALYZER_PYTHONHOME %USERPROFILE%\AppData\Local\Programs\Python\Python38
+setx ipt_PYTHONHOME %USERPROFILE%\AppData\Local\Programs\Python\Python38
 ```
 
 2. Install [pybind11](https://pybind11.readthedocs.io/en/stable/)
