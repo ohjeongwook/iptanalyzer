@@ -15,8 +15,8 @@ void main(int argc, char* argv[]) {
 
     iptanalyzer ptracer = iptanalyzer();
     ptracer.Open(filename, 0);
-    // ptracer.AddImage(0x00007ffbb5ba1000, "..\\TestFiles\\00007ffb`b5ba1000.dmp");
-    // ptracer.AddImage(0x00007ffbb7cc1000, "..\\TestFiles\\00007ffb`b7cc1000.dmp");
+    // ptracer.AddImage(0x00007ffbb5ba1000, "..\\test_files\\00007ffb`b5ba1000.dmp");
+    // ptracer.AddImage(0x00007ffbb7cc1000, "..\\test_files\\00007ffb`b7cc1000.dmp");
 
     for (;;) {
         struct pt_block* p_block = ptracer.DecodeBlock();
