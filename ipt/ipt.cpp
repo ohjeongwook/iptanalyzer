@@ -156,6 +156,7 @@ void ipt::Open(const char* filename, uint64_t start_offset, uint64_t end_offset)
 
     BuildConfig((uint8_t*)&m_buffer[0], (uint8_t*)&m_buffer[0] + m_size);
 }
+
 int ipt::InitImageCache()
 {
     m_iscache = pt_iscache_alloc(NULL);
@@ -163,6 +164,8 @@ int ipt::InitImageCache()
         return -pte_nomem;
 
     m_image = pt_image_alloc(NULL);
+
+    return 0;
 }
 
 void ipt::AddImage(uint64_t base, const char* filename)
