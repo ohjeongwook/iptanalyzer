@@ -1,6 +1,5 @@
 import os
 import sys
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), r'.')))
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import pickle
@@ -10,24 +9,24 @@ from datetime import datetime, timedelta
 import tempfile
 import logging
 
-import pyipt
+import pyipttool.pyipt
 import windbgtool.debugger
 
 class Analyzer:
     def __init__(self, dump_filename = '', load_image = False, dump_instructions = False, dump_symbols = True, progress_report_interval = 0, temp_foldername = ''):
-        self.ProgressReportInterval = progress_report_interval
-        self.DumpInstructions = dump_instructions
-        self.DumpSymbols = dump_symbols
-        self.LoadImage = load_image
+        self.progress_report_interval = progress_report_interval
+        self.dump_instructions = dump_instructions
+        self.dump_symbols = dump_symbols
+        self.load_image = load_image
 
-        self.LoadedMemories = {}
-        self.ErrorLocations = {}
+        self.loaded_modules = {}
+        self.error_locations = {}
 
-        self.AddressToSymbols = {}
-        self.AddressList = None
-        self.BlockIPsToOffsets = {}
-        self.BlockOffsetsToIPs = {}
-        self.BlockSyncOffsets = []
+        self.address_to_symbols = {}
+        self.address_list = None
+        self.block_ips_to_offsets = {}
+        self.block_offsets_to_ips = {}
+        self.block_sync_offsets = []
 
         if temp_foldername:
             self.TempFolderName = temp_foldername
@@ -35,24 +34,24 @@ class Analyzer:
             self.TempFolderName = tempfile.gettempdir()
 
         if dump_filename:
-            self.Debugger = windbgtool.debugger.DbgEngine()
-            self.Debugger.load_dump(dump_filename)
-            self.AddressList = self.Debugger.get_address_list()
+            self.debugger = windbgtool.debugger.DbgEngine()
+            self.debugger.load_dump(dump_filename)
+            self.address_list = self.debugger.get_address_list()
 
-            if self.DumpSymbols:
-                self.Debugger.enumerate_modules()
+            if self.dump_symbols:
+                self.debugger.enumerate_modules()
         else:
-            self.Debugger = None
+            self.debugger = None
 
     def open_ipt_log(self, pt_filename, start_offset = 0, end_offset = 0):
-        self.StartOffset = start_offset
-        self.EndOffset = end_offset
+        self.start_offset = start_offset
+        self.end_offset = end_offset
 
-        self.LoadedMemories = {}
-        self.ErrorLocations = {}
+        self.loaded_modules = {}
+        self.error_locations = {}
 
         self.ipt = pyipt.ipt()
-        self.ipt.open(pt_filename, self.StartOffset , self.EndOffset)
+        self.ipt.open(pt_filename, self.start_offset , self.end_offset)
 
     def __extract_ipt(self, pt_zip_filename, pt_filename ):
         if not os.path.isfile(pt_filename):
@@ -66,20 +65,20 @@ class Analyzer:
             raw_line += '%.2x ' % (byte % 256)
 
     def add_image(self, ip, use_address_map = True):
-        if ip in self.LoadedMemories:
-            return self.LoadedMemories[ip]
+        if ip in self.loaded_modules:
+            return self.loaded_modules[ip]
 
-        self.LoadedMemories[ip] = False
+        self.loaded_modules[ip] = False
 
-        address_info = self.Debugger.get_address_info(ip)
-        if self.DumpSymbols and address_info and 'Module Name' in address_info:
+        address_info = self.debugger.get_address_info(ip)
+        if self.dump_symbols and address_info and 'Module Name' in address_info:
             module_name = address_info['Module Name'].split('.')[0]
-            for (address, symbol) in self.Debugger.enumerate_module_symbols([module_name, ]).items():
-                self.AddressToSymbols[address] = symbol
+            for (address, symbol) in self.debugger.enumerate_module_symbols([module_name, ]).items():
+                self.address_to_symbols[address] = symbol
 
         base_address = region_size = None
-        if use_address_map and self.AddressList:
-            for mem_info in self.AddressList:
+        if use_address_map and self.address_list:
+            for mem_info in self.address_list:
                 if mem_info['BaseAddr'] <= ip and ip <= mem_info['EndAddr']:
                     base_address = mem_info['BaseAddr']
                     region_size = mem_info['RgnSize']
@@ -93,16 +92,16 @@ class Analyzer:
             logging.error('add_image failed to find base address for %x' % ip)
             return False
 
-        if base_address in self.LoadedMemories:
-            return self.LoadedMemories[base_address]
+        if base_address in self.loaded_modules:
+            return self.loaded_modules[base_address]
 
-        self.LoadedMemories[base_address] = False
+        self.loaded_modules[base_address] = False
         dump_filename = os.path.join(self.TempFolderName, '%x.dmp' % base_address)
         writemem_cmd = '.writemem %s %x L?%x' % (dump_filename, base_address, region_size)
-        self.Debugger.run_command(writemem_cmd)
+        self.debugger.run_command(writemem_cmd)
         self.ipt.add_image(base_address, dump_filename)
-        self.LoadedMemories[ip] = True
-        self.LoadedMemories[base_address] = True
+        self.loaded_modules[ip] = True
+        self.loaded_modules[base_address] = True
         return True
 
     # True:  Handled error
@@ -111,12 +110,12 @@ class Analyzer:
         errcode = self.ipt.get_decode_status()
         if errcode != pyipt.pt_error_code.pte_ok:
             if errcode == pyipt.pt_error_code.pte_nomap:
-                if ip in self.ErrorLocations:
+                if ip in self.error_locations:
                     return False
 
-                self.ErrorLocations[ip] = 1
+                self.error_locations[ip] = 1
 
-                if self.LoadImage and self.add_image(ip):
+                if self.load_image and self.add_image(ip):
                     return True
 
         return False 
@@ -132,9 +131,9 @@ class Analyzer:
                 move_forward = False
             else:
                 offset = self.ipt.get_offset()
-                if self.ProgressReportInterval > 0 and instruction_count % self.ProgressReportInterval == 0:
+                if self.progress_report_interval > 0 and instruction_count % self.progress_report_interval == 0:
                     size = self.ipt.get_size()
-                    progress_offset = offset - self.StartOffset
+                    progress_offset = offset - self.start_offset
                     logging.info('enumerate_instructions: offset: %x progress: %x/%x (%f%%)' % (
                         offset,
                         progress_offset,
@@ -155,10 +154,11 @@ class Analyzer:
                 move_forward = True
 
     def enumerate_blocks(self, log_filename = '', move_forward = True, block_offset = 0):
-        self.BlockIPsToOffsets = {}
-        self.BlockOffsetsToIPs = {}
-        self.BlockSyncOffsets = []
+        self.block_ips_to_offsets = {}
+        self.block_offsets_to_ips = {}
+        self.block_sync_offsets = []
         self.StartTime = datetime.now()
+        block_count = 0
         while 1:
             block = self.ipt.decode_block(move_forward)
             if not block:
@@ -170,18 +170,18 @@ class Analyzer:
                 sync_offset = self.ipt.get_sync_offset()
                 offset = self.ipt.get_sync_offset()
 
-                if self.ProgressReportInterval > 0 and block_count % self.ProgressReportInterval == 0:
+                if self.progress_report_interval > 0 and block_count % self.progress_report_interval == 0:
                     time_diff = datetime.now() - self.StartTime
                     if time_diff.seconds > 0:
                         speed = block_count/time_diff.seconds
                     else:
                         speed = 0
                     size = self.ipt.get_size()
-                    relative_offset = sync_offset - self.StartOffset
-                    logging.info('DecodeBlock: %x +%x @ %d/%d (%f%%) speed: %d blocks/sec' % (self.StartOffset, block_count, relative_offset, size, (relative_offset*100)/size, speed))
+                    relative_offset = sync_offset - self.start_offset
+                    logging.info('DecodeBlock: %x +%x @ %d/%d (%f%%) speed: %d blocks/sec' % (self.start_offset, block_count, relative_offset, size, (relative_offset*100)/size, speed))
 
-                if self.DumpInstructions:
-                    logging.info('%x (%x): %s' % (sync_offset, offset, self.AddressToSymbols[block.ip]))
+                if self.dump_instructions:
+                    logging.info('%x (%x): %s' % (sync_offset, offset, self.address_to_symbols[block.ip]))
 
                 self.record_block_offsets(block, self.ipt.get_current_cr3())
 
@@ -196,38 +196,40 @@ class Analyzer:
 
                 move_forward = True
 
+        block_count += 1
+
     def record_block_offsets(self, block, cr3 = 0):
         sync_offset = self.ipt.get_sync_offset()
         offset = self.ipt.get_offset()
 
         logging.debug("record_block_offsets: %.16x ~ %.16x (cr3: %.16x/ ip: %.16x)" % (sync_offset, offset, cr3, block.ip))
-        if not cr3 in self.BlockIPsToOffsets:
-            self.BlockIPsToOffsets[cr3] = {}
+        if not cr3 in self.block_ips_to_offsets:
+            self.block_ips_to_offsets[cr3] = {}
 
-        self.BlockSyncOffsets.append(sync_offset)
-        if not block.ip in self.BlockIPsToOffsets[cr3]:
-            self.BlockIPsToOffsets[cr3][block.ip] = {}
+        self.block_sync_offsets.append(sync_offset)
+        if not block.ip in self.block_ips_to_offsets[cr3]:
+            self.block_ips_to_offsets[cr3][block.ip] = {}
 
-        if not sync_offset in self.BlockIPsToOffsets[cr3][block.ip]:
-            self.BlockIPsToOffsets[cr3][block.ip][sync_offset]={}
+        if not sync_offset in self.block_ips_to_offsets[cr3][block.ip]:
+            self.block_ips_to_offsets[cr3][block.ip][sync_offset]={}
 
-        if not offset in self.BlockIPsToOffsets[cr3][block.ip][sync_offset]:
-            self.BlockIPsToOffsets[cr3][block.ip][sync_offset][offset] = 1
+        if not offset in self.block_ips_to_offsets[cr3][block.ip][sync_offset]:
+            self.block_ips_to_offsets[cr3][block.ip][sync_offset][offset] = 1
         else:
-            self.BlockIPsToOffsets[cr3][block.ip][sync_offset][offset] += 1
+            self.block_ips_to_offsets[cr3][block.ip][sync_offset][offset] += 1
 
-        if not cr3 in self.BlockOffsetsToIPs:
-            self.BlockOffsetsToIPs[cr3] = {}
+        if not cr3 in self.block_offsets_to_ips:
+            self.block_offsets_to_ips[cr3] = {}
 
-        if not offset in self.BlockOffsetsToIPs[cr3]:
-            self.BlockOffsetsToIPs[cr3][offset] = []
+        if not offset in self.block_offsets_to_ips[cr3]:
+            self.block_offsets_to_ips[cr3][offset] = []
 
-        self.BlockOffsetsToIPs[cr3][offset].append({'IP': block.ip, 'SyncOffset': sync_offset})
+        self.block_offsets_to_ips[cr3][offset].append({'IP': block.ip, 'SyncOffset': sync_offset})
 
     def decode_blocks(self, move_forward = True):
-        self.BlockIPsToOffsets = {}
-        self.BlockOffsetsToIPs = {}
-        self.BlockSyncOffsets = []
+        self.block_ips_to_offsets = {}
+        self.block_offsets_to_ips = {}
+        self.block_sync_offsets = []
 
         while 1:
             block = self.ipt.decode_block(move_forward)
