@@ -2,14 +2,14 @@ import windbgtool.debugger
 
 class Loader:
     def __init__(self, dump_filename):
-        self.DumpFilename = dump_filename
-        self.LoadedModules = {}
+        self.dump_filename = dump_filename
+        self.loaded_modules = {}
         self.AddressToSymbols = {}
         self.SymbolsToAddress = {}
 
-        self.Debugger = windbgtool.debugger.DbgEngine()
-        self.Debugger.load_dump(self.DumpFilename)
-        self.Debugger.enumerate_modules()
+        self.debugger = windbgtool.debugger.DbgEngine()
+        self.debugger.load_dump(self.dump_filename)
+        self.debugger.enumerate_modules()
     
     def __normalize_symbol(self, symbol):
         (module, function) = symbol.split('!', 1)
@@ -18,18 +18,18 @@ class Loader:
     def load_module_symbols(self, module_name):
         module_name = module_name.split('.')[0]
         module_name = module_name.lower()
-        if module_name in self.LoadedModules:
+        if module_name in self.loaded_modules:
             return
 
-        for (address, symbol) in self.Debugger.enumerate_module_symbols([module_name, ]).items():
+        for (address, symbol) in self.debugger.enumerate_module_symbols([module_name, ]).items():
             symbol = self.__normalize_symbol(symbol)
             self.AddressToSymbols[address] = symbol
             self.SymbolsToAddress[symbol] = address
 
-        self.LoadedModules[module_name] = True
+        self.loaded_modules[module_name] = True
 
     def load_address_symbol(self, address):
-        address_info = self.Debugger.get_address_info(address)
+        address_info = self.debugger.get_address_info(address)
         if address_info and 'Module Name' in address_info:
             self.load_module_symbols(address_info['Module Name'])
 
@@ -61,6 +61,6 @@ class Loader:
 
     def get_disassembly_line(self, ip):
         try:
-            return self.Debugger.run_command('u %x L1' % (ip))
+            return self.debugger.run_command('u %x L1' % (ip))
         except:
             return ''
