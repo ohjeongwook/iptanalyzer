@@ -53,7 +53,7 @@ if __name__ == '__main__':
             disasm_line = dump_loader.get_disassembly_line(address)
             print('\t' + disasm_line)
     else:
-        ptlog_analyzer = pyipttool.ipt.LogAnalyzer(args.dump_file, 
+        ptlog_analyzer = pyipttool.ipt.Analyzer(args.dump_file, 
                                          dump_symbols = dump_symbols, 
                                          load_image = load_image)
 

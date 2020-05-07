@@ -39,7 +39,7 @@ def decode_block_process(pt_filename, dump_filename, queue, temp_foldername):
         set_log_file('decode_block_process-%.16x-%.16x.log' % (start_offset, end_offset))
         logging.debug("# decode_block_process: %.16x ~ %.16x" % (start_offset, end_offset))
 
-        pt_log_analyzer = pyipttool.ipt.LogAnalyzer(dump_filename, dump_symbols = False, load_image = True, temp_foldername = temp_foldername)
+        pt_log_analyzer = pyipttool.ipt.Analyzer(dump_filename, dump_symbols = False, load_image = True, temp_foldername = temp_foldername)
         pt_log_analyzer.open_ipt_log(pt_filename, start_offset = start_offset, end_offset = end_offset)
 
         try:
@@ -75,7 +75,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    pytracer = pyipttool.ipt.LogAnalyzer(args.dump_file, dump_symbols = False, progress_report_interval = 100)
+    pytracer = pyipttool.ipt.Analyzer(args.dump_file, dump_symbols = False, progress_report_interval = 100)
     pytracer.open_ipt_log(args.pt_file, start_offset = 0)
     pytracer.decode_blocks()
 

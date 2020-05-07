@@ -33,7 +33,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     dump_loader = pyipttool.dump.Loader(args.dump_file)
-    ptlog_analyzer = pyipttool.ipt.LogAnalyzer(args.dump_file,
+    ptlog_analyzer = pyipttool.ipt.Analyzer(args.dump_file,
                                      dump_symbols = False,
                                      dump_instructions = False,
                                      load_image = True,
