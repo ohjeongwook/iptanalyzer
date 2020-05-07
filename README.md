@@ -61,4 +61,4 @@ pip install git+https://github.com/ohjeongwook/windbgtool
 ---
 ## Fix Windbg DLL Compatibility Issues
 
-Please run script from [install_windbg_files.py](https://raw.githubusercontent.com/ohjeongwook/windbgtool/master/installation/install_windbg_files.py) to fix PyKD WinDbg DLL compatibility issues
+PyKD sometimes suffers from WinDbg DLL compability issues. Please run script from [fix_windbg_files.py](https://github.com/ohjeongwook/windbgtool/blob/master/pykdfix/fix_windbg_files.py) when you find the issue affecting PyKD loading.
