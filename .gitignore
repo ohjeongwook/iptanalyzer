@@ -25,12 +25,11 @@
 /Pyiptanalyzer/Pyiptanalyzer.vcxproj.filters
 /x64/Release
 /pyiptanalyzertool/trace.pt
-/test_files/trace.pt
-*.dmp
+/tests/test_files/trace.pt
 *.p
 __pycache__/
-/test_files/0x104b9bec.txt
-/test_files/0x104b9bec.pt
+/tests/test_files/0x104b9bec.txt
+/tests/test_files/0x104b9bec.pt
 /pyiptanalyzertool/ins.txt
 /pyiptanalyzertool/block_analyzer.txt
 /pyiptanalyzertool/pyiptanalyzer.pyd
@@ -47,3 +46,8 @@ pyiptanalyzertool/pyiptanalyzer.pdb
 pyiptanalyzertool/pyiptanalyzertool_ohjeongwook.egg-info/
 pyiptanalyzertool/dist/pyiptanalyzertool_ohjeongwook-0.0.1-py3.8.egg
 Debug/
+tests/test_files/notepad.exe.dmp
+tests/iptanalyzer_tests/iptanalyzer_tests.vcxproj.user
+tests/test_files/blocks.cache
+pyiptanalyzer.pyd
+libipt.dll
