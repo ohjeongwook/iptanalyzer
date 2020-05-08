@@ -14,6 +14,11 @@
    * Some examples are under [pyipttool](pyipttool) folder
 
 ---
+# Usage
+
+For a good example, please read my article [Using Intel PT for Vulnerability Triaging with IPTAnalyzer](https://darungrim.com/research/2020-05-07-UsingIntelPTForVulnerabilityTriagingWithIPTAnalyzer.html)
+
+---
 ## Build Instruction
 
 ### libipt
