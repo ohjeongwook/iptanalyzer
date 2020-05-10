@@ -1,7 +1,6 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-sys.path.append(r'..\x64\Debug')
 
 import pickle
 import pprint
@@ -13,7 +12,6 @@ import traceback
 
 import pyipttool.ipt
 import pyipttool.cache
-import windbgtool.debugger
 
 def set_log_file(filename):
     fh = logging.FileHandler(filename, 'w')

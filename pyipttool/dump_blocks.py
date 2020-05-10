@@ -8,7 +8,6 @@ from zipfile import ZipFile
 from datetime import datetime, timedelta
 
 import pyipttool.ipt
-import windbgtool.debugger
 
 if __name__ == '__main__':
     import argparse
