@@ -8,10 +8,10 @@ from zipfile import ZipFile
 from datetime import datetime, timedelta
 
 import pyipttool.ipt
-import pyipttool.dump
 
 if __name__ == '__main__':
     import argparse
+    import windbgtool.debugger
 
     def auto_int(x):
         return int(x, 0)
@@ -30,7 +30,10 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    dump_loader = pyipttool.dump.Loader(args.dump_file)
+    debugger = windbgtool.debugger.DbgEngine()
+    debugger.load_dump(args.dump_file)
+    debugger.enumerate_modules()
+
     ptlog_analyzer = pyipttool.ipt.Analyzer(args.dump_file,
                                      dump_symbols = False,
                                      dump_instructions = False,
@@ -40,7 +43,7 @@ if __name__ == '__main__':
     ptlog_analyzer.open_ipt_log(args.pt_file, start_offset = args.start_offset, end_offset = args.end_offset)
     for insn in ptlog_analyzer.enumerate_instructions(move_forward = False, instruction_offset = args.instruction_offset, start_address = args.start_address, end_address = args.end_address):
         try:
-           disasmline = dump_loader.get_disassembly_line(insn.ip)
+           disasmline = debugger.get_disassembly_line(insn.ip)
            print('Instruction: %s' % (disasmline))
         except:
            pass

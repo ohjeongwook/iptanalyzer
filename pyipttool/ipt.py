@@ -22,7 +22,6 @@ class Analyzer:
         self.loaded_modules = {}
         self.error_locations = {}
 
-        self.address_to_symbols = {}
         self.address_list = None
         self.block_ips_to_offsets = {}
         self.block_offsets_to_ips = {}
@@ -73,8 +72,7 @@ class Analyzer:
         address_info = self.debugger.get_address_info(ip)
         if self.dump_symbols and address_info and 'Module Name' in address_info:
             module_name = address_info['Module Name'].split('.')[0]
-            for (address, symbol) in self.debugger.enumerate_module_symbols([module_name, ]).items():
-                self.address_to_symbols[address] = symbol
+            self.debugger.load_symbols([module_name, ])
 
         base_address = region_size = None
         if use_address_map and self.address_list:
@@ -181,7 +179,7 @@ class Analyzer:
                     logging.info('DecodeBlock: %x +%x @ %d/%d (%f%%) speed: %d blocks/sec' % (self.start_offset, block_count, relative_offset, size, (relative_offset*100)/size, speed))
 
                 if self.dump_instructions:
-                    logging.info('%x (%x): %s' % (sync_offset, offset, self.address_to_symbols[block.ip]))
+                    logging.info('%x (%x): %s' % (sync_offset, offset, self.debugger.find_symbol(block.ip)))
 
                 self.record_block_offsets(block, self.ipt.get_current_cr3())
 

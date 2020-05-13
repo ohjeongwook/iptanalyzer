@@ -12,7 +12,7 @@ import pyipttool.ipt
 if __name__ == '__main__':
     import argparse
     import pyipttool.cache
-    import pyipttool.dump
+    import windbgtool.debugger
 
     def auto_int(x):
         return int(x, 0)
@@ -43,13 +43,15 @@ if __name__ == '__main__':
 
     if args.cache_file:
         block_analyzer = pyipttool.cache.Reader(args.cache_file, args.pt_file)
-        dump_loader = pyipttool.dump.Loader(args.dump_file)
+
+        debugger = windbgtool.debugger.DbgEngine()
+        debugger.load_dump(args.dump_filename)
+        debugger.enumerate_modules()
 
         for (sync_offset, offset, address) in block_analyzer.enumrate_block_range(cr3 = args.cr3, start_address = args.start_address, end_address = args.end_address):
-            symbol = dump_loader.get_symbol(address)
+            symbol = debugger.find_symbol(address)
             print('> %.16x (%s) (sync_offset=%x, offset=%x)' % (address, symbol, sync_offset, offset))
-            disasm_line = dump_loader.get_disassembly_line(address)
-            print('\t' + disasm_line)
+            print('\t' + debugger.get_disassembly_line(address))
     else:
         ptlog_analyzer = pyipttool.ipt.Analyzer(args.dump_file, 
                                          dump_symbols = dump_symbols, 
