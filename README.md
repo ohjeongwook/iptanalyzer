@@ -32,17 +32,17 @@ For a good example, please read my article [Using Intel PT for Vulnerability Tri
 
 ### Setup Python Environment
 
-1. The project depends on PYTHONEHOME environment variable to find PYTHON insntallation, set IPTANALYZER_PYTHONHOME to the Python home directory
+1. The project depends on PYTHONEHOME environment variable to find PYTHON insntallation, set PYTHONHOME to the Python home directory
 
-   * This PC -> Right Click -> Properties -> Change Settings -> Advanced -> Environment Variables -> Add/modify "IPTANALYZER_PYTHONHOME" variable
+   * This PC -> Right Click -> Properties -> Change Settings -> Advanced -> Environment Variables -> Add/modify "PYTHONHOME" variable
 
 ```
 ex) C:\Users\<user>\AppData\Local\Programs\Python\Python38
 ```
 
-   * Or, you can use setx to set IPTANALYZER_PYTHONHOME variable.
+   * Or, you can use setx to set PYTHONHOME variable.
 ```
-setx IPTANALYZER_PYTHONHOME %USERPROFILE%\AppData\Local\Programs\Python\Python38
+setx PYTHONHOME %USERPROFILE%\AppData\Local\Programs\Python\Python38
 ```
 
 2. Install [pybind11](https://pybind11.readthedocs.io/en/stable/)
