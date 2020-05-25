@@ -28,9 +28,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ipt.py" />
-    <Compile Include="dump.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="dump_blocks.py">
       <SubType>Code</SubType>
     </Compile>
