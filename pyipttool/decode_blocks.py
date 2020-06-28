@@ -49,7 +49,7 @@ def decode_block_process(pt_filename, dump_filename, queue, temp_foldername):
         logging.debug("# decode_block_process: Writing %.16x ~ %.16x to %s" % (start_offset, end_offset, block_offsets_filename))
         if block_offsets_filename:
             try:
-                cache_writer = pyipttool.cache.Writer(pt_log_analyzer.block_ips_to_offset, pt_log_analyzer.block_offsets_to_ips)
+                cache_writer = pyipttool.cache.Writer(pt_log_analyzer.block_ips_to_offsets, pt_log_analyzer.block_offsets_to_ips)
                 cache_writer.save(block_offsets_filename)
             except:
                 tb = traceback.format_exc()
