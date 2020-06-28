@@ -19,7 +19,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='pyipt')
     parser.add_argument('-p', action = "store", default = "", dest = "pt_file")
-    parser.add_argument('-d', action = "store", default = "", dest = "dump_file")
+    parser.add_argument('-d', action = "store", default = "", dest = "dump_filename")
 
     parser.add_argument('-s', dest = "start_address", default = 0, type = auto_int)
     parser.add_argument('-e', dest = "end_address", default = 0, type = auto_int)
@@ -34,7 +34,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    if args.dump_file:
+    if args.dump_filename:
         dump_symbols = True
         load_image = True
     else:
@@ -53,7 +53,7 @@ if __name__ == '__main__':
             print('> %.16x (%s) (sync_offset=%x, offset=%x)' % (address, symbol, sync_offset, offset))
             print('\t' + debugger.get_disassembly_line(address))
     else:
-        ptlog_analyzer = pyipttool.ipt.Analyzer(args.dump_file, 
+        ptlog_analyzer = pyipttool.ipt.Analyzer(args.dump_filename, 
                                          dump_symbols = dump_symbols, 
                                          load_image = load_image)
 
