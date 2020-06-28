@@ -23,14 +23,15 @@ class Reader:
         offsets.sort()
 
         for offset in offsets:
-            for address_info in self.block_offsets_to_ips[cr3][offset]:
-                address = address_info['IP']
-                sync_offset = address_info['SyncOffset']
-
+            for block in self.block_offsets_to_ips[cr3][offset]:
+                block_start = block['IP']
+                block_end = block['EndIP']
                 if start_address > 0 and end_address > 0:
-                    if address < start_address or end_address < address:
-                        continue
-                yield (sync_offset, offset, address)
+                    if block_start >= start_address and block_start <= end_address:
+                        yield (offset, block)
+
+                    if block_end >= start_address and block_end <= end_address:
+                        yield (offset, block)
 
     def enumerate_blocks(self, address = None, cr3 = 0):
         if not cr3 in self.block_ips_to_offset:
