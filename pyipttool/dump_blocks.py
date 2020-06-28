@@ -63,7 +63,7 @@ if __name__ == '__main__':
             end_address = args.end_address
 
         addresses = {}
-        for (offset, block) in block_analyzer.enumrate_block_range(cr3 = args.cr3, start_address = start_address, end_address = end_address):
+        for (offset, block) in block_analyzer.enumerate_block_range(cr3 = args.cr3, start_address = start_address, end_address = end_address):
             address = block['IP']
             end_address = block['EndIP']
 

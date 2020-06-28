@@ -15,7 +15,7 @@ class Reader:
         self.PTFilename = pt_filename
         [self.block_ips_to_offset, self.block_offsets_to_ips] = pickle.load(open(cache_filename, "rb"))
 
-    def enumrate_block_range(self, cr3 = 0, start_address = 0, end_address = 0):
+    def enumerate_block_range(self, cr3 = 0, start_address = 0, end_address = 0):
         if not cr3 in self.block_offsets_to_ips:
             return
 
