@@ -22,6 +22,9 @@ if __name__ == '__main__':
     parser.add_argument('-d', action = "store", default = "", dest = "dump_filename")
 
     parser.add_argument('-m', action = "store", dest = "module_name", default = "")
+    parser.add_argument('-o', action = "store", dest = "output_filename", default = "output.log")
+    parser.add_argument('-f', action = "store", dest = "format", default = "instruction")
+
     parser.add_argument('-s', dest = "start_address", default = 0, type = auto_int)
     parser.add_argument('-e', dest = "end_address", default = 0, type = auto_int)
 
@@ -30,8 +33,6 @@ if __name__ == '__main__':
 
     parser.add_argument('-b', dest = "block_offset", default = 0, type = auto_int)
     
-    parser.add_argument('-f', action = "store", dest = "format", default = "lighthouse")
-
     parser.add_argument('-c', action = "store", dest = "cache_file")
     parser.add_argument('-C', dest = "cr3", default = 0, type = auto_int)    
 
@@ -61,13 +62,27 @@ if __name__ == '__main__':
             start_address = args.start_address
             end_address = args.end_address
 
-        for (sync_offset, offset, address) in block_analyzer.enumrate_block_range(cr3 = args.cr3, start_address = start_address, end_address = end_address):
-            if args.format == 'lighthouse':
-                print('%s+%x' % (module_name, address - start_address))
-            else:
+        addresses = {}
+        for (offset, block) in block_analyzer.enumrate_block_range(cr3 = args.cr3, start_address = start_address, end_address = end_address):
+            address = block['IP']
+            end_address = block['EndIP']
+
+            if args.format == 'instruction':
                 symbol = debugger.find_symbol(address)
-                print('> %.16x (%s) (sync_offset=%x, offset=%x)' % (address, symbol, sync_offset, offset))
+                print('> %.16x (%s) (sync_offset=%x, offset=%x)' % (address, symbol, block['SyncOffset'], offset))
                 print('\t' + debugger.get_disassembly_line(address))
+            elif args.format == 'modoffset_coverage':
+                addresses[address] = end_address
+
+        if args.format == 'modoffset_coverage':
+            if args.output_filename:
+                with open(args.output_filename, 'w') as fd:
+                    for address in addresses.keys():
+                        fd.write('%s+%x\n' % (module_name, address - start_address))
+            else:
+                for address in addresses.keys():
+                    print('%s+%x' % (module_name, address - start_address))
+
     else:
         ptlog_analyzer = pyipttool.ipt.Analyzer(args.dump_filename, 
                                          dump_symbols = dump_symbols, 
