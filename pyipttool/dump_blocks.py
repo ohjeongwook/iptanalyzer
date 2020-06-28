@@ -21,6 +21,7 @@ if __name__ == '__main__':
     parser.add_argument('-p', action = "store", default = "", dest = "pt_file")
     parser.add_argument('-d', action = "store", default = "", dest = "dump_filename")
 
+    parser.add_argument('-m', action = "store", dest = "module_name", default = "")
     parser.add_argument('-s', dest = "start_address", default = 0, type = auto_int)
     parser.add_argument('-e', dest = "end_address", default = 0, type = auto_int)
 
@@ -29,6 +30,8 @@ if __name__ == '__main__':
 
     parser.add_argument('-b', dest = "block_offset", default = 0, type = auto_int)
     
+    parser.add_argument('-f', action = "store", dest = "format", default = "lighthouse")
+
     parser.add_argument('-c', action = "store", dest = "cache_file")
     parser.add_argument('-C', dest = "cr3", default = 0, type = auto_int)    
 
@@ -48,10 +51,23 @@ if __name__ == '__main__':
         debugger.load_dump(args.dump_filename)
         debugger.enumerate_modules()
 
-        for (sync_offset, offset, address) in block_analyzer.enumrate_block_range(cr3 = args.cr3, start_address = args.start_address, end_address = args.end_address):
-            symbol = debugger.find_symbol(address)
-            print('> %.16x (%s) (sync_offset=%x, offset=%x)' % (address, symbol, sync_offset, offset))
-            print('\t' + debugger.get_disassembly_line(address))
+        start_address = 0
+        end_address = 0
+
+        if args.module_name:
+            module_name = args.module_name
+            (start_address, end_address) = debugger.get_module_range(args.module_name)
+        else:
+            start_address = args.start_address
+            end_address = args.end_address
+
+        for (sync_offset, offset, address) in block_analyzer.enumrate_block_range(cr3 = args.cr3, start_address = start_address, end_address = end_address):
+            if args.format == 'lighthouse':
+                print('%s+%x' % (module_name, address - start_address))
+            else:
+                symbol = debugger.find_symbol(address)
+                print('> %.16x (%s) (sync_offset=%x, offset=%x)' % (address, symbol, sync_offset, offset))
+                print('\t' + debugger.get_disassembly_line(address))
     else:
         ptlog_analyzer = pyipttool.ipt.Analyzer(args.dump_filename, 
                                          dump_symbols = dump_symbols, 
