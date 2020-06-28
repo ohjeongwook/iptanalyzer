@@ -37,7 +37,7 @@
     <Compile Include="find_api_calls.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="decode_blocks.py" />
+    <Compile Include="generate_cache.py" />
   </ItemGroup>
   <ItemGroup>
     <InterpreterReference Include="Global|PythonCore|3.8" />
