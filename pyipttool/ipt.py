@@ -49,7 +49,7 @@ class Analyzer:
         self.loaded_modules = {}
         self.error_locations = {}
 
-        self.ipt = pyipt.ipt()
+        self.ipt = pyipttool.pyipt.ipt()
         self.ipt.open(pt_filename, self.start_offset , self.end_offset)
 
     def __extract_ipt(self, pt_zip_filename, pt_filename ):
@@ -106,8 +106,8 @@ class Analyzer:
     # False: No errors or repeated and ignored error
     def process_error(self, ip):
         errcode = self.ipt.get_decode_status()
-        if errcode != pyipt.pt_error_code.pte_ok:
-            if errcode == pyipt.pt_error_code.pte_nomap:
+        if errcode != pyipttool.pyipt.pt_error_code.pte_ok:
+            if errcode == pyipttool.pyipt.pt_error_code.pte_nomap:
                 if ip in self.error_locations:
                     return False
 
@@ -222,7 +222,7 @@ class Analyzer:
         if not offset in self.block_offsets_to_ips[cr3]:
             self.block_offsets_to_ips[cr3][offset] = []
 
-        self.block_offsets_to_ips[cr3][offset].append({'IP': block.ip, 'SyncOffset': sync_offset})
+        self.block_offsets_to_ips[cr3][offset].append({'IP': block.ip, 'EndIP': block.end_ip, 'SyncOffset': sync_offset})
 
     def decode_blocks(self, move_forward = True):
         self.block_ips_to_offsets = {}
