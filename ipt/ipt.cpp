@@ -38,6 +38,24 @@ uint64_t ipt::GetSyncOffset()
     return m_startOffset + m_syncOffset;
 }
 
+int ipt::SetInstructionSyncOffset(uint64_t sync_offset)
+{
+    if (m_insnDecoder)
+    {
+        return pt_insn_sync_set(m_insnDecoder, sync_offset);
+    }
+    return -1;
+}
+
+int ipt::SetBlockSyncOffset(uint64_t sync_offset)
+{
+    if (m_blockDecoder)
+    {
+        return pt_blk_sync_set(m_blockDecoder, sync_offset);
+    }
+    return -1;
+}
+
 uint64_t ipt::GetOffset()
 {
     return m_startOffset + m_offset;
