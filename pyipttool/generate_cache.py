@@ -73,7 +73,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    ipt_analyzer = pyipttool.ipt.Analyzer(args.dump_file, dump_symbols = False, progress_report_interval = 100)
+    ipt_analyzer = pyipttool.ipt.Analyzer(args.dump_file, dump_symbols = False, load_image = False, progress_report_interval = 100)
     ipt_analyzer.open_ipt_log(args.pt_file, start_offset = 0)
     ipt_analyzer.decode_blocks()
 
