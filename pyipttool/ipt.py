@@ -124,14 +124,12 @@ class Analyzer:
         if sync_offset > 0:
             self.ipt.set_instruction_sync_offset(sync_offset)
 
-        print('self.ipt.get_size(): %x' % self.ipt.get_size())
         instruction_count = 0
         while 1:
             insn = self.ipt.decode_instruction(move_forward)
             if not insn:
                 status = self.ipt.get_status()
                 decode_status = self.ipt.get_decode_status()
-                print('status: %x decode_status: %x' % (status, decode_status))
                 move_forward = True
                 break
 
@@ -162,8 +160,7 @@ class Analyzer:
                 instruction_count += 1
                 move_forward = True
 
-                if insn.ip == stop_address:
-                    print('Found stop_address: %x' % insn.ip)
+                if stop_address!=0 and insn.ip == stop_address:
                     break
 
     def record_block_offsets(self, block, cr3 = 0):
