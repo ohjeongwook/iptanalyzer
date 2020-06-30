@@ -270,28 +270,25 @@ pt_insn* ipt::DecodeInstruction(bool moveForward) {
         }
     }
 
-    if (moveForward)
+    if (moveForward && m_decodeStatus < 0)
     {
-        if (m_decodeStatus < 0)
-        {
-            m_status = pt_insn_sync_forward(m_insnDecoder);
+        m_status = pt_insn_sync_forward(m_insnDecoder);
 
-            if (m_status < 0)
-            {
-                return NULL;
-            }
+        if (m_status < 0)
+        {
+            return NULL;
         }
     }
 
     pt_insn_get_sync_offset(m_insnDecoder, &m_syncOffset);
 
-    for (;;) {
+    int start_offset = GetOffset();
+
+    while (m_status & pts_event_pending) {
         struct pt_event event;
+
+        m_status = pt_insn_get_offset(m_insnDecoder, &m_offset);
         m_status = pt_insn_event(m_insnDecoder, &event, sizeof(event));
-        if (m_status <= 0)
-        {
-            break;
-        }
 
         if (event.type == ptev_paging)
         {
@@ -301,14 +298,27 @@ pt_insn* ipt::DecodeInstruction(bool moveForward) {
         {
             m_currentCR3 = event.variant.async_paging.cr3;
         }
+        else if (event.type == ptev_disabled)
+        {
+        }
+        else if (event.type == ptev_async_disabled)
+        {
+        }
+        else if (event.type == ptev_enabled)
+        {
+        }
+
+        if (m_status <= 0)
+        {
+          break;
+        }
     }
 
     m_status = pt_insn_get_offset(m_insnDecoder, &m_offset);
 
-
     pt_insn* p_insn = new pt_insn();
-    m_decodeStatus = pt_insn_next(m_insnDecoder, p_insn, sizeof(pt_insn));
-
+    m_status = pt_insn_next(m_insnDecoder, p_insn, sizeof(pt_insn));
+    m_decodeStatus = m_status;
     return p_insn;
 }
 
