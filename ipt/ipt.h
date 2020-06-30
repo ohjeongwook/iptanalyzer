@@ -65,8 +65,8 @@ public:
 
     void AddImage(uint64_t base, const char* filename);
 
-    pt_insn* DecodeInstruction(bool moveForward = true);
-    pt_block* DecodeBlock(bool moveForward = true);
+    pt_insn* DecodeInstruction();
+    pt_block* DecodeBlock();
     pt_error_code GetDecodeStatus();
 
     uint64_t GetCurrentCR3();

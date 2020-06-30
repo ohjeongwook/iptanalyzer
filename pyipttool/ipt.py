@@ -18,7 +18,7 @@ class Analyzer:
         self.dump_instructions = dump_instructions
         self.dump_symbols = dump_symbols
         self.load_image = load_image
-
+        self.load_image_ranges = []
         self.loaded_modules = {}
         self.error_locations = {}
 
@@ -104,39 +104,51 @@ class Analyzer:
 
     # True:  Handled error
     # False: No errors or repeated and ignored error
-    def process_error(self, ip, start_address = 0, end_address = 0):
-        errcode = self.ipt.get_decode_status()
+    def process_error(self, ip):
+        decode_status = self.ipt.get_decode_status()
 
-        if errcode == pyipttool.pyipt.pt_error_code.pte_ok:
+        if decode_status == pyipttool.pyipt.pt_error_code.pte_ok:
             return False
 
-        if errcode == pyipttool.pyipt.pt_error_code.pte_nomap:
+        if decode_status == pyipttool.pyipt.pt_error_code.pte_nomap:
             if ip in self.error_locations:
                 return False
+
             self.error_locations[ip] = 1
 
-            if self.load_image and ((start_address == 0 and end_address == 0) or (start_address <= ip and ip <= end_address)) and self.add_image(ip):
+            if self.load_image and self.is_in_load_image_range(ip):
+                self.add_image(ip)
                 return True
 
         return False 
 
-    def enumerate_instructions(self, move_forward = True, instruction_offset = 0, start_address = 0, end_address = 0, stop_address = 0, sync_offset = 0):
+    def is_in_load_image_range(self, address):
+        if len(self.load_image_ranges) == 0:
+            return True
+
+        for (start_address, end_address) in self.load_image_ranges:
+            if start_address <= address and address <= end_address:
+                return True
+
+        return False
+
+    def add_load_image_address_range(self, start_address, end_address):
+        self.load_image_ranges.append((start_address, end_address))
+
+    def enumerate_instructions(self, instruction_offset = 0, start_address = 0, end_address = 0, stop_address = 0, sync_offset = 0):
         if sync_offset > 0:
             self.ipt.set_instruction_sync_offset(sync_offset)
 
         instruction_count = 0
         while 1:
-            insn = self.ipt.decode_instruction(move_forward)
+            insn = self.ipt.decode_instruction()
             if not insn:
                 status = self.ipt.get_status()
                 decode_status = self.ipt.get_decode_status()
-                move_forward = True
                 break
 
-            if self.process_error(insn.ip): # , start_address, end_address
-                move_forward = False
-            else:
-                current_offset = self.ipt.get_offset()
+            current_offset = self.ipt.get_offset()
+            if not self.process_error(insn.ip):
                 if self.progress_report_interval > 0 and instruction_count % self.progress_report_interval == 0:
                     size = self.ipt.get_size()
                     progress_offset = current_offset - self.start_offset
@@ -158,9 +170,8 @@ class Analyzer:
                         yield insn
 
                 instruction_count += 1
-                move_forward = True
 
-                if stop_address!=0 and insn.ip == stop_address:
+                if stop_address != 0 and insn.ip == stop_address:
                     break
 
     def record_block_offsets(self, block, cr3 = 0):
@@ -191,38 +202,33 @@ class Analyzer:
 
         self.block_offsets_to_ips[cr3][offset].append({'IP': block.ip, 'EndIP': block.end_ip, 'SyncOffset': sync_offset})
 
-    def decode_blocks(self, move_forward = True):
+    def decode_blocks(self):
         self.block_ips_to_offsets = {}
         self.block_offsets_to_ips = {}
         self.block_sync_offsets = []
 
         while 1:
-            block = self.ipt.decode_block(move_forward)
+            block = self.ipt.decode_block()
             if not block:
                 logging.debug("DecodeBlocks: block==None")
                 break
 
             logging.debug("DecodeBlocks: %.16x" % block.ip)
-            if self.process_error(block.ip):
-                move_forward = False
-            else:
+            if not self.process_error(block.ip):
                 self.record_block_offsets(block, self.ipt.get_current_cr3())
-                move_forward = True
 
-    def enumerate_blocks(self, log_filename = '', move_forward = True, block_offset = 0):
+    def enumerate_blocks(self, log_filename = '', block_offset = 0):
         self.block_ips_to_offsets = {}
         self.block_offsets_to_ips = {}
         self.block_sync_offsets = []
         self.StartTime = datetime.now()
         block_count = 0
         while 1:
-            block = self.ipt.decode_block(move_forward)
+            block = self.ipt.decode_block()
             if not block:
                 break
 
-            if self.process_error(block.ip):
-                move_forward = False
-            else:
+            if not self.process_error(block.ip):
                 sync_offset = self.ipt.get_sync_offset()
 
                 if self.progress_report_interval > 0 and block_count % self.progress_report_interval == 0:
@@ -249,7 +255,5 @@ class Analyzer:
 
                 else:
                     yield block
-
-                move_forward = True
 
         block_count += 1

@@ -260,7 +260,7 @@ int ipt::InitDecoding(DecodingMode decodingMode)
     return 0;
 }
 
-pt_insn* ipt::DecodeInstruction(bool moveForward) {
+pt_insn* ipt::DecodeInstruction() {
     if (!m_insnDecoder)
     {
         InitDecoding(Instruction);
@@ -270,7 +270,7 @@ pt_insn* ipt::DecodeInstruction(bool moveForward) {
         }
     }
 
-    if (moveForward && m_decodeStatus < 0)
+    if (m_decodeStatus < 0 && m_decodeStatus != -pte_nomap)
     {
         m_status = pt_insn_sync_forward(m_insnDecoder);
 
@@ -307,22 +307,15 @@ pt_insn* ipt::DecodeInstruction(bool moveForward) {
         else if (event.type == ptev_enabled)
         {
         }
-
-        if (m_status <= 0)
-        {
-          break;
-        }
     }
-
     m_status = pt_insn_get_offset(m_insnDecoder, &m_offset);
-
     pt_insn* p_insn = new pt_insn();
     m_status = pt_insn_next(m_insnDecoder, p_insn, sizeof(pt_insn));
     m_decodeStatus = m_status;
     return p_insn;
 }
 
-pt_block* ipt::DecodeBlock(bool moveForward) {
+pt_block* ipt::DecodeBlock() {
     if (!m_blockDecoder) {
         InitDecoding(Block);
         if (!m_blockDecoder) {
@@ -330,22 +323,19 @@ pt_block* ipt::DecodeBlock(bool moveForward) {
         }
     }
 
-    if (moveForward)
+    if (m_decodeStatus < 0 && m_decodeStatus != -pte_nomap)
     {
-        if (m_decodeStatus < 0)
+        m_status = pt_blk_sync_forward(m_blockDecoder);
+
+        if (m_status < 0)
         {
-            m_status = pt_blk_sync_forward(m_blockDecoder);
-
-            if (m_status < 0)
-            {
-                return NULL;
-            }
-
-            pt_blk_get_sync_offset(m_blockDecoder, &m_syncOffset);
+            return NULL;
         }
+
+        pt_blk_get_sync_offset(m_blockDecoder, &m_syncOffset);
     }
 
-    for (;;) {
+    while (m_status & pts_event_pending) {
         struct pt_event event;
         m_status = pt_blk_event(m_blockDecoder, &event, sizeof(event));
         if (m_status <= 0)
@@ -365,6 +355,7 @@ pt_block* ipt::DecodeBlock(bool moveForward) {
     m_status = pt_blk_get_offset(m_blockDecoder, &m_offset);
     pt_block* p_block = new pt_block();
     m_decodeStatus = pt_blk_next(m_blockDecoder, p_block, sizeof(pt_block));
+    m_status = m_decodeStatus;
     return p_block;
 }
 
