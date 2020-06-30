@@ -20,6 +20,10 @@ if __name__ == '__main__':
     parser.add_argument('-p', action = "store", default = "", dest = "pt_file")
     parser.add_argument('-d', action = "store", default = "", dest = "dump_file")
 
+    parser.add_argument('-m', action = "store", dest = "module_name", default = "")
+    parser.add_argument('-o', action = "store", dest = "output_filename", default = "output.log")
+    parser.add_argument('-f', action = "store", dest = "format", default = "instruction")
+
     parser.add_argument('-s', dest = "start_address", default = 0, type = auto_int)
     parser.add_argument('-e', dest = "end_address", default = 0, type = auto_int)
 
@@ -34,6 +38,17 @@ if __name__ == '__main__':
     debugger.load_dump(args.dump_file)
     debugger.enumerate_modules()
 
+    start_address = 0
+    end_address = 0
+
+    if args.module_name:
+        module_name = args.module_name
+        (start_address, end_address) = debugger.get_module_range(args.module_name)
+    else:
+        module_name = ''
+        start_address = args.start_address
+        end_address = args.end_address
+
     ptlog_analyzer = pyipttool.ipt.Analyzer(args.dump_file,
                                      dump_symbols = False,
                                      dump_instructions = False,
@@ -41,9 +56,10 @@ if __name__ == '__main__':
                                      progress_report_interval = 0)
 
     ptlog_analyzer.open_ipt_log(args.pt_file, start_offset = args.start_offset, end_offset = args.end_offset)
-    for insn in ptlog_analyzer.enumerate_instructions(move_forward = False, instruction_offset = args.instruction_offset, start_address = args.start_address, end_address = args.end_address):
+
+    for insn in ptlog_analyzer.enumerate_instructions(move_forward = False, instruction_offset = args.instruction_offset, start_address = start_address, end_address = end_address):
         try:
-           disasmline = debugger.get_disassembly_line(insn.ip)
-           print('Instruction: %s' % (disasmline))
+            disasmline = debugger.get_disassembly_line(insn.ip)
+            print('Instruction: %s' % (disasmline))
         except:
-           pass
+            pass
