@@ -23,9 +23,9 @@ class Analyzer:
         self.error_locations = {}
 
         self.address_list = None
-        self.block_ips_to_offsets = {}
+        self.basic_block_addresss_to_offsets = {}
         self.block_offsets_to_ips = {}
-        self.block_sync_offsets = []
+        self.psb_offsets = []
 
         if temp_foldername:
             self.TempFolderName = temp_foldername
@@ -120,7 +120,7 @@ class Analyzer:
                 return True
 
         current_offset = self.ipt.get_offset()
-        print("\t%.8x: insn.ip: %x" % (current_offset, ip))
+        print("%.8x: insn.ip: 0x%.16x decode_status: 0x%.8x" % (current_offset, ip, decode_status))
         return False 
 
     def is_in_load_image_range(self, address):
@@ -146,6 +146,10 @@ class Analyzer:
             if not insn:
                 status = self.ipt.get_status()
                 decode_status = self.ipt.get_decode_status()
+                break
+
+            decode_status = self.ipt.get_decode_status()
+            if decode_status == pyipttool.pyipt.pt_error_code.pte_eos:
                 break
 
             current_offset = self.ipt.get_offset()
@@ -188,6 +192,10 @@ class Analyzer:
             if not insn:
                 break
 
+            decode_status = self.ipt.get_decode_status()
+            if decode_status == pyipttool.pyipt.pt_error_code.pte_eos:
+                break
+
             current_offset = self.ipt.get_offset()
 
             if not self.process_error(insn.ip):
@@ -201,28 +209,27 @@ class Analyzer:
                         break
 
             if len(stop_addresses) == 0:
-                break
-                    
+                break                    
 
     def record_block_offsets(self, block, cr3 = 0):
         sync_offset = self.ipt.get_sync_offset()
         offset = self.ipt.get_offset()
 
         logging.debug("record_block_offsets: %.16x ~ %.16x (cr3: %.16x/ ip: %.16x)" % (sync_offset, offset, cr3, block.ip))
-        if not cr3 in self.block_ips_to_offsets:
-            self.block_ips_to_offsets[cr3] = {}
+        if not cr3 in self.basic_block_addresss_to_offsets:
+            self.basic_block_addresss_to_offsets[cr3] = {}
 
-        self.block_sync_offsets.append(sync_offset)
-        if not block.ip in self.block_ips_to_offsets[cr3]:
-            self.block_ips_to_offsets[cr3][block.ip] = {}
+        self.psb_offsets.append(sync_offset)
+        if not block.ip in self.basic_block_addresss_to_offsets[cr3]:
+            self.basic_block_addresss_to_offsets[cr3][block.ip] = {}
 
-        if not sync_offset in self.block_ips_to_offsets[cr3][block.ip]:
-            self.block_ips_to_offsets[cr3][block.ip][sync_offset]={}
+        if not sync_offset in self.basic_block_addresss_to_offsets[cr3][block.ip]:
+            self.basic_block_addresss_to_offsets[cr3][block.ip][sync_offset]={}
 
-        if not offset in self.block_ips_to_offsets[cr3][block.ip][sync_offset]:
-            self.block_ips_to_offsets[cr3][block.ip][sync_offset][offset] = 1
+        if not offset in self.basic_block_addresss_to_offsets[cr3][block.ip][sync_offset]:
+            self.basic_block_addresss_to_offsets[cr3][block.ip][sync_offset][offset] = 1
         else:
-            self.block_ips_to_offsets[cr3][block.ip][sync_offset][offset] += 1
+            self.basic_block_addresss_to_offsets[cr3][block.ip][sync_offset][offset] += 1
 
         if not cr3 in self.block_offsets_to_ips:
             self.block_offsets_to_ips[cr3] = {}
@@ -233,9 +240,9 @@ class Analyzer:
         self.block_offsets_to_ips[cr3][offset].append({'IP': block.ip, 'EndIP': block.end_ip, 'SyncOffset': sync_offset})
 
     def decode_blocks(self):
-        self.block_ips_to_offsets = {}
+        self.basic_block_addresss_to_offsets = {}
         self.block_offsets_to_ips = {}
-        self.block_sync_offsets = []
+        self.psb_offsets = []
 
         while 1:
             block = self.ipt.decode_block()
@@ -243,19 +250,40 @@ class Analyzer:
                 logging.debug("DecodeBlocks: block==None")
                 break
 
+            decode_status = self.ipt.get_decode_status()
+            if decode_status == pyipttool.pyipt.pt_error_code.pte_eos:
+                break
+
             logging.debug("DecodeBlocks: %.16x" % block.ip)
+
             if not self.process_error(block.ip):
                 self.record_block_offsets(block, self.ipt.get_current_cr3())
 
+    def enumerate_sync_offsets(self):
+        sync_offsets = []
+
+        while 1:
+            sync_offset = self.ipt.get_sync_offset()
+            sync_offsets.append(sync_offset)
+
+            if not self.ipt.forward_block_sync():
+                break
+
+        return sync_offsets
+
     def enumerate_blocks(self, log_filename = '', block_offset = 0):
-        self.block_ips_to_offsets = {}
+        self.basic_block_addresss_to_offsets = {}
         self.block_offsets_to_ips = {}
-        self.block_sync_offsets = []
+        self.psb_offsets = []
         self.StartTime = datetime.now()
         block_count = 0
         while 1:
             block = self.ipt.decode_block()
             if not block:
+                break
+
+            decode_status = self.ipt.get_decode_status()
+            if decode_status == pyipttool.pyipt.pt_error_code.pte_eos:
                 break
 
             if not self.process_error(block.ip):
