@@ -25,7 +25,6 @@ class Coverage:
                                         progress_report_interval = 0)
 
         self.ptlog_analyzer.open_ipt_log(self.pt_filename)
-        #self.ptlog_analyzer.add_load_image_address_range(self.start_address, self.end_address)
 
     def add_block(self, offset, block):
         start_address = block['IP']
@@ -36,19 +35,27 @@ class Coverage:
     def save(self, output_filename):
         instruction_addresses = {}
 
-        """
+        sync_offsets = {}
         for start_address in self.addresses.keys():
             for end_address in self.addresses[start_address].keys():
                 (offset, block) = self.addresses[start_address][end_address]
-                print('Dumping %x - %x (sync_offset: %x, offset: %x)' % (block['IP'], block['EndIP'], block['SyncOffset'], offset))
-                for insn in self.ptlog_analyzer.enumerate_instructions(start_address = block['IP'], end_address = block['EndIP'], stop_address = block['EndIP'], sync_offset = block['SyncOffset']):
-                    instruction_addresses[insn.ip] = 1
+                sync_offset = block['SyncOffset']
+                if not sync_offset in sync_offsets:
+                    sync_offsets[sync_offset] = []
 
-                print('len(instruction_addresses): %d' % len(instruction_addresses))
-        """
+                sync_offsets[sync_offset].append(block)
 
-        for insn in self.ptlog_analyzer.enumerate_instructions(start_address = self.start_address, end_address = self.end_address):
-            instruction_addresses[insn.ip] = 1
+        for sync_offset, blocks in sync_offsets.items():
+            print("sync_offset: %x" % sync_offset)
+            ranges = []
+            for block in blocks:
+                ranges.append((block['IP'], block['EndIP']))
+
+            for insn in self.ptlog_analyzer.find_ranges(sync_offset = block['SyncOffset'], ranges = ranges):
+                print("\tinsn.ip: %x" % insn.ip)
+                instruction_addresses[insn.ip] = 1
+
+            print('len(instruction_addresses): %d' % len(instruction_addresses))
 
         with open(output_filename, 'w') as fd:
             for instruction_address in instruction_addresses.keys():
@@ -108,6 +115,7 @@ if __name__ == '__main__':
             module_name = args.module_name
             (start_address, end_address) = debugger.get_module_range(args.module_name)
         else:
+            module_name = ''
             start_address = args.start_address
             end_address = args.end_address
 
@@ -120,6 +128,7 @@ if __name__ == '__main__':
                 print('> %.16x (%s) (sync_offset=%x, offset=%x)' % (address, symbol, block['SyncOffset'], offset))
                 print('\t' + debugger.get_disassembly_line(address))
             elif args.format == 'modoffset_coverage':
+                print('> %.16x (sync_offset=%x, offset=%x)' % (block['IP'], block['SyncOffset'], offset))
                 coverage.add_block(offset, block)
 
         if args.format == 'modoffset_coverage':

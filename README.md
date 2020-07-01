@@ -18,6 +18,17 @@
 
 For a good example, please read my article [Using Intel PT for Vulnerability Triaging with IPTAnalyzer](https://darungrim.com/research/2020-05-07-UsingIntelPTForVulnerabilityTriagingWithIPTAnalyzer.html)
 
+## Decoding Blocks
+
+```
+    parser = argparse.ArgumentParser(description='pyipt')
+    parser.add_argument('-p', action = "store", default = "", dest = "pt_file")
+    parser.add_argument('-d', action = "store", default = "", dest = "dump_file")
+    parser.add_argument('-c', action = "store", default="blocks.cache", dest = "cache_file")
+    parser.add_argument('-t', action = "store", default=tempfile.gettempdir(), dest = "temp")
+    parser.add_argument('-o', dest = "offset", default = 0, type = auto_int)
+```
+
 ---
 ## Build Instruction
 
