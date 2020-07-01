@@ -21,6 +21,7 @@ PYBIND11_MODULE(pyipt, m) {
         .def("add_image", &ipt::AddImage)
         .def("decode_instruction", &ipt::DecodeInstruction)
         .def("decode_block", &ipt::DecodeBlock)
+        .def("forward_block_sync", &ipt::ForwardBlockSync)
         .def("get_decode_status", &ipt::GetDecodeStatus)
         .def("get_current_cr3", &ipt::GetCurrentCR3);
 

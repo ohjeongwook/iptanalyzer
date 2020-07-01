@@ -66,6 +66,7 @@ public:
     void AddImage(uint64_t base, const char* filename);
 
     pt_insn* DecodeInstruction();
+    bool ForwardBlockSync();
     pt_block* DecodeBlock();
     pt_error_code GetDecodeStatus();
 

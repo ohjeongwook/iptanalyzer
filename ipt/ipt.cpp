@@ -315,7 +315,28 @@ pt_insn* ipt::DecodeInstruction() {
     return p_insn;
 }
 
-pt_block* ipt::DecodeBlock() {
+bool ipt::ForwardBlockSync()
+{
+    if (!m_blockDecoder) {
+        InitDecoding(Block);
+        if (!m_blockDecoder) {
+            return false;
+        }
+    }
+
+    m_status = pt_blk_sync_forward(m_blockDecoder);
+
+    if (m_status < 0)
+    {
+        return false;
+    }
+
+    pt_blk_get_sync_offset(m_blockDecoder, &m_syncOffset);
+    return true;
+}
+
+pt_block* ipt::DecodeBlock()
+{
     if (!m_blockDecoder) {
         InitDecoding(Block);
         if (!m_blockDecoder) {
@@ -346,7 +367,8 @@ pt_block* ipt::DecodeBlock() {
         if (event.type == ptev_paging)
         {
             m_currentCR3 = event.variant.paging.cr3;
-        }else if (event.type == ptev_async_paging)
+        }
+        else if (event.type == ptev_async_paging)
         {
             m_currentCR3 = event.variant.async_paging.cr3;
         }
