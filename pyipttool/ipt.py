@@ -103,20 +103,18 @@ class Analyzer:
 
     # True:  Handled error
     # False: No errors or repeated and ignored error
-    def process_error(self, ip):
-        decode_status = self.ipt.get_decode_status()
-
+    def handle_decode_status(self, address, decode_status):
         if decode_status == pyipttool.pyipt.pt_error_code.pte_ok:
             return False
 
         if decode_status == pyipttool.pyipt.pt_error_code.pte_nomap:
-            if ip in self.error_locations:
+            if address in self.error_locations:
                 return False
 
-            self.error_locations[ip] = 1
+            self.error_locations[address] = 1
 
             if self.load_image: # and self.is_in_load_image_range(ip):
-                self.add_image(ip)
+                self.add_image(address)
                 return True
 
         current_offset = self.ipt.get_offset()
@@ -153,7 +151,7 @@ class Analyzer:
                 break
 
             current_offset = self.ipt.get_offset()
-            if not self.process_error(insn.ip):
+            if not self.handle_decode_status(insn.ip, decode_status):
                 if self.progress_report_interval > 0 and instruction_count % self.progress_report_interval == 0:
                     size = self.ipt.get_size()
                     progress_offset = current_offset - self.start_offset
@@ -198,7 +196,7 @@ class Analyzer:
 
             current_offset = self.ipt.get_offset()
 
-            if not self.process_error(insn.ip):
+            if not self.handle_decode_status(insn.ip, decode_status):
                 for (start_address, end_address) in ranges:
                     if start_address <= insn.ip and insn.ip <= end_address:
                         if insn.ip in stop_addresses:
@@ -247,16 +245,16 @@ class Analyzer:
         while 1:
             block = self.ipt.decode_block()
             if not block:
-                logging.debug("DecodeBlocks: block==None")
                 break
 
             decode_status = self.ipt.get_decode_status()
             if decode_status == pyipttool.pyipt.pt_error_code.pte_eos:
                 break
 
-            logging.debug("DecodeBlocks: %.16x" % block.ip)
+            offset = self.ipt.get_offset()
+            logging.debug("%.8x: decode_blocks: ip: %.16x decode_status: %x" % (offset, block.ip, decode_status))
 
-            if not self.process_error(block.ip):
+            if not self.handle_decode_status(block.ip, decode_status):
                 self.record_block_offsets(block, self.ipt.get_current_cr3())
 
     def enumerate_sync_offsets(self):
@@ -286,7 +284,7 @@ class Analyzer:
             if decode_status == pyipttool.pyipt.pt_error_code.pte_eos:
                 break
 
-            if not self.process_error(block.ip):
+            if not self.handle_decode_status(block.ip, decode_status):
                 sync_offset = self.ipt.get_sync_offset()
 
                 if self.progress_report_interval > 0 and block_count % self.progress_report_interval == 0:
