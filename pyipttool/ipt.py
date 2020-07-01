@@ -63,13 +63,11 @@ class Analyzer:
         for byte in raw_bytes:
             raw_line += '%.2x ' % (byte % 256)
 
-    def add_image(self, ip, use_address_map = True):
-        if ip in self.loaded_modules:
-            return self.loaded_modules[ip]
+    def add_image(self, address, use_address_map = True):
+        if address in self.loaded_modules:
+            return self.loaded_modules[address]
 
-        self.loaded_modules[ip] = False
-
-        address_info = self.debugger.get_address_info(ip)
+        address_info = self.debugger.get_address_info(address)
         if self.dump_symbols and address_info and 'Module Name' in address_info:
             module_name = address_info['Module Name'].split('.')[0]
             self.debugger.load_symbols([module_name, ])
@@ -77,7 +75,7 @@ class Analyzer:
         base_address = region_size = None
         if use_address_map and self.address_list:
             for mem_info in self.address_list:
-                if mem_info['BaseAddr'] <= ip and ip <= mem_info['EndAddr']:
+                if mem_info['BaseAddr'] <= address and address < mem_info['EndAddr']:
                     base_address = mem_info['BaseAddr']
                     region_size = mem_info['RgnSize']
                     break
@@ -87,18 +85,19 @@ class Analyzer:
             region_size = int(address_info['Region Size'], 16)
 
         if base_address == None or region_size == None:
-            logging.error('add_image failed to find base address for %x' % ip)
+            logging.error('add_image failed to find base address for %x' % address)
             return False
 
         if base_address in self.loaded_modules:
             return self.loaded_modules[base_address]
 
-        self.loaded_modules[base_address] = False
         dump_filename = os.path.join(self.TempFolderName, '%x.dmp' % base_address)
         writemem_cmd = '.writemem %s %x L?%x' % (dump_filename, base_address, region_size)
         self.debugger.run_command(writemem_cmd)
+
         self.ipt.add_image(base_address, dump_filename)
-        self.loaded_modules[ip] = True
+
+        self.loaded_modules[address] = True
         self.loaded_modules[base_address] = True
         return True
 
@@ -116,10 +115,12 @@ class Analyzer:
 
             self.error_locations[ip] = 1
 
-            if self.load_image and self.is_in_load_image_range(ip):
+            if self.load_image: # and self.is_in_load_image_range(ip):
                 self.add_image(ip)
                 return True
 
+        current_offset = self.ipt.get_offset()
+        print("\t%.8x: insn.ip: %x" % (current_offset, ip))
         return False 
 
     def is_in_load_image_range(self, address):
@@ -173,6 +174,35 @@ class Analyzer:
 
                 if stop_address != 0 and insn.ip == stop_address:
                     break
+
+    def find_ranges(self, sync_offset = 0, ranges = []):
+        if sync_offset > 0:
+            self.ipt.set_instruction_sync_offset(sync_offset)
+
+        stop_addresses = {}
+        for (start_address, end_address) in ranges:
+            stop_addresses[end_address] = 1
+
+        while 1:
+            insn = self.ipt.decode_instruction()
+            if not insn:
+                break
+
+            current_offset = self.ipt.get_offset()
+
+            if not self.process_error(insn.ip):
+                for (start_address, end_address) in ranges:
+                    if start_address <= insn.ip and insn.ip <= end_address:
+                        if insn.ip in stop_addresses:
+                            print("* Found insn.ip (%x) in stop_addresses" % insn.ip)
+                            del stop_addresses[insn.ip]
+                            print('\tlen(stop_addresses): %d' % len(stop_addresses))
+                        yield insn
+                        break
+
+            if len(stop_addresses) == 0:
+                break
+                    
 
     def record_block_offsets(self, block, cr3 = 0):
         sync_offset = self.ipt.get_sync_offset()
