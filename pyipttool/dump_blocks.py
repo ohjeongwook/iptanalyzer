@@ -142,5 +142,5 @@ if __name__ == '__main__':
                                          load_image = load_image)
 
         ptlog_analyzer.open_ipt_log(args.pt_filename, start_offset = args.start_offset, end_offset = args.end_offset)
-        for block in ptlog_analyzer.decode_blocks(offset = args.block_offset):
+        for block in ptlog_analyzer.decode_blocks(offset = args.block_offset, start_address = start_address, end_address = end_address):
             print('block.ip: %.16x ~ %.16x (%.16x)' % (block.ip, block.end_ip, block.ninsn))
