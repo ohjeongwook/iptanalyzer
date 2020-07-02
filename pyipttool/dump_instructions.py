@@ -56,7 +56,6 @@ if __name__ == '__main__':
                                      progress_report_interval = 0)
 
     ptlog_analyzer.open_ipt_log(args.pt_file, start_offset = args.start_offset, end_offset = args.end_offset)
-    #ptlog_analyzer.add_load_image_address_range(start_address, end_address)
 
     for insn in ptlog_analyzer.decode_instructions(offset = args.instruction_offset, start_address = start_address, end_address = end_address):
         try:
