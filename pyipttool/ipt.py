@@ -269,15 +269,15 @@ class Analyzer:
 
             if offset > 0:
                 if offset == current_offset:
-                    yield block
+                    yield instruction
 
                 if offset < current_offset:
                     break
             else:
-                if (start_address == 0 and end_address == 0) or start_address <= block.ip and block.ip <= end_address:
-                    yield block
+                if (start_address == 0 and end_address == 0) or start_address <= instruction.ip and instruction.ip <= end_address:
+                    yield instruction
         
-            if stop_address != 0 and block.ip == stop_address:
+            if stop_address != 0 and instruction.ip == stop_address:
                 break
 
     def find_ranges(self, sync_offset = 0, ranges = []):
