@@ -4,6 +4,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 import pickle
 import pprint
+import traceback
 from zipfile import ZipFile
 from datetime import datetime, timedelta
 
@@ -62,4 +63,4 @@ if __name__ == '__main__':
             disasmline = debugger.get_disassembly_line(insn.ip)
             print('Instruction: %s' % (disasmline))
         except:
-            pass
+            traceback.print_exc()
