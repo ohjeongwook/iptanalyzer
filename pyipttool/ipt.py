@@ -95,8 +95,14 @@ class Analyzer:
         writemem_cmd = '.writemem %s %x L?%x' % (dump_filename, base_address, region_size)
         self.debugger.run_command(writemem_cmd)
 
-        self.ipt.add_image(base_address, dump_filename)
+        if not os.path.isfile(dump_filename):
+            return False
 
+        if os.path.getsize(dump_filename) < region_size:
+            return False
+
+        logging.error('add_image base_address: %.8x dump_filename: %s' % (base_address, dump_filename))
+        self.ipt.add_image(base_address, dump_filename)
         self.loaded_modules[address] = True
         self.loaded_modules[base_address] = True
         return True
@@ -113,9 +119,8 @@ class Analyzer:
 
             self.error_locations[address] = 1
 
-            if self.load_image: # and self.is_in_load_image_range(ip):
-                self.add_image(address)
-                return True
+            if self.load_image:
+                return self.add_image(address)
 
         current_offset = self.ipt.get_offset()
         print("%.8x: insn.ip: 0x%.16x decode_status: 0x%.8x" % (current_offset, ip, decode_status))
@@ -213,7 +218,7 @@ class Analyzer:
         sync_offset = self.ipt.get_sync_offset()
         offset = self.ipt.get_offset()
 
-        logging.debug("record_block_offsets: %.16x ~ %.16x (cr3: %.16x/ ip: %.16x)" % (sync_offset, offset, cr3, block.ip))
+        logging.debug("%.8x: record_block_offsets: sync_offset: %.16x cr3: %.16x ip: %.16x" % (offset, sync_offset, cr3, block.ip))
         if not cr3 in self.basic_block_addresss_to_offsets:
             self.basic_block_addresss_to_offsets[cr3] = {}
 
@@ -247,15 +252,36 @@ class Analyzer:
             if not block:
                 break
 
+            skip_to_next_sync = False
             decode_status = self.ipt.get_decode_status()
-            if decode_status == pyipttool.pyipt.pt_error_code.pte_eos:
+            offset = self.ipt.get_offset()
+            address = block.ip
+            if decode_status == pyipttool.pyipt.pt_error_code.pte_ok:
+                self.record_block_offsets(block, self.ipt.get_current_cr3())
+
+            elif decode_status == pyipttool.pyipt.pt_error_code.pte_eos:
+                logging.debug("%.8x: ip: %.16x decode_status(pte_eos): %x" % (offset, address, decode_status))
                 break
 
-            offset = self.ipt.get_offset()
-            logging.debug("%.8x: decode_blocks: ip: %.16x decode_status: %x" % (offset, block.ip, decode_status))
+            elif decode_status == pyipttool.pyipt.pt_error_code.pte_nomap:
+                logging.debug("%.8x: ip: %.16x decode_status(pte_nomap): %x" % (offset, address, decode_status))
 
-            if not self.handle_decode_status(block.ip, decode_status):
-                self.record_block_offsets(block, self.ipt.get_current_cr3())
+                skip_to_next_sync = True
+                if self.load_image:
+                    if self.add_image(address):
+                        logging.debug("%.8x: add_image succeed for %.16x" % (offset, address))
+                        skip_to_next_sync = False
+                    else:
+                        logging.debug("%.8x: add_image failed for %.16x" % (offset, address))
+
+            else:
+                logging.debug("%.8x: ip: %.16x decode_status: %x" % (offset, address, decode_status))
+                skip_to_next_sync = True
+
+            if skip_to_next_sync:
+                if not self.ipt.forward_block_sync():
+                    logging.debug("%.8x: forward_block_sync failed for %.16x" % (offset, address))
+                    break
 
     def enumerate_sync_offsets(self):
         sync_offsets = []
