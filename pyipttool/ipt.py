@@ -109,7 +109,7 @@ class Analyzer:
         if os.path.getsize(dump_filename) < region_size:
             return False
 
-        logging.debug('add_image base_address: %.8x dump_filename: %s' % (base_address, dump_filename))
+        logging.debug('add_image base_address: %.8x mem_info: %s' % (base_address, pprint.pformat(mem_info)))
         self.ipt.add_image(base_address, dump_filename)
         self.loaded_modules[address] = True
         self.loaded_modules[base_address] = True
@@ -180,8 +180,6 @@ class Analyzer:
             skip_to_next_sync = False
             decode_status = self.ipt.get_decode_status()
             offset = self.ipt.get_offset()
-
-            logging.debug("%.8x: address: %x" % (offset, address))
 
             if decode_status == pyipttool.pyipt.pt_error_code.pte_ok:
                 if callback:
@@ -272,7 +270,6 @@ class Analyzer:
                 break
 
             current_offset = self.ipt.get_offset()
-
             if offset > 0:
                 if offset == current_offset:
                     yield instruction
@@ -281,12 +278,13 @@ class Analyzer:
                     break
             else:
                 if (start_address == 0 and end_address == 0) or start_address <= instruction.ip and instruction.ip <= end_address:
+                    print('%.8X: %x' % (current_offset, instruction.ip))
                     yield instruction
-        
+
             if stop_address != 0 and instruction.ip == stop_address:
                 break
 
-    def find_ranges(self, sync_offset = 0, ranges = []):
+    def decode_ranges(self, sync_offset = 0, ranges = []):
         if sync_offset > 0:
             self.ipt.set_instruction_sync_offset(sync_offset)
 
@@ -298,16 +296,23 @@ class Analyzer:
             instruction = self.decode(decode_type = 'instruction')
             if not instruction:
                 break
+
             current_offset = self.ipt.get_offset()
+            current_sync_offset = self.ipt.get_sync_offset()
 
             for (start_address, end_address) in ranges:
                 if start_address <= instruction.ip and instruction.ip <= end_address:
+                    logging.debug('%.16x: instruction.ip: %.16x' % (current_offset, instruction.ip))
                     if instruction.ip in stop_addresses:
                         logging.debug("* Found instruction.ip (%x) in stop_addresses" % instruction.ip)
                         del stop_addresses[instruction.ip]
                         logging.debug('\tlen(stop_addresses): %d' % len(stop_addresses))
+
                     yield instruction
                     break
 
             if len(stop_addresses) == 0:
-                break                    
+                break
+
+            if current_sync_offset > sync_offset:
+                break
