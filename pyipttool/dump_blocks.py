@@ -4,6 +4,8 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 import pickle
 import pprint
+import copy
+import logging
 from zipfile import ZipFile
 from datetime import datetime, timedelta
 
@@ -32,9 +34,7 @@ class Coverage:
             self.addresses[start_address] = {}
         self.addresses[start_address][ block['EndIP']] = (offset, block)
 
-    def save(self, output_filename):
-        instruction_addresses = {}
-
+    def enumerate_instructions(self):
         sync_offsets = {}
         for start_address in self.addresses.keys():
             for end_address in self.addresses[start_address].keys():
@@ -45,21 +45,38 @@ class Coverage:
 
                 sync_offsets[sync_offset].append(block)
 
+        instruction_addresses = {}
         for sync_offset, blocks in sync_offsets.items():
-            print("sync_offset: %x" % sync_offset)
+            logging.debug("sync_offset: %x" % sync_offset)
             ranges = []
             for block in blocks:
                 ranges.append((block['IP'], block['EndIP']))
 
-            for insn in self.ptlog_analyzer.find_ranges(sync_offset = block['SyncOffset'], ranges = ranges):
-                print("\tinsn.ip: %x" % insn.ip)
+            for insn in self.ptlog_analyzer.decode_ranges(sync_offset = block['SyncOffset'], ranges = ranges):
+                logging.debug("\tinsn.ip: %x" % insn.ip)
                 instruction_addresses[insn.ip] = 1
 
-            print('len(instruction_addresses): %d' % len(instruction_addresses))
+            logging.debug('len(instruction_addresses): %d' % len(instruction_addresses))
+
+        return instruction_addresses
+
+    def save(self, output_filename):
+        instruction_addresses = self.enumerate_instructions()
+
+        """
+        instruction_addresses = {}
+        for start_address in self.addresses.keys():
+            for end_address in self.addresses[start_address].keys():
+                (offset, block) = self.addresses[start_address][end_address]
+
+                for address in range(block['IP'], block['EndIP'] + 1, 1):
+                    instruction_addresses[address] = (block['IP'], block['EndIP'])
+                logging.debug('block: %.16x - %.16x' % (block['IP'], block['EndIP']))
+        """
 
         with open(output_filename, 'w') as fd:
-            for instruction_address in instruction_addresses.keys():
-                fd.write('%s+%x\n' % (module_name, instruction_address - self.start_address))
+            for address in instruction_addresses.keys():
+                fd.write('%s+%x\n' % (module_name, address - self.start_address))
 
     def print(self):
         for address in self.addresses.keys():
@@ -79,6 +96,7 @@ if __name__ == '__main__':
 
     parser.add_argument('-m', action = "store", dest = "module_name", default = "")
     parser.add_argument('-o', action = "store", dest = "output_filename", default = "output.log")
+    parser.add_argument('-D', action = "store", dest = "debug_filename", default = "")
     parser.add_argument('-f', action = "store", dest = "format", default = "instruction")
 
     parser.add_argument('-s', dest = "start_address", default = 0, type = auto_int)
@@ -100,6 +118,19 @@ if __name__ == '__main__':
     else:
         dump_symbols = False
         load_image = False
+
+    if args.debug_filename:
+        handlers = []
+        if args.debug_filename == 'stdout':
+            handlers.append(logging.StreamHandler())
+        else:
+            handlers.append(logging.FileHandler(args.debug_filename))
+
+        logging.basicConfig(
+            level=logging.DEBUG,
+            format = '%(name)s - %(levelname)s - %(message)s',
+            handlers = handlers
+        )
 
     if args.cache_file:
         block_analyzer = pyipttool.cache.Reader(args.cache_file, args.pt_filename)
