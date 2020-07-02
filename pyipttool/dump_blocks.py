@@ -10,15 +10,17 @@ from zipfile import ZipFile
 from datetime import datetime, timedelta
 
 import pyipttool.ipt
+import capstone
 
 class Coverage:
-    def __init__(self, module_name, start_address, end_address, pt_filename, dump_filename):
+    def __init__(self, module_name, start_address, end_address, pt_filename, dump_filename, debugger):
         self.module_name = module_name
         self.pt_filename = pt_filename
         self.dump_filename = dump_filename
         self.start_address = start_address
         self.end_address = end_address
         self.addresses = {}
+        self.debugger = debugger
 
         self.ptlog_analyzer = pyipttool.ipt.Analyzer(self.dump_filename,
                                         dump_symbols = False,
@@ -34,7 +36,7 @@ class Coverage:
             self.addresses[start_address] = {}
         self.addresses[start_address][ block['EndIP']] = (offset, block)
 
-    def enumerate_instructions(self):
+    def enumerate_instructions_by_pt(self):
         sync_offsets = {}
         for start_address in self.addresses.keys():
             for end_address in self.addresses[start_address].keys():
@@ -60,19 +62,29 @@ class Coverage:
 
         return instruction_addresses
 
-    def save(self, output_filename):
-        instruction_addresses = self.enumerate_instructions()
-
-        """
+    def enumerate_instruction_by_disassemble(self):
         instruction_addresses = {}
         for start_address in self.addresses.keys():
             for end_address in self.addresses[start_address].keys():
                 (offset, block) = self.addresses[start_address][end_address]
+                start_address = block['IP']
+                end_address = block['EndIP']
 
-                for address in range(block['IP'], block['EndIP'] + 1, 1):
-                    instruction_addresses[address] = (block['IP'], block['EndIP'])
                 logging.debug('block: %.16x - %.16x' % (block['IP'], block['EndIP']))
-        """
+
+                # self.disassembler = Cs(CS_ARCH_X86, CS_MODE_32)
+                # cs = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_64 if x64 else capstone.CS_MODE_32)
+                # retrieve dump using windbg
+                # disassemble from start_address
+                # continue
+                # follow jump/calls
+                # end when met with end_address
+                # record instruction IPs
+
+        return instruction_addresses
+
+    def save(self, output_filename):
+        instruction_addresses= self.enumerate_instruction_by_disassemble()
 
         with open(output_filename, 'w') as fd:
             for address in instruction_addresses.keys():
@@ -150,7 +162,7 @@ if __name__ == '__main__':
             start_address = args.start_address
             end_address = args.end_address
 
-        coverage = Coverage(module_name, start_address, end_address, args.pt_filename, args.dump_filename)
+        coverage = Coverage(module_name, start_address, end_address, args.pt_filename, args.dump_filename, debugger = debugger)
         
         for (offset, block) in block_analyzer.enumerate_block_range(cr3 = args.cr3, start_address = start_address, end_address = end_address):
             if args.format == 'instruction':
