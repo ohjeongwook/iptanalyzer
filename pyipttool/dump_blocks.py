@@ -128,7 +128,6 @@ if __name__ == '__main__':
                 print('> %.16x (%s) (sync_offset=%x, offset=%x)' % (address, symbol, block['SyncOffset'], offset))
                 print('\t' + debugger.get_disassembly_line(address))
             elif args.format == 'modoffset_coverage':
-                print('> %.16x (sync_offset=%x, offset=%x)' % (block['IP'], block['SyncOffset'], offset))
                 coverage.add_block(offset, block)
 
         if args.format == 'modoffset_coverage':
@@ -143,6 +142,5 @@ if __name__ == '__main__':
                                          load_image = load_image)
 
         ptlog_analyzer.open_ipt_log(args.pt_filename, start_offset = args.start_offset, end_offset = args.end_offset)
-
-        for block in ptlog_analyzer.enumerate_blocks(move_forward = False, block_offset = args.block_offset):
+        for block in ptlog_analyzer.decode_blocks(offset = args.block_offset):
             print('block.ip: %.16x ~ %.16x (%.16x)' % (block.ip, block.end_ip, block.ninsn))

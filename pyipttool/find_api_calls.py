@@ -29,11 +29,10 @@ if __name__ == '__main__':
 
     if args.symbol:
         address = debugger.resolve_symbol(args.symbol)
-
         for (sync_offset, offset) in block_analyzer.enumerate_blocks(address, cr3 = args.cr3):
             print('> sync_offset = %x / offset = %x' % (sync_offset, offset))
 
             pt_log_analyzer = pyipttool.ipt.Analyzer(args.dump_file, dump_symbols = True, load_image = True)
             pt_log_analyzer.open_ipt_log(args.pt_file, start_offset = sync_offset, end_offset = offset+2)
-            for insn in pt_log_analyzer.enumerate_instructions(move_forward = False, instruction_offset = offset):
-                print('\tInstruction: %s' % (debugger.get_disassembly_line(insn.ip)))
+            for instruction in pt_log_analyzer.decode_instructions(offset = offset):
+                print('\tInstruction: %s' % (debugger.get_disassembly_line(instruction.ip)))

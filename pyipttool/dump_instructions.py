@@ -58,7 +58,7 @@ if __name__ == '__main__':
     ptlog_analyzer.open_ipt_log(args.pt_file, start_offset = args.start_offset, end_offset = args.end_offset)
     #ptlog_analyzer.add_load_image_address_range(start_address, end_address)
 
-    for insn in ptlog_analyzer.enumerate_instructions(instruction_offset = args.instruction_offset, start_address = start_address, end_address = end_address):
+    for insn in ptlog_analyzer.decode_instructions(offset = args.instruction_offset, start_address = start_address, end_address = end_address):
         try:
             disasmline = debugger.get_disassembly_line(insn.ip)
             print('Instruction: %s' % (disasmline))
