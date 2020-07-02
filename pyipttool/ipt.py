@@ -250,6 +250,9 @@ class Analyzer:
     def decode_blocks(self, offset, start_address = 0, end_address = 0):
         while 1:
             block = self.decode(decode_type = 'block')
+            if not block:
+                break
+
             current_offset = self.ipt.get_offset()
 
             if offset > 0:
@@ -265,6 +268,9 @@ class Analyzer:
     def decode_instructions(self, offset = 0, start_address = 0, end_address = 0, stop_address = 0):
         while 1:
             instruction = self.decode(decode_type = 'instruction')
+            if not instruction:
+                break
+
             current_offset = self.ipt.get_offset()
 
             if offset > 0:
