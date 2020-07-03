@@ -10,89 +10,7 @@ from zipfile import ZipFile
 from datetime import datetime, timedelta
 
 import pyipttool.ipt
-import capstone
-
-class Coverage:
-    def __init__(self, module_name, start_address, end_address, pt_filename, dump_filename, debugger):
-        self.module_name = module_name
-        self.pt_filename = pt_filename
-        self.dump_filename = dump_filename
-        self.start_address = start_address
-        self.end_address = end_address
-        self.addresses = {}
-        self.debugger = debugger
-
-        self.ptlog_analyzer = pyipttool.ipt.Analyzer(self.dump_filename,
-                                        dump_symbols = False,
-                                        dump_instructions = False,
-                                        load_image = True,
-                                        progress_report_interval = 0)
-
-        self.ptlog_analyzer.open_ipt_log(self.pt_filename)
-
-    def add_block(self, offset, block):
-        start_address = block['IP']
-        if not start_address in self.addresses:
-            self.addresses[start_address] = {}
-        self.addresses[start_address][ block['EndIP']] = (offset, block)
-
-    def enumerate_instructions_by_pt(self):
-        sync_offsets = {}
-        for start_address in self.addresses.keys():
-            for end_address in self.addresses[start_address].keys():
-                (offset, block) = self.addresses[start_address][end_address]
-                sync_offset = block['SyncOffset']
-                if not sync_offset in sync_offsets:
-                    sync_offsets[sync_offset] = []
-
-                sync_offsets[sync_offset].append(block)
-
-        instruction_addresses = {}
-        for sync_offset, blocks in sync_offsets.items():
-            logging.debug("sync_offset: %x" % sync_offset)
-            ranges = []
-            for block in blocks:
-                ranges.append((block['IP'], block['EndIP']))
-
-            for insn in self.ptlog_analyzer.decode_ranges(sync_offset = block['SyncOffset'], ranges = ranges):
-                logging.debug("\tinsn.ip: %x" % insn.ip)
-                instruction_addresses[insn.ip] = 1
-
-            logging.debug('len(instruction_addresses): %d' % len(instruction_addresses))
-
-        return instruction_addresses
-
-    def enumerate_instruction_by_disassemble(self):
-        instruction_addresses = {}
-        for start_address in self.addresses.keys():
-            for end_address in self.addresses[start_address].keys():
-                (offset, block) = self.addresses[start_address][end_address]
-                start_address = block['IP']
-                end_address = block['EndIP']
-
-                logging.debug('block: %.16x - %.16x' % (block['IP'], block['EndIP']))
-
-                # self.disassembler = Cs(CS_ARCH_X86, CS_MODE_32)
-                # cs = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_64 if x64 else capstone.CS_MODE_32)
-                # retrieve dump using windbg
-                # disassemble from start_address
-                # continue
-                # follow jump/calls
-                # end when met with end_address
-                # record instruction IPs
-
-        return instruction_addresses
-
-    def save(self, output_filename):
-        instruction_addresses= self.enumerate_instruction_by_disassemble()
-
-        with open(output_filename, 'w') as fd:
-            for address in instruction_addresses.keys():
-                fd.write('%s+%x\n' % (module_name, address - self.start_address))
-
-    def print(self):
-        for address in self.addresses.keys():
-            print('%s+%x' % (module_name, address - start_address))
+import pyipttool.coverage
 
 if __name__ == '__main__':
     import argparse
@@ -162,7 +80,7 @@ if __name__ == '__main__':
             start_address = args.start_address
             end_address = args.end_address
 
-        coverage = Coverage(module_name, start_address, end_address, args.pt_filename, args.dump_filename, debugger = debugger)
+        coverage_logger = pyipttool.coverage.Logger(module_name, start_address, end_address, args.pt_filename, args.dump_filename, debugger = debugger)
         
         for (offset, block) in block_analyzer.enumerate_block_range(cr3 = args.cr3, start_address = start_address, end_address = end_address):
             if args.format == 'instruction':
@@ -171,13 +89,13 @@ if __name__ == '__main__':
                 print('> %.16x (%s) (sync_offset=%x, offset=%x)' % (address, symbol, block['SyncOffset'], offset))
                 print('\t' + debugger.get_disassembly_line(address))
             elif args.format == 'modoffset_coverage':
-                coverage.add_block(offset, block)
+                coverage_logger.add_block(offset, block)
 
         if args.format == 'modoffset_coverage':
             if args.output_filename:
-                coverage.save(args.output_filename)
+                coverage_logger.save(args.output_filename)
             else:
-                coverage.print()
+                coverage_logger.print()
 
     else:
         ptlog_analyzer = pyipttool.ipt.Analyzer(args.dump_filename, 
