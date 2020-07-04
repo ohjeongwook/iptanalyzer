@@ -52,7 +52,6 @@ class Merger:
         for record in records:
             args = (record['IP'], record['EndIP'], record['SyncOffset'], record['Offset'], record['CR3'])
             cursor.execute(sql, args)
-        self.conn.commit()
 
     def save(self):
         self.conn.commit()
