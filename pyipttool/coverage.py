@@ -12,7 +12,6 @@ from datetime import datetime, timedelta
 import pyipttool.ipt
 import capstone
 
-
 class Disasm:
     def __init__(self, base_address, filename = '', image_data = b'', x64 = False):
         self.base_address = base_address
@@ -69,8 +68,7 @@ class Logger:
         self.ptlog_analyzer = pyipttool.ipt.Analyzer(self.dump_filename,
                                         dump_symbols = False,
                                         dump_instructions = False,
-                                        load_image = True,
-                                        progress_report_interval = 0)
+                                        load_image = True)
 
         self.ptlog_analyzer.open_ipt_log(self.pt_filename)
 
