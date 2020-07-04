@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 import logging
 import uuid
 import traceback
+import multiprocessing
 
 import pyipttool.ipt
 import pyipttool.cache
@@ -47,21 +48,17 @@ def decode_block(pt_filename, dump_filename, temp_directory, cache_filename, sta
 
     pt_log_analyzer.close()
 
-def decode_blocks_function(pt_filename, dump_filename, queue, temp_directory, log_directory, debug_level = 0):
-    log_filename = os.path.join(log_directory, str(uuid.uuid1()) + '.log')
-    logging.basicConfig(level=logging.DEBUG, filename = log_filename, filemode = 'w', format = '%(name)s - %(levelname)s - %(message)s')
-    
-    while True:
-        msg = queue.get()
-        if msg == None:
-            break
+def decode_blocks_function(data):
+    (arguments, start_offset, end_offset, cache_filename) = data
+    (pt_filename, dump_filename, temp_directory, log_directory, debug_level) = arguments
+    set_log_file(os.path.join(log_directory, 'decode_blocks_function-%.16x-%.16x.log' % (start_offset, end_offset)))
+    logging.debug("# decode_blocks_function: %.16x ~ %.16x" % (start_offset, end_offset))
+    logging.debug("* debug_level: %d" % (debug_level))
+    decode_block(pt_filename, dump_filename, temp_directory, cache_filename, start_offset, end_offset, debug_level = debug_level)
 
-        (start_offset, end_offset, cache_filename) = msg
-        decode_blocks_function_log_filename = os.path.join(log_directory, 'decode_blocks_function-%.16x-%.16x.log' % (start_offset, end_offset))
-        set_log_file(decode_blocks_function_log_filename)
-
-        logging.debug("# decode_blocks_function: %.16x ~ %.16x" % (start_offset, end_offset))
-        decode_block(pt_filename, dump_filename, temp_directory, cache_filename, start_offset, end_offset, debug_level = debug_level)
+def start_process():
+    print('Starting', multiprocessing.current_process().name)
+    logging.basicConfig(level=logging.DEBUG, filename = '', filemode = 'w', format = '%(name)s - %(levelname)s - %(message)s')
 
 if __name__ == '__main__':
     import argparse
@@ -92,32 +89,22 @@ if __name__ == '__main__':
     use_multiprocess = True
 
     if args.debug_level > 0:
-        log_filename = os.path.join(args.log_directory, str(uuid.uuid1()) + '.log')
+        log_filename = os.path.join(args.log_directory, 'generate_cache.log')
         logging.basicConfig(level=logging.DEBUG, filename = log_filename, filemode = 'w', format = '%(name)s - %(levelname)s - %(message)s')
 
     if not use_multiprocess:
         decode_block(args.pt_filename, args.dump_filename, args.temp_directory, args.cache_filename, debug_level = debug_level)
     else:
-        import multiprocessing
+        process_count = multiprocessing.cpu_count()
 
         ipt_analyzer = pyipttool.ipt.Analyzer(args.dump_filename, dump_symbols = False, load_image = False)
         ipt_analyzer.open_ipt_log(args.pt_filename, start_offset = 0)
         sync_offsets = ipt_analyzer.enumerate_sync_offsets()
-
-        process_count = multiprocessing.cpu_count()
-        pqueue = multiprocessing.Queue()
-
-        print("Launching decode block functions...")
-        procs = []
-        cache_filenames = []
-
-        for i in range(0, process_count, 1):
-            proc = multiprocessing.Process(target = decode_blocks_function, args=(args.pt_filename, args.dump_filename, pqueue, args.temp_directory, args.log_directory, args.debug_level))
-            procs.append(proc)
-            proc.start()
-
+        arguments = (args.pt_filename, args.dump_filename, args.temp_directory, args.log_directory, args.debug_level)
+        inputs = []
         offsets_count = len(sync_offsets)
-        chunk_size = 100
+        chunk_size = int(offsets_count / process_count)
+        cache_filenames = []
         for start_index in range(0, offsets_count, chunk_size):
             end_index = start_index + chunk_size
             if end_index < offsets_count:
@@ -129,13 +116,18 @@ if __name__ == '__main__':
 
             cache_filename = os.path.join(args.temp_directory, 'block-%.16x-%.16x.cache' % (start_offset, end_offset))
             cache_filenames.append(cache_filename)
-            pqueue.put((start_offset, end_offset, cache_filename))
 
-        for i in range(0, process_count, 1):
-            pqueue.put(None)
+            logging.debug("# queing: %.16x ~ %.16x" % (start_offset, end_offset))
 
-        for proc in procs:
-            proc.join()
+            inputs.append((arguments, start_offset, end_offset, cache_filename))
+
+        print("Launching decode block functions...")       
+
+        pool = multiprocessing.Pool(processes = process_count,
+                                    initializer = start_process)
+        pool_outputs = pool.map(decode_blocks_function, inputs)
+        pool.close()
+        pool.join()
 
         print("Merging block cache files...")
         merger = pyipttool.cache.Merger(args.cache_filename)
