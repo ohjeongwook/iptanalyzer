@@ -107,13 +107,10 @@ class Logger:
         instruction_addresses = {}
         for start_address in self.addresses.keys():
             for end_address in self.addresses[start_address].keys():
-                (offset, block) = self.addresses[start_address][end_address]
-                start_address = block['IP']
-                end_address = block['EndIP']
+                (offset, sync_offset) = self.addresses[start_address][end_address]
+                logging.debug('block: %.16x - %.16x' % (start_address, end_address))
 
-                logging.debug('block: %.16x - %.16x' % (block['IP'], block['EndIP']))
-
-                for instruction in self.disasm.trace(block['IP'], block['EndIP']):
+                for instruction in self.disasm.trace(start_address, end_address):
                     instruction_addresses[instruction.address] = 1
 
         return instruction_addresses
