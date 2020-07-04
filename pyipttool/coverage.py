@@ -6,6 +6,7 @@ import pickle
 import pprint
 import copy
 import logging
+import traceback
 from zipfile import ZipFile
 from datetime import datetime, timedelta
 
@@ -51,7 +52,11 @@ class Disasm:
             if current_instructions[-1].address == end_address:
                 break
 
-            start_address = int(instructions[-1].op_str, 0x10)
+            try:
+                start_address = int(instructions[-1].op_str, 0x10)
+            except:
+                traceback.print_exc()
+                break
 
         return instructions
 
