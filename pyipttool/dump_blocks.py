@@ -26,7 +26,10 @@ if __name__ == '__main__':
 
     parser.add_argument('-m', action = "store", dest = "module_name", default = "")
     parser.add_argument('-o', action = "store", dest = "output_filename", default = "output.log")
-    parser.add_argument('-D', action = "store", dest = "debug_filename", default = "")
+    
+    parser.add_argument('-D', dest = "debug_level", default = 0, type = auto_int)
+    parser.add_argument('-O', action = "store", dest = "debug_filename", default = "stdout")
+    
     parser.add_argument('-f', action = "store", dest = "format", default = "instruction")
 
     parser.add_argument('-s', dest = "start_address", default = 0, type = auto_int)
@@ -49,7 +52,7 @@ if __name__ == '__main__':
         dump_symbols = False
         load_image = False
 
-    if args.debug_filename:
+    if args.debug_level > 0:
         handlers = []
         if args.debug_filename == 'stdout':
             handlers.append(logging.StreamHandler())
@@ -62,24 +65,23 @@ if __name__ == '__main__':
             handlers = handlers
         )
 
+    debugger = windbgtool.debugger.DbgEngine()
+    debugger.load_dump(args.dump_filename)
+    debugger.enumerate_modules()
+
+    start_address = 0
+    end_address = 0
+
+    if args.module_name:
+        module_name = args.module_name
+        (start_address, end_address) = debugger.get_module_range(args.module_name)
+    else:
+        module_name = ''
+        start_address = args.start_address
+        end_address = args.end_address
+
     if args.cache_file:
         block_analyzer = pyipttool.cache.Reader(args.cache_file)
-
-        debugger = windbgtool.debugger.DbgEngine()
-        debugger.load_dump(args.dump_filename)
-        debugger.enumerate_modules()
-
-        start_address = 0
-        end_address = 0
-
-        if args.module_name:
-            module_name = args.module_name
-            (start_address, end_address) = debugger.get_module_range(args.module_name)
-        else:
-            module_name = ''
-            start_address = args.start_address
-            end_address = args.end_address
-
         coverage_logger = pyipttool.coverage.Logger(module_name, start_address, end_address, args.pt_filename, args.dump_filename, debugger = debugger)
         
         for (offset, address, end_address, sync_offset) in block_analyzer.enumerate_block_range(cr3 = args.cr3, start_address = start_address, end_address = end_address):
@@ -99,7 +101,8 @@ if __name__ == '__main__':
     else:
         ptlog_analyzer = pyipttool.ipt.Analyzer(args.dump_filename, 
                                          dump_symbols = dump_symbols, 
-                                         load_image = load_image)
+                                         load_image = load_image,
+                                         debug_level = args.debug_level)
 
         ptlog_analyzer.open_ipt_log(args.pt_filename, start_offset = args.start_offset, end_offset = args.end_offset)
         for block in ptlog_analyzer.decode_blocks(offset = args.block_offset, start_address = start_address, end_address = end_address):
