@@ -39,7 +39,7 @@ def decode_block(pt_filename, dump_filename, temp_directory, cache_filename, sta
     logging.debug("# decode_block: Writing %.16x ~ %.16x to %s" % (start_offset, end_offset, cache_filename))
     if cache_filename:
         try:
-            cache_writer = pyipttool.cache.Writer(pt_log_analyzer.basic_block_addresss_to_offsets, pt_log_analyzer.block_offsets_to_ips)
+            cache_writer = pyipttool.cache.Writer(pt_log_analyzer.records)
             cache_writer.save(cache_filename)
         except:
             tb = traceback.format_exc()
@@ -48,6 +48,9 @@ def decode_block(pt_filename, dump_filename, temp_directory, cache_filename, sta
     pt_log_analyzer.close()
 
 def decode_blocks_function(pt_filename, dump_filename, queue, temp_directory, log_directory, debug_level = 0):
+    log_filename = os.path.join(log_directory, str(uuid.uuid1()) + '.log')
+    logging.basicConfig(level=logging.DEBUG, filename = log_filename, filemode = 'w', format = '%(name)s - %(levelname)s - %(message)s')
+    
     while True:
         msg = queue.get()
         if msg == None:
@@ -114,7 +117,7 @@ if __name__ == '__main__':
             proc.start()
 
         offsets_count = len(sync_offsets)
-        chunk_size = 2
+        chunk_size = 100
         for start_index in range(0, offsets_count, chunk_size):
             end_index = start_index + chunk_size
             if end_index < offsets_count:
@@ -135,8 +138,8 @@ if __name__ == '__main__':
             proc.join()
 
         print("Merging block cache files...")
-        merger = pyipttool.cache.Merger()
+        merger = pyipttool.cache.Merger(args.cache_filename)
         for filename in cache_filenames:
-            merger.read(filename)
+            merger.add_record_file(filename)
             os.unlink(filename)
-        merger.write(args.cache_filename)
+        merger.save()
