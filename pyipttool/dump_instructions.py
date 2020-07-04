@@ -53,8 +53,7 @@ if __name__ == '__main__':
     ptlog_analyzer = pyipttool.ipt.Analyzer(args.dump_file,
                                      dump_symbols = False,
                                      dump_instructions = False,
-                                     load_image = True,
-                                     progress_report_interval = 0)
+                                     load_image = True)
 
     ptlog_analyzer.open_ipt_log(args.pt_file, start_offset = args.start_offset, end_offset = args.end_offset)
 
