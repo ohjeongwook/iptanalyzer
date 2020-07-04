@@ -285,7 +285,6 @@ class Analyzer:
                     break
             else:
                 if (start_address == 0 and end_address == 0) or start_address <= instruction.ip and instruction.ip <= end_address:
-                    print('%.8X: %x' % (current_offset, instruction.ip))
                     yield instruction
 
             if stop_address != 0 and instruction.ip == stop_address:
