@@ -18,7 +18,11 @@ class Merger:
         except sqlite3.Error as e:
             print(e)
 
-        create_table_sql = """ CREATE TABLE IF NOT EXISTS Blocks (
+        self.create_table()
+        self.create_index()
+
+    def create_table(self):
+        sql = """ CREATE TABLE IF NOT EXISTS Blocks (
                                         id integer PRIMARY KEY,
                                         address integer,
                                         end_address integer,
@@ -29,9 +33,20 @@ class Merger:
 
         try:
             cursor = self.conn.cursor()
-            cursor.execute(create_table_sql)
+            cursor.execute(sql)
         except sqlite3.Error as e:
             print(e)
+
+    def create_index(self):
+        sqls = (
+            "CREATE INDEX blocks_address ON Blocks(address)",
+            "CREATE INDEX blocks_end_address ON Blocks(end_address)",
+            "CREATE INDEX blocks_cr3_address ON Blocks(cr3)",
+        )
+        cursor = self.conn.cursor()
+
+        for sql in sqls:
+            cursor.execute(sql)
 
     def add_record_files(self, dirname):
         for basename in os.listdir(dirname):
