@@ -31,9 +31,8 @@ class Analyzer:
         self.no_map_addresses = {}
 
         self.address_list = None
-        self.basic_block_addresss_to_offsets = {}
-        self.block_offsets_to_ips = {}
         self.psb_offsets = []
+        self.records = []
 
         if temp_directory:
             self.temp_directory = temp_directory
@@ -171,8 +170,7 @@ class Analyzer:
 
     def decode(self, decode_type = 'block', callback = None):
         if decode_type == 'block':
-            self.basic_block_addresss_to_offsets = {}
-            self.block_offsets_to_ips = {}
+            self.records = []
             self.psb_offsets = []
 
         pt_no_map_error_counts = {}
@@ -242,36 +240,14 @@ class Analyzer:
     def record_block_offset(self, block):
         address = block.ip
         block_end_address = block.end_ip
-
-        offset = self.ipt.get_offset()
         cr3 = self.ipt.get_current_cr3()
         sync_offset = self.ipt.get_sync_offset()
+        offset = self.ipt.get_offset()
 
         if self.debug_level > 1:
             logging.debug("%.8x: record_block_offsets: sync_offset: %.16x cr3: %.16x ip: %.16x" % (offset, sync_offset, cr3, address))
 
-        if not cr3 in self.basic_block_addresss_to_offsets:
-            self.basic_block_addresss_to_offsets[cr3] = {}
-
-        self.psb_offsets.append(sync_offset)
-        if not address in self.basic_block_addresss_to_offsets[cr3]:
-            self.basic_block_addresss_to_offsets[cr3][address] = {}
-
-        if not sync_offset in self.basic_block_addresss_to_offsets[cr3][address]:
-            self.basic_block_addresss_to_offsets[cr3][address][sync_offset]={}
-
-        if not offset in self.basic_block_addresss_to_offsets[cr3][address][sync_offset]:
-            self.basic_block_addresss_to_offsets[cr3][address][sync_offset][offset] = 1
-        else:
-            self.basic_block_addresss_to_offsets[cr3][address][sync_offset][offset] += 1
-
-        if not cr3 in self.block_offsets_to_ips:
-            self.block_offsets_to_ips[cr3] = {}
-
-        if not offset in self.block_offsets_to_ips[cr3]:
-            self.block_offsets_to_ips[cr3][offset] = []
-
-        self.block_offsets_to_ips[cr3][offset].append({'IP': address, 'EndIP': block_end_address, 'SyncOffset': sync_offset})
+        self.records.append({'IP': address, 'EndIP': block_end_address, 'SyncOffset': sync_offset, 'Offset': offset, 'CR3': cr3})
 
     def record_block_offsets(self):
         self.decode(decode_type = 'block', callback = self.record_block_offset)
