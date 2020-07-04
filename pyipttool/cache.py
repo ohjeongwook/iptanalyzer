@@ -15,7 +15,7 @@ class Merger:
         self.conn = None
         try:
             self.conn = sqlite3.connect(sqlite_filename)
-        except Error as e:
+        except sqlite3.Error as e:
             print(e)
 
         create_table_sql = """ CREATE TABLE IF NOT EXISTS Blocks (
@@ -30,7 +30,7 @@ class Merger:
         try:
             cursor = self.conn.cursor()
             cursor.execute(create_table_sql)
-        except Error as e:
+        except sqlite3.Error as e:
             print(e)
 
     def add_record_files(self, dirname):
@@ -61,7 +61,7 @@ class Reader:
     def __init__(self, sqlite_filename):
         try:
             self.conn = sqlite3.connect(sqlite_filename)
-        except Error as e:
+        except sqlite3.Error as e:
             print(e)
 
     def enumerate_block_range(self, cr3 = 0, start_address = 0, end_address = 0):
