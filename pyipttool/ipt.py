@@ -89,7 +89,7 @@ class Analyzer:
 
         return (region_size, dump_filename)
 
-    def add_image(self, address, use_address_map = True, load_module_image = False):
+    def add_image(self, address, use_address_map = True, load_module_image = True):
         if address in self.no_map_addresses:
             return False
 
@@ -196,7 +196,14 @@ class Analyzer:
             decode_status = self.ipt.get_decode_status()
             offset = self.ipt.get_offset()
 
-            if decode_status == pyipttool.pyipt.pt_error_code.pte_ok:
+            if decode_status == pyipttool.pyipt.pt_error_code.pte_ok or decode_status == pyipttool.pyipt.pt_error_code.pte_bad_insn:
+                if decode_status != pyipttool.pyipt.pt_error_code.pte_ok:
+                    logging.error("%.8x: ip: %.16x decode_status: %x (continue)" % (offset, address, decode_status))
+
+                if self.debug_level > 2:
+                    sync_offset = self.ipt.get_sync_offset()
+                    logging.debug("%.8x: decode: sync_offset: %.16x ip: %.16x" % (offset, sync_offset, address))
+                    
                 if callback:
                     callback(decoded_obj)
                 else:
@@ -228,10 +235,11 @@ class Analyzer:
                         if self.debug_level > 1:
                             logging.debug("%.8x: add_image failed for %.16x" % (offset, address))
             else:
-                logging.debug("%.8x: ip: %.16x decode_status: %x" % (offset, address, decode_status))
+                logging.error("%.8x: ip: %.16x decode_status: %x" % (offset, address, decode_status))
                 skip_to_next_sync = True
 
             if skip_to_next_sync:
+                logging.debug("%.8x: forward_block_sync @%.16x" % (offset, address))
                 if not self.ipt.forward_block_sync():
                     logging.debug("%.8x: forward_block_sync failed for %.16x" % (offset, address))
                     break
@@ -252,7 +260,7 @@ class Analyzer:
     def record_block_offsets(self):
         self.decode(decode_type = 'block', callback = self.record_block_offset)
 
-    def decode_blocks(self, offset, start_address = 0, end_address = 0):
+    def decode_blocks(self, offset = 0, start_address = 0, end_address = 0):
         while 1:
             block = self.decode(decode_type = 'block')
             if not block:
@@ -263,8 +271,7 @@ class Analyzer:
             if offset > 0:
                 if offset == current_offset:
                     yield block
-
-                if offset < current_offset:
+                elif offset < current_offset:
                     break
             else:
                 if (start_address == 0 and end_address == 0) or start_address <= block.ip and block.ip <= end_address:
