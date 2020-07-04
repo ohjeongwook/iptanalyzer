@@ -78,30 +78,23 @@ class Logger:
         debugger.run_command(writemem_cmd)
         self.disasm = Disasm(base_address = start_address, filename = module_filename)
 
-    def add_block(self, offset, block):
-        start_address = block['IP']
+    def add_block(self, offset, start_address, end_address, sync_offset):
         if not start_address in self.addresses:
             self.addresses[start_address] = {}
-        self.addresses[start_address][ block['EndIP']] = (offset, block)
+        self.addresses[start_address][end_address] = (offset, sync_offset)
 
     def enumerate_instructions_by_pt(self):
         sync_offsets = {}
         for start_address in self.addresses.keys():
             for end_address in self.addresses[start_address].keys():
-                (offset, block) = self.addresses[start_address][end_address]
-                sync_offset = block['SyncOffset']
+                (offset, sync_offset) = self.addresses[start_address][end_address]
                 if not sync_offset in sync_offsets:
                     sync_offsets[sync_offset] = []
-
-                sync_offsets[sync_offset].append(block)
+                sync_offsets[sync_offset].append((start_address, end_address))
 
         instruction_addresses = {}
-        for sync_offset, blocks in sync_offsets.items():
+        for sync_offset, ranges in sync_offsets.items():
             logging.debug("sync_offset: %x" % sync_offset)
-            ranges = []
-            for block in blocks:
-                ranges.append((block['IP'], block['EndIP']))
-
             for insn in self.ptlog_analyzer.decode_ranges(sync_offset = block['SyncOffset'], ranges = ranges):
                 logging.debug("\tinsn.ip: %x" % insn.ip)
                 instruction_addresses[insn.ip] = 1
