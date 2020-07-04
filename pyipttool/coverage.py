@@ -133,22 +133,30 @@ class Logger:
 
 if __name__ == '__main__':
     import json
-    import pprint
+    import argparse
+    import pyipttool.cache
+    import windbgtool.debugger
 
-    disasm = Disasm(base_address = 0x400000, filename = '00400000.dmp')
+    def auto_int(x):
+        return int(x, 0)
 
-    address_range_list = []
-    data_filename = 'tests.json'
-    with open(data_filename, 'r') as fd:
-        data = json.load(fd)
-        for address_range in data:
-            start_address = int(address_range['start'], 0x10)
-            end_address = int(address_range['end'], 0x10)
-            address_range_list.append((start_address, end_address))
+    parser = argparse.ArgumentParser(description='pyipt')
+    parser.add_argument('-d', action = "store", default = "", dest = "dump_filename")
+    parser.add_argument('-c', action = "store", dest = "coverage_filename", default = "coverage.log")   
+    parser.add_argument('-o', action = "store", dest = "output_filename", default = "output.log")   
+    parser.add_argument('-b', dest = "base_address", default = 0, type = auto_int)
+    parser.add_argument('-D', dest = "debug_level", default = 0, type = auto_int)
+    parser.add_argument('-O', action = "store", dest = "debug_filename", default = "stdout")
+    args = parser.parse_args()
 
-    #address_range_list = []
-    #address_range_list.append((0x41f095, 0x41ff3b))
+    disasm = Disasm(base_address = args.base_address, filename = args.dump_filename)
 
-    for (start_address, end_address) in address_range_list:
+    coverage_list = []
+    with open(args.coverage_filename, 'r') as fd:
+        for line in fd.read().splitlines():
+            (start_address_str, end_address_str) = line.split()
+            coverage_list.append((int(start_address_str, 0x10), int(end_address_str, 0x10)))
+
+    for (start_address, end_address) in coverage_list:
         print('%x - %x' % (start_address, end_address))
         disasm.trace(start_address, end_address)
