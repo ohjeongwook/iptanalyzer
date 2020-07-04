@@ -21,7 +21,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    block_analyzer = pyipttool.cache.Reader(args.cache_file, args.pt_file)
+    block_analyzer = pyipttool.cache.Reader(args.cache_file)
 
     debugger = windbgtool.debugger.DbgEngine()
     debugger.load_dump(args.dump_file)
