@@ -63,7 +63,7 @@ if __name__ == '__main__':
         )
 
     if args.cache_file:
-        block_analyzer = pyipttool.cache.Reader(args.cache_file, args.pt_filename)
+        block_analyzer = pyipttool.cache.Reader(args.cache_file)
 
         debugger = windbgtool.debugger.DbgEngine()
         debugger.load_dump(args.dump_filename)
@@ -82,14 +82,13 @@ if __name__ == '__main__':
 
         coverage_logger = pyipttool.coverage.Logger(module_name, start_address, end_address, args.pt_filename, args.dump_filename, debugger = debugger)
         
-        for (offset, block) in block_analyzer.enumerate_block_range(cr3 = args.cr3, start_address = start_address, end_address = end_address):
+        for (offset, address, end_address, sync_offset) in block_analyzer.enumerate_block_range(cr3 = args.cr3, start_address = start_address, end_address = end_address):
             if args.format == 'instruction':
-                address = block['IP']
                 symbol = debugger.find_symbol(address)
-                print('> %.16x (%s) (sync_offset=%x, offset=%x)' % (address, symbol, block['SyncOffset'], offset))
+                print('> %.16x (%s) (sync_offset=%x, offset=%x)' % (address, symbol, sync_offset, offset))
                 print('\t' + debugger.get_disassembly_line(address))
             elif args.format == 'modoffset_coverage':
-                coverage_logger.add_block(offset, block)
+                coverage_logger.add_block(offset, address, end_address, sync_offset)
 
         if args.format == 'modoffset_coverage':
             if args.output_filename:
