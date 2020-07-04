@@ -2,20 +2,14 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-import pickle
-import pprint
-import copy
-import logging
-from zipfile import ZipFile
-from datetime import datetime, timedelta
-
-import pyipttool.ipt
-import pyipttool.coverage
-
 if __name__ == '__main__':
     import argparse
-    import pyipttool.cache
+    import logging
+
     import windbgtool.debugger
+
+    import pyipttool.cache    
+    import pyipttool.coverage
 
     def auto_int(x):
         return int(x, 0)
