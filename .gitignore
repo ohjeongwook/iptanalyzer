@@ -57,3 +57,5 @@ Libs/libipt/
 tests/test_files/logs/
 tests/test_files/blocks.cache.1
 tests/test_files/blocks.cache.2
+tmp/
+*.sqlite
