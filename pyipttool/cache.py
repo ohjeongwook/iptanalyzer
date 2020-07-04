@@ -46,7 +46,10 @@ class Merger:
         cursor = self.conn.cursor()
 
         for sql in sqls:
-            cursor.execute(sql)
+            try:
+                cursor.execute(sql)
+            except sqlite3.Error as e:
+                print(e)
 
     def add_record_files(self, dirname):
         for basename in os.listdir(dirname):
