@@ -61,3 +61,4 @@ tmp/
 *.sqlite
 tests/coverage/coverage.txt
 tests/notepad/cache_merge.cmd
+tests/notepad/dump_instructions.log
