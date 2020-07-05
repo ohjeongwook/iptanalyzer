@@ -4,7 +4,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 if __name__ == '__main__':
     import argparse
-
+    import json
     import pyipttool.cache
     import pyipttool.ipt
     import windbgtool.debugger
@@ -14,7 +14,8 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='pyipt')
     parser.add_argument('-c', action = "store", dest = "cache_file")
-    parser.add_argument('-p', action = "store", default = "", dest = "pt_file")
+    parser.add_argument('-o', action = "store", dest = "output_filename", default = 'apis_blocks.json')
+    parser.add_argument('-p', action = "store", default = "", dest = "pt_filename")
     parser.add_argument('-d', action = "store", default = "", dest = "dump_file")
     parser.add_argument('-s', action = "store", dest = "symbol")
     parser.add_argument('-C', dest = "cr3", default = 0, type = auto_int)
@@ -29,10 +30,23 @@ if __name__ == '__main__':
 
     if args.symbol:
         address = debugger.resolve_symbol(args.symbol)
+        apis_blocks = []
         for (sync_offset, offset) in block_analyzer.enumerate_blocks(address, cr3 = args.cr3):
             print('> sync_offset = %x / offset = %x' % (sync_offset, offset))
 
             pt_log_analyzer = pyipttool.ipt.Analyzer(args.dump_file, dump_symbols = True, load_image = True)
-            pt_log_analyzer.open_ipt_log(args.pt_file, start_offset = sync_offset, end_offset = offset+2)
+            pt_log_analyzer.open_ipt_log(args.pt_filename, start_offset = sync_offset, end_offset = offset+2)
+
+            instructions = []
             for instruction in pt_log_analyzer.decode_instructions(offset = offset):
-                print('\tInstruction: %s' % (debugger.get_disassembly_line(instruction.ip)))
+                instruction_str = debugger.get_disassembly_line(instruction.ip)
+                print('\tInstruction: %s' % (instruction_str))
+                instructions.append({'IP': instruction.ip, 'Instruction': instruction_str})
+
+            apis_blocks.append({
+                'SyncOffset': sync_offset,
+                'Offset': offset,
+                'Instructions': instructions})
+
+        with open(args.output_filename, 'w') as fd:
+            json.dump(apis_blocks, fd, indent = 4)
