@@ -22,8 +22,6 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    block_analyzer = pyipttool.cache.Reader(args.cache_file)
-
     debugger = windbgtool.debugger.DbgEngine()
     debugger.load_dump(args.dump_file)
     debugger.enumerate_modules()
@@ -31,6 +29,8 @@ if __name__ == '__main__':
     if args.symbol:
         address = debugger.resolve_symbol(args.symbol)
         apis_blocks = []
+
+        block_analyzer = pyipttool.cache.Reader(args.cache_file)
         for (sync_offset, offset) in block_analyzer.enumerate_blocks(address, cr3 = args.cr3):
             print('> sync_offset = %x / offset = %x' % (sync_offset, offset))
 
