@@ -27,7 +27,7 @@ if __name__ == '__main__':
     parser.add_argument('-s', dest = "start_address", default = 0, type = auto_int)
     parser.add_argument('-e', dest = "end_address", default = 0, type = auto_int)
     
-    parser.add_argument('-c', action = "store", dest = "cache_file")
+    parser.add_argument('-c', action = "store", dest = "cache_filename")
     parser.add_argument('-C', dest = "cr3", default = 0, type = auto_int)    
 
     args = parser.parse_args()
@@ -60,8 +60,8 @@ if __name__ == '__main__':
         start_address = args.start_address
         end_address = args.end_address
 
-    if args.cache_file:
-        block_analyzer = pyipttool.cache.Reader(args.cache_file)
+    if args.cache_filename:
+        block_analyzer = pyipttool.cache.Reader(args.cache_filename)
         coverage_logger = pyipttool.coverage.Logger(module_name, start_address, end_address, args.pt_filename, args.dump_filename, debugger = debugger)
         
         for (offset, address, end_address, sync_offset) in block_analyzer.enumerate_block_range(cr3 = args.cr3, start_address = start_address, end_address = end_address):
