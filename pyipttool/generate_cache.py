@@ -131,7 +131,8 @@ if __name__ == '__main__':
 
         print("Merging block cache files...")
         merger = pyipttool.cache.Merger(args.cache_filename)
-        for filename in cache_filenames:
-            merger.add_record_file(filename)
-            os.unlink(filename)
+        merger.add_record_files(cache_filenames)
         merger.save()
+
+        for filename in cache_filenames:
+            os.unlink(filename)

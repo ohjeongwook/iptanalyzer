@@ -18,6 +18,7 @@ class Merger:
         except sqlite3.Error as e:
             print(e)
 
+        self.cursor = self.conn.cursor()
         self.create_table()
         self.create_index()
 
@@ -32,8 +33,7 @@ class Merger:
                                     ); """
 
         try:
-            cursor = self.conn.cursor()
-            cursor.execute(sql)
+            self.cursor.execute(sql)
         except sqlite3.Error as e:
             print(e)
 
@@ -43,15 +43,14 @@ class Merger:
             "CREATE INDEX blocks_end_address ON Blocks(end_address)",
             "CREATE INDEX blocks_cr3_address ON Blocks(cr3)",
         )
-        cursor = self.conn.cursor()
 
         for sql in sqls:
             try:
-                cursor.execute(sql)
+                self.cursor.execute(sql)
             except sqlite3.Error as e:
                 print(e)
 
-    def add_record_files(self, dirname):
+    def add_record_directory(self, dirname):
         for basename in os.listdir(dirname):
             if not basename.endswith('.cache'):
                 continue
@@ -65,11 +64,13 @@ class Merger:
             return
 
         sql = '''INSERT INTO Blocks(address, end_address, sync_offset, offset, cr3) VALUES(?,?,?,?,?) '''
-        cursor = self.conn.cursor()
-
         for record in records:
             args = (record['IP'], record['EndIP'], record['SyncOffset'], record['Offset'], record['CR3'])
-            cursor.execute(sql, args)
+            self.cursor.execute(sql, args)
+
+    def add_record_files(self, filenames):
+        for filename in filenames:
+            self.add_record_file(filename)
 
     def save(self):
         self.conn.commit()
@@ -108,5 +109,5 @@ if __name__ == '__main__':
     args = parser.parse_args()
     
     merger = Merger(args.output)
-    merger.add_record_files(args.cache_file)
+    merger.add_record_directory(args.cache_file)
     merger.save()
