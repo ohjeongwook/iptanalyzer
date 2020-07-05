@@ -115,10 +115,11 @@ class Logger:
         return instruction_addresses
 
     def save(self, output_filename):
-        instruction_addresses= self.enumerate_instruction_by_disassemble()
+        instruction_addresses= list(self.enumerate_instruction_by_disassemble())
+        instruction_addresses.sort()
 
         with open(output_filename, 'w') as fd:
-            for address in instruction_addresses.keys():
+            for address in instruction_addresses:
                 fd.write('%s+%x\n' % (self.module_name, address - self.start_address))
 
     def print(self):
