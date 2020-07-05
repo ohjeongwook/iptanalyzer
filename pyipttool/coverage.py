@@ -7,8 +7,6 @@ import pprint
 import copy
 import logging
 import traceback
-from zipfile import ZipFile
-from datetime import datetime, timedelta
 
 import pyipttool.ipt
 import capstone
@@ -26,13 +24,10 @@ class Disasm:
 
         self.md = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_64 if x64 else capstone.CS_MODE_32)
         
-    def disassemble(self, start_address, end_address, level = 0):
-        prefix = '\t' * level
-        print(prefix + '* disassemble: %x - %x' % (start_address, end_address))
+    def disassemble(self, start_address, end_address):
         start_offset = start_address - self.base_address
         instructions = []
         for i in self.md.disasm(self.image_data[start_offset:], start_address):
-            print(prefix + " 0x%x:\t%s\t%s" %(i.address, i.mnemonic, i.op_str))
             instructions.append(i)
             if i.address == end_address:
                 break
@@ -43,10 +38,9 @@ class Disasm:
         return instructions
 
     def trace(self, start_address, end_address):
-        level = 0
         instructions = []
         while 1:
-            current_instructions = self.disassemble(start_address, end_address, level = level + 1)
+            current_instructions = self.disassemble(start_address, end_address)
 
             instructions += current_instructions
             if current_instructions[-1].address == end_address:
@@ -129,11 +123,13 @@ class Logger:
 
     def print(self):
         for address in self.addresses.keys():
-            print('%s+%x' % (module_name, address - start_address))
+            print('%s+%x' % (self.module_name, address - start_address))
 
 if __name__ == '__main__':
     import json
     import argparse
+    import json
+
     import pyipttool.cache
     import windbgtool.debugger
 
@@ -143,7 +139,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='pyipt')
     parser.add_argument('-d', action = "store", default = "", dest = "dump_filename")
     parser.add_argument('-c', action = "store", dest = "coverage_filename", default = "coverage.log")   
-    parser.add_argument('-o', action = "store", dest = "output_filename", default = "output.log")   
+    parser.add_argument('-o', action = "store", dest = "output_filename", default = "coverage.json")
     parser.add_argument('-b', dest = "base_address", default = 0, type = auto_int)
     parser.add_argument('-D', dest = "debug_level", default = 0, type = auto_int)
     parser.add_argument('-O', action = "store", dest = "debug_filename", default = "stdout")
@@ -157,6 +153,24 @@ if __name__ == '__main__':
             (start_address_str, end_address_str) = line.split()
             coverage_list.append((int(start_address_str, 0x10), int(end_address_str, 0x10)))
 
+    test_cases = []
     for (start_address, end_address) in coverage_list:
         print('%x - %x' % (start_address, end_address))
-        disasm.trace(start_address, end_address)
+        instructions = disasm.trace(start_address, end_address)
+
+        for instruction in instructions:
+            print(" 0x%x:\t%s\t%s" %(instruction.address, instruction.mnemonic, instruction.op_str))
+
+        test_case = {}
+        test_case['start_address'] = start_address
+        test_case['end_address'] = end_address
+        test_case['instructions'] = []
+
+        for instruction in instructions:
+            test_case['instructions'].append({'address': instruction.address, 'mnemonic': instruction.mnemonic, 'op_str': instruction.op_str})
+
+        test_cases.append(test_case)
+
+    if args.output_filename:
+        with open(args.output_filename, 'w') as fd:
+            json.dump(test_cases, fd, indent = 4)
