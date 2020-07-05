@@ -90,9 +90,9 @@ class Reader:
 
     def enumerate_blocks(self, address = None, cr3 = 0):
         cursor = self.conn.cursor()
-        cursor.execute("SELECT sync_offset, offset FROM Blocks WHERE cr3=? and address >= ? and address <= ?", (cr3, start_address, end_address))
+        cursor.execute("SELECT sync_offset, offset FROM Blocks WHERE cr3=? and end_address >= ? and address <= ?", (cr3, address, address))
 
-        for (offset, address, end_address, sync_offset) in cursor.fetchall():
+        for (sync_offset, offset) in cursor.fetchall():
             yield (sync_offset, offset)
 
     def find_offsets(self, symbol):
