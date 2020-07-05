@@ -62,3 +62,6 @@ tmp/
 tests/coverage/coverage.txt
 tests/notepad/cache_merge.cmd
 tests/notepad/dump_instructions.log
+logs/
+tests/CVE-2017-11882/artifacts/EQNEDT32.pt
+tests/CVE-2017-11882/artifacts/EQNEDT32.dmp
