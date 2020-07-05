@@ -95,11 +95,6 @@ class Reader:
         for (sync_offset, offset) in cursor.fetchall():
             yield (sync_offset, offset)
 
-    def find_offsets(self, symbol):
-        for block_address in self.BlockAddresses.keys():
-            if block_address in self.AddressToSymbols:
-                print(self.AddressToSymbols[block_address])
-
 if __name__ == '__main__':
     import argparse
 
