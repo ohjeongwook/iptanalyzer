@@ -13,28 +13,28 @@ if __name__ == '__main__':
         return int(x, 0)
 
     parser = argparse.ArgumentParser(description='pyipt')
-    parser.add_argument('-c', action = "store", dest = "cache_file")
+    parser.add_argument('-c', action = "store", dest = "cache_filename")
     parser.add_argument('-o', action = "store", dest = "output_filename", default = 'apis_blocks.json')
     parser.add_argument('-p', action = "store", default = "", dest = "pt_filename")
-    parser.add_argument('-d', action = "store", default = "", dest = "dump_file")
+    parser.add_argument('-d', action = "store", default = "", dest = "dump_filename")
     parser.add_argument('-s', action = "store", dest = "symbol")
     parser.add_argument('-C', dest = "cr3", default = 0, type = auto_int)
 
     args = parser.parse_args()
 
     debugger = windbgtool.debugger.DbgEngine()
-    debugger.load_dump(args.dump_file)
+    debugger.load_dump(args.dump_filename)
     debugger.enumerate_modules()
 
     if args.symbol:
         address = debugger.resolve_symbol(args.symbol)
         apis_blocks = []
 
-        block_analyzer = pyipttool.cache.Reader(args.cache_file)
+        block_analyzer = pyipttool.cache.Reader(args.cache_filename)
         for (sync_offset, offset) in block_analyzer.enumerate_blocks(address, cr3 = args.cr3):
             print('> sync_offset = %x / offset = %x' % (sync_offset, offset))
 
-            pt_log_analyzer = pyipttool.ipt.Analyzer(args.dump_file, dump_symbols = True, load_image = True)
+            pt_log_analyzer = pyipttool.ipt.Analyzer(args.dump_filename, dump_symbols = True, load_image = True)
             pt_log_analyzer.open_ipt_log(args.pt_filename, start_offset = sync_offset, end_offset = offset+2)
 
             instructions = []
