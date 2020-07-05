@@ -59,3 +59,5 @@ tests/test_files/blocks.cache.1
 tests/test_files/blocks.cache.2
 tmp/
 *.sqlite
+tests/coverage/coverage.txt
+tests/test_files/cache_merge.cmd
