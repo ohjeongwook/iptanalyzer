@@ -10,8 +10,8 @@
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
-    <Name>pyipttool</Name>
-    <RootNamespace>pyipttool</RootNamespace>
+    <Name>iptanalyzer</Name>
+    <RootNamespace>iptanalyzer</RootNamespace>
     <IsWindowsApplication>False</IsWindowsApplication>
     <InterpreterId>Global|PythonCore|3.8</InterpreterId>
   </PropertyGroup>
