@@ -11,8 +11,8 @@ import uuid
 import traceback
 import multiprocessing
 
-import pyipttool.ipt
-import pyipttool.cache
+import iptdecoder.ipt
+import iptdecoder.cache
 
 def set_log_file(filename):
     fh = logging.FileHandler(filename, 'w')
@@ -27,7 +27,7 @@ def set_log_file(filename):
 def decode_block(pt_filename, dump_filename, temp_directory, cache_filename, start_offset = 0, end_offset = 0, debug_level = 0):
     logging.debug("decode_block: dump_filename: %s, cache_filename: %s" % (dump_filename, cache_filename))
 
-    pt_log_analyzer = pyipttool.ipt.Analyzer(dump_filename, dump_symbols = False, load_image = True, temp_directory = temp_directory, debug_level = debug_level)
+    pt_log_analyzer = iptdecoder.ipt.Analyzer(dump_filename, dump_symbols = False, load_image = True, temp_directory = temp_directory, debug_level = debug_level)
     pt_log_analyzer.open_ipt_log(pt_filename, start_offset = start_offset, end_offset = end_offset)
 
     try:
@@ -40,7 +40,7 @@ def decode_block(pt_filename, dump_filename, temp_directory, cache_filename, sta
     logging.debug("# decode_block: Writing %.16x ~ %.16x to %s" % (start_offset, end_offset, cache_filename))
     if cache_filename:
         try:
-            cache_writer = pyipttool.cache.Writer(pt_log_analyzer.records)
+            cache_writer = iptdecoder.cache.Writer(pt_log_analyzer.records)
             cache_writer.save(cache_filename)
         except:
             tb = traceback.format_exc()
@@ -64,7 +64,7 @@ if __name__ == '__main__':
     import argparse
     import tempfile
 
-    import pyipttool.cache
+    import iptdecoder.cache
 
     def auto_int(x):
         return int(x, 0)
@@ -97,7 +97,7 @@ if __name__ == '__main__':
     else:
         process_count = multiprocessing.cpu_count()
 
-        ipt_analyzer = pyipttool.ipt.Analyzer(args.dump_filename, dump_symbols = False, load_image = False)
+        ipt_analyzer = iptdecoder.ipt.Analyzer(args.dump_filename, dump_symbols = False, load_image = False)
         ipt_analyzer.open_ipt_log(args.pt_filename, start_offset = 0)
         sync_offsets = ipt_analyzer.enumerate_sync_offsets()
         arguments = (args.pt_filename, args.dump_filename, args.temp_directory, args.log_directory, args.debug_level)
@@ -130,7 +130,7 @@ if __name__ == '__main__':
         pool.join()
 
         print("Merging block cache files...")
-        merger = pyipttool.cache.Merger(args.cache_filename)
+        merger = iptdecoder.cache.Merger(args.cache_filename)
         merger.add_record_files(cache_filenames)
         merger.save()
 

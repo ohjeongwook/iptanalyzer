@@ -9,12 +9,12 @@ import logging
 from zipfile import ZipFile
 from datetime import datetime, timedelta
 
-import pyipttool.ipt
-import pyipttool.coverage
+import iptdecoder.ipt
+import iptdecoder.coverage
 
 if __name__ == '__main__':
     import argparse
-    import pyipttool.cache
+    import iptdecoder.cache
     import windbgtool.debugger
 
     def auto_int(x):
@@ -79,15 +79,15 @@ if __name__ == '__main__':
         end_address = args.end_address
 
     if args.cache_file:
-        block_analyzer = pyipttool.cache.Reader(args.cache_file)
-        coverage_logger = pyipttool.coverage.Logger(module_name, start_address, end_address, args.pt_filename, args.dump_filename, debugger = debugger)
+        block_analyzer = iptdecoder.cache.Reader(args.cache_file)
+        coverage_logger = iptdecoder.coverage.Logger(module_name, start_address, end_address, args.pt_filename, args.dump_filename, debugger = debugger)
         
         for (offset, address, end_address, sync_offset) in block_analyzer.enumerate_block_range(cr3 = args.cr3, start_address = start_address, end_address = end_address):
             symbol = debugger.find_symbol(address)
             print('> %.16x (%s) (sync_offset=%x, offset=%x)' % (address, symbol, sync_offset, offset))
             print('\t' + debugger.get_disassembly_line(address))
     else:
-        ptlog_analyzer = pyipttool.ipt.Analyzer(args.dump_filename, 
+        ptlog_analyzer = iptdecoder.ipt.Analyzer(args.dump_filename, 
                                          dump_symbols = dump_symbols, 
                                          load_image = load_image,
                                          debug_level = args.debug_level)

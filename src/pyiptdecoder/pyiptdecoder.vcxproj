@@ -22,9 +22,9 @@
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{AED12ED3-51EA-4FB7-9F2E-E25A2BC5EF52}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>pyipt</RootNamespace>
+    <RootNamespace>pyiptdecoder</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>pyipt</ProjectName>
+    <ProjectName>pyiptdecoder</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -105,10 +105,11 @@
       <EnableUAC>false</EnableUAC>
       <AdditionalLibraryDirectories>$(SolutionDir)\libs\libipt\lib;%PYTHONHOME%\libs;%USERPROFILE%\AppData\Local\Programs\Python\Python38\libs</AdditionalLibraryDirectories>
       <AdditionalDependencies>libipt.lib;python38.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);libipt.lib;</AdditionalDependencies>
+      <OutputFile>$(OutDir)iptdecoder$(TargetExt)</OutputFile>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y $(OutDir)*.pyd $(SolutionDir)\pyipttool
-copy /Y $(SolutionDir)\libs\libipt\lib\*.dll $(SolutionDir)\pyipttool</Command>
+      <Command>copy /Y $(OutDir)*.pyd $(SolutionDir)\iptanalyzer
+copy /Y $(SolutionDir)\libs\libipt\lib\*.dll $(SolutionDir)\iptanalyzer</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -130,8 +131,8 @@ copy /Y $(SolutionDir)\libs\libipt\lib\*.dll $(SolutionDir)\pyipttool</Command>
       <AdditionalDependencies>python38.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);libipt.lib;</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y $(OutDir)*.pyd $(SolutionDir)\pyipttool
-copy /Y $(SolutionDir)\libs\libipt\lib\*.dll $(SolutionDir)\pyipttool</Command>
+      <Command>copy /Y $(OutDir)*.pyd $(SolutionDir)\iptanalyzer
+copy /Y $(SolutionDir)\libs\libipt\lib\*.dll $(SolutionDir)\iptanalyzer</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -157,8 +158,8 @@ copy /Y $(SolutionDir)\libs\libipt\lib\*.dll $(SolutionDir)\pyipttool</Command>
       <AdditionalDependencies>python38.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);libipt.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y $(OutDir)*.pyd $(SolutionDir)\pyipttool
-copy /Y $(SolutionDir)\libs\libipt\lib\*.dll $(SolutionDir)\pyipttool</Command>
+      <Command>copy /Y $(OutDir)*.pyd $(SolutionDir)\iptanalyzer
+copy /Y $(SolutionDir)\libs\libipt\lib\*.dll $(SolutionDir)\iptanalyzer</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -182,14 +183,15 @@ copy /Y $(SolutionDir)\libs\libipt\lib\*.dll $(SolutionDir)\pyipttool</Command>
       <EnableUAC>false</EnableUAC>
       <AdditionalLibraryDirectories>$(SolutionDir)\libs\libipt\lib;%PYTHONHOME%\libs;%USERPROFILE%\AppData\Local\Programs\Python\Python38\libs</AdditionalLibraryDirectories>
       <AdditionalDependencies>python38.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);libipt.lib;</AdditionalDependencies>
+      <OutputFile>$(OutDir)iptdecoder$(TargetExt)</OutputFile>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y $(OutDir)*.pyd $(SolutionDir)\pyipttool
-copy /Y $(SolutionDir)\libs\libipt\lib\*.dll $(SolutionDir)\pyipttool</Command>
+      <Command>copy /Y $(OutDir)*.pyd $(SolutionDir)\iptanalyzer
+copy /Y $(SolutionDir)\libs\libipt\lib\*.dll $(SolutionDir)\iptanalyzer</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="pyipt.cpp" />
+    <ClCompile Include="pyiptdecoder.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\iptdecoder\iptdecoder.vcxproj">

@@ -8,8 +8,8 @@ if __name__ == '__main__':
 
     import windbgtool.debugger
 
-    import pyipttool.cache    
-    import pyipttool.coverage
+    import iptdecoder.cache    
+    import iptdecoder.coverage
 
     def auto_int(x):
         return int(x, 0)
@@ -61,8 +61,8 @@ if __name__ == '__main__':
         end_address = args.end_address
 
     if args.cache_filename:
-        block_analyzer = pyipttool.cache.Reader(args.cache_filename)
-        coverage_logger = pyipttool.coverage.Logger(module_name, start_address, end_address, args.pt_filename, args.dump_filename, debugger = debugger)
+        block_analyzer = iptdecoder.cache.Reader(args.cache_filename)
+        coverage_logger = iptdecoder.coverage.Logger(module_name, start_address, end_address, args.pt_filename, args.dump_filename, debugger = debugger)
         
         for (offset, address, end_address, sync_offset) in block_analyzer.enumerate_block_range(cr3 = args.cr3, start_address = start_address, end_address = end_address):
             coverage_logger.add_block(offset, address, end_address, sync_offset)

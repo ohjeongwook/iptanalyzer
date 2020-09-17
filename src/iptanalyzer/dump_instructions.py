@@ -8,7 +8,7 @@ import traceback
 from zipfile import ZipFile
 from datetime import datetime, timedelta
 
-import pyipttool.ipt
+import iptdecoder.ipt
 
 if __name__ == '__main__':
     import argparse
@@ -50,7 +50,7 @@ if __name__ == '__main__':
         start_address = args.start_address
         end_address = args.end_address
 
-    ptlog_analyzer = pyipttool.ipt.Analyzer(args.dump_file,
+    ptlog_analyzer = iptdecoder.ipt.Analyzer(args.dump_file,
                                      dump_symbols = False,
                                      dump_instructions = False,
                                      load_image = True)

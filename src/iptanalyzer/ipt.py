@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 import tempfile
 import logging
 
-import pyipttool.pyipt
+import iptdecoder.pyipt
 import windbgtool.debugger
 
 class Filter:
@@ -56,7 +56,7 @@ class Analyzer:
         self.loaded_modules = {}
         self.no_map_addresses = {}
 
-        self.ipt = pyipttool.pyipt.ipt()
+        self.ipt = iptdecoder.pyipt.ipt()
         self.ipt.open(pt_filename, self.start_offset , self.end_offset)
 
     def close(self):
@@ -196,8 +196,8 @@ class Analyzer:
             decode_status = self.ipt.get_decode_status()
             offset = self.ipt.get_offset()
 
-            if decode_status == pyipttool.pyipt.pt_error_code.pte_ok or decode_status == pyipttool.pyipt.pt_error_code.pte_bad_insn:
-                if decode_status != pyipttool.pyipt.pt_error_code.pte_ok:
+            if decode_status == iptdecoder.pyipt.pt_error_code.pte_ok or decode_status == iptdecoder.pyipt.pt_error_code.pte_bad_insn:
+                if decode_status != iptdecoder.pyipt.pt_error_code.pte_ok:
                     logging.error("%.8x: ip: %.16x decode_status: %x (continue)" % (offset, address, decode_status))
 
                 if self.debug_level > 2:
@@ -209,11 +209,11 @@ class Analyzer:
                 else:
                     return decoded_obj
 
-            elif decode_status == pyipttool.pyipt.pt_error_code.pte_eos:
+            elif decode_status == iptdecoder.pyipt.pt_error_code.pte_eos:
                 logging.debug("%.8x: ip: %.16x decode_status(pte_eos): %x" % (offset, address, decode_status))
                 break
 
-            elif decode_status == pyipttool.pyipt.pt_error_code.pte_nomap:
+            elif decode_status == iptdecoder.pyipt.pt_error_code.pte_nomap:
                 if self.debug_level > 1:
                     logging.debug("%.8x: ip: %.16x decode_status(pte_nomap): %x" % (offset, address, decode_status))
 
