@@ -2,19 +2,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>968bdd29-f1a3-4553-bb51-56085d15a258</ProjectGuid>
-    <ProjectHome>
-    </ProjectHome>
+    <ProjectGuid>093b7e27-3c24-4c6d-a775-321f74ed43fb</ProjectGuid>
+    <ProjectHome>.</ProjectHome>
     <StartupFile>
     </StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
-    <Name>iptanalyzer</Name>
-    <RootNamespace>iptanalyzer</RootNamespace>
-    <IsWindowsApplication>False</IsWindowsApplication>
-    <InterpreterId>Global|PythonCore|3.8</InterpreterId>
+    <Name>tools</Name>
+    <RootNamespace>tools</RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -25,13 +22,11 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="cache.py">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="ipt.py" />
-  </ItemGroup>
-  <ItemGroup>
-    <InterpreterReference Include="Global|PythonCore|3.8" />
+    <Compile Include="dump_blocks.py" />
+    <Compile Include="dump_coverage.py" />
+    <Compile Include="dump_instructions.py" />
+    <Compile Include="find_api_calls.py" />
+    <Compile Include="generate_cache.py" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
