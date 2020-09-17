@@ -50,12 +50,12 @@ if __name__ == '__main__':
         start_address = args.start_address
         end_address = args.end_address
 
-    ptlog_analyzer = iptanalyzer.ipt.Analyzer(args.dump_file,
+    ptlog_analyzer = iptanalyzer.ipt.Loader(args.dump_file,
                                      dump_symbols = False,
                                      dump_instructions = False,
                                      load_image = True)
 
-    ptlog_analyzer.open_ipt_log(args.pt_file, start_offset = args.start_offset, end_offset = args.end_offset)
+    ptlog_analyzer.open(args.pt_file, start_offset = args.start_offset, end_offset = args.end_offset)
 
     for insn in ptlog_analyzer.decode_instructions(offset = args.instruction_offset, start_address = start_address, end_address = end_address):
         try:

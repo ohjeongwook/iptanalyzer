@@ -20,7 +20,7 @@ class Filter:
         self.stop_address = 0
         self.sync_offset = 0
 
-class Analyzer:
+class Loader:
     def __init__(self, dump_filename = '', load_image = False, dump_instructions = False, dump_symbols = True, temp_directory = '', debug_level = 0):     
         self.debug_level = debug_level
         self.dump_instructions = dump_instructions
@@ -49,7 +49,7 @@ class Analyzer:
         else:
             self.debugger = None
 
-    def open_ipt_log(self, pt_filename, start_offset = 0, end_offset = 0):
+    def open(self, pt_filename, start_offset = 0, end_offset = 0):
         self.start_offset = start_offset
         self.end_offset = end_offset
 

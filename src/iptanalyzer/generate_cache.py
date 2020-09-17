@@ -27,12 +27,12 @@ def set_log_file(filename):
 def decode_block(pt_filename, dump_filename, temp_directory, cache_filename, start_offset = 0, end_offset = 0, debug_level = 0):
     logging.debug("decode_block: dump_filename: %s, cache_filename: %s" % (dump_filename, cache_filename))
 
-    pt_log_analyzer = iptanalyzer.ipt.Analyzer(dump_filename, dump_symbols = False, load_image = True, temp_directory = temp_directory, debug_level = debug_level)
-    pt_log_analyzer.open_ipt_log(pt_filename, start_offset = start_offset, end_offset = end_offset)
+    ipt_loader = iptanalyzer.ipt.Loader(dump_filename, dump_symbols = False, load_image = True, temp_directory = temp_directory, debug_level = debug_level)
+    ipt_loader.open(pt_filename, start_offset = start_offset, end_offset = end_offset)
 
     try:
-        logging.debug("# pt_log_analyzer.record_block_offsets")
-        pt_log_analyzer.record_block_offsets()
+        logging.debug("# ipt_loader.record_block_offsets")
+        ipt_loader.record_block_offsets()
     except:
         tb = traceback.format_exc()
         logging.debug("# decode_block exception: %s" % str(tb))
@@ -40,13 +40,13 @@ def decode_block(pt_filename, dump_filename, temp_directory, cache_filename, sta
     logging.debug("# decode_block: Writing %.16x ~ %.16x to %s" % (start_offset, end_offset, cache_filename))
     if cache_filename:
         try:
-            cache_writer = iptanalyzer.cache.Writer(pt_log_analyzer.records)
+            cache_writer = iptanalyzer.cache.Writer(ipt_loader.records)
             cache_writer.save(cache_filename)
         except:
             tb = traceback.format_exc()
             logging.debug("# decode_block save exception: %s" % tb)
 
-    pt_log_analyzer.close()
+    ipt_loader.close()
 
 def decode_blocks_function(data):
     (arguments, start_offset, end_offset, cache_filename) = data
@@ -97,8 +97,8 @@ if __name__ == '__main__':
     else:
         process_count = multiprocessing.cpu_count()
 
-        ipt_analyzer = iptanalyzer.ipt.Analyzer(args.dump_filename, dump_symbols = False, load_image = False)
-        ipt_analyzer.open_ipt_log(args.pt_filename, start_offset = 0)
+        ipt_analyzer = iptanalyzer.ipt.Loader(args.dump_filename, dump_symbols = False, load_image = False)
+        ipt_analyzer.open(args.pt_filename, start_offset = 0)
         sync_offsets = ipt_analyzer.enumerate_sync_offsets()
         arguments = (args.pt_filename, args.dump_filename, args.temp_directory, args.log_directory, args.debug_level)
         inputs = []

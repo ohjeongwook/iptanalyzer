@@ -34,11 +34,11 @@ if __name__ == '__main__':
         for (sync_offset, offset) in block_analyzer.enumerate_blocks(address, cr3 = args.cr3):
             print('> sync_offset = %x / offset = %x' % (sync_offset, offset))
 
-            pt_log_analyzer = iptanalyzer.ipt.Analyzer(args.dump_filename, dump_symbols = True, load_image = True)
-            pt_log_analyzer.open_ipt_log(args.pt_filename, start_offset = sync_offset, end_offset = offset+2)
+            ipt_loader = iptanalyzer.ipt.Loader(args.dump_filename, dump_symbols = True, load_image = True)
+            ipt_loader.open(args.pt_filename, start_offset = sync_offset, end_offset = offset+2)
 
             instructions = []
-            for instruction in pt_log_analyzer.decode_instructions(offset = offset):
+            for instruction in ipt_loader.decode_instructions(offset = offset):
                 instruction_str = debugger.get_disassembly_line(instruction.ip)
                 print('\tInstruction: %s' % (instruction_str))
                 instructions.append({'IP': instruction.ip, 'Instruction': instruction_str})

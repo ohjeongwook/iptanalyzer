@@ -64,12 +64,12 @@ class Logger:
         self.temp_directory = temp_directory
         self.addresses = {}
 
-        self.ptlog_analyzer = iptanalyzer.ipt.Analyzer(self.dump_filename,
+        self.ptlog_analyzer = iptanalyzer.ipt.Loader(self.dump_filename,
                                         dump_symbols = False,
                                         dump_instructions = False,
                                         load_image = True)
 
-        self.ptlog_analyzer.open_ipt_log(self.pt_filename)
+        self.ptlog_analyzer.open(self.pt_filename)
 
         module_filename = os.path.join(self.temp_directory, '%x.dmp' % start_address)
         region_size = end_address - start_address
