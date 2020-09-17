@@ -8,7 +8,7 @@ import copy
 import logging
 import traceback
 
-import iptdecoder.ipt
+import iptanalyzer.ipt
 import capstone
 
 class Disasm:
@@ -64,7 +64,7 @@ class Logger:
         self.temp_directory = temp_directory
         self.addresses = {}
 
-        self.ptlog_analyzer = iptdecoder.ipt.Analyzer(self.dump_filename,
+        self.ptlog_analyzer = iptanalyzer.ipt.Analyzer(self.dump_filename,
                                         dump_symbols = False,
                                         dump_instructions = False,
                                         load_image = True)
@@ -131,7 +131,7 @@ if __name__ == '__main__':
     import argparse
     import json
 
-    import iptdecoder.cache
+    import iptanalyzer.cache
     import windbgtool.debugger
 
     def auto_int(x):

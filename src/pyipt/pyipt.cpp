@@ -9,7 +9,7 @@
 namespace py = pybind11;
 
 PYBIND11_MODULE(pyipt, m) {
-    py::class_<IPTDecoder>(m, "ipt")
+    py::class_<IPTDecoder>(m, "iptdecoder")
         .def(py::init())
         .def("open", &IPTDecoder::Open)
         .def("get_sync_offset", &IPTDecoder::GetSyncOffset)

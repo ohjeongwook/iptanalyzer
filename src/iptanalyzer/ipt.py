@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 import tempfile
 import logging
 
-import iptdecoder.pyipt
+import iptanalyzer.pyipt
 import windbgtool.debugger
 
 class Filter:
@@ -56,8 +56,8 @@ class Analyzer:
         self.loaded_modules = {}
         self.no_map_addresses = {}
 
-        self.ipt = iptdecoder.pyipt.ipt()
-        self.ipt.open(pt_filename, self.start_offset , self.end_offset)
+        self.ipt_decoder = iptanalyzer.pyipt.iptdecoder()
+        self.ipt_decoder.open(pt_filename, self.start_offset , self.end_offset)
 
     def close(self):
         self.debugger.close_dump()
@@ -138,7 +138,7 @@ class Analyzer:
         if self.debug_level > 1:
             logging.debug('add_image base_address: %.8x region_size: %x' % (base_address, region_size))
 
-        self.ipt.add_image(base_address, dump_filename)
+        self.ipt_decoder.add_image(base_address, dump_filename)
         self.loaded_modules[address] = region_size
         self.loaded_modules[base_address] = region_size
         return True
@@ -160,10 +160,10 @@ class Analyzer:
         sync_offsets = []
 
         while 1:
-            sync_offset = self.ipt.get_sync_offset()
+            sync_offset = self.ipt_decoder.get_sync_offset()
             sync_offsets.append(sync_offset)
 
-            if not self.ipt.forward_block_sync():
+            if not self.ipt_decoder.forward_block_sync():
                 break
 
         return sync_offsets
@@ -176,13 +176,13 @@ class Analyzer:
         pt_no_map_error_counts = {}
         while 1:
             if decode_type == 'block':
-                decoded_obj = self.ipt.decode_block()
+                decoded_obj = self.ipt_decoder.decode_block()
                 if not decoded_obj:
                     break
 
                 end_address = decoded_obj.end_ip
             else:
-                decoded_obj = self.ipt.decode_instruction()
+                decoded_obj = self.ipt_decoder.decode_instruction()
                 if not decoded_obj:
                     break
 
@@ -193,15 +193,15 @@ class Analyzer:
 
             address = decoded_obj.ip
             skip_to_next_sync = False
-            decode_status = self.ipt.get_decode_status()
-            offset = self.ipt.get_offset()
+            decode_status = self.ipt_decoder.get_decode_status()
+            offset = self.ipt_decoder.get_offset()
 
-            if decode_status == iptdecoder.pyipt.pt_error_code.pte_ok or decode_status == iptdecoder.pyipt.pt_error_code.pte_bad_insn:
-                if decode_status != iptdecoder.pyipt.pt_error_code.pte_ok:
+            if decode_status == iptanalyzer.pyipt.pt_error_code.pte_ok or decode_status == iptanalyzer.pyipt.pt_error_code.pte_bad_insn:
+                if decode_status != iptanalyzer.pyipt.pt_error_code.pte_ok:
                     logging.error("%.8x: ip: %.16x decode_status: %x (continue)" % (offset, address, decode_status))
 
                 if self.debug_level > 2:
-                    sync_offset = self.ipt.get_sync_offset()
+                    sync_offset = self.ipt_decoder.get_sync_offset()
                     logging.debug("%.8x: decode: sync_offset: %.16x ip: %.16x" % (offset, sync_offset, address))
                     
                 if callback:
@@ -209,11 +209,11 @@ class Analyzer:
                 else:
                     return decoded_obj
 
-            elif decode_status == iptdecoder.pyipt.pt_error_code.pte_eos:
+            elif decode_status == iptanalyzer.pyipt.pt_error_code.pte_eos:
                 logging.debug("%.8x: ip: %.16x decode_status(pte_eos): %x" % (offset, address, decode_status))
                 break
 
-            elif decode_status == iptdecoder.pyipt.pt_error_code.pte_nomap:
+            elif decode_status == iptanalyzer.pyipt.pt_error_code.pte_nomap:
                 if self.debug_level > 1:
                     logging.debug("%.8x: ip: %.16x decode_status(pte_nomap): %x" % (offset, address, decode_status))
 
@@ -240,7 +240,7 @@ class Analyzer:
 
             if skip_to_next_sync:
                 logging.debug("%.8x: forward_block_sync @%.16x" % (offset, address))
-                if not self.ipt.forward_block_sync():
+                if not self.ipt_decoder.forward_block_sync():
                     logging.debug("%.8x: forward_block_sync failed for %.16x" % (offset, address))
                     break
         return None
@@ -248,9 +248,9 @@ class Analyzer:
     def record_block_offset(self, block):
         address = block.ip
         block_end_address = block.end_ip
-        cr3 = self.ipt.get_current_cr3()
-        sync_offset = self.ipt.get_sync_offset()
-        offset = self.ipt.get_offset()
+        cr3 = self.ipt_decoder.get_current_cr3()
+        sync_offset = self.ipt_decoder.get_sync_offset()
+        offset = self.ipt_decoder.get_offset()
 
         if self.debug_level > 1:
             logging.debug("%.8x: record_block_offsets: sync_offset: %.16x cr3: %.16x ip: %.16x" % (offset, sync_offset, cr3, address))
@@ -266,7 +266,7 @@ class Analyzer:
             if not block:
                 break
 
-            current_offset = self.ipt.get_offset()
+            current_offset = self.ipt_decoder.get_offset()
 
             if offset > 0:
                 if offset == current_offset:
@@ -283,7 +283,7 @@ class Analyzer:
             if not instruction:
                 break
 
-            current_offset = self.ipt.get_offset()
+            current_offset = self.ipt_decoder.get_offset()
             if offset > 0:
                 if offset == current_offset:
                     yield instruction
@@ -299,7 +299,7 @@ class Analyzer:
 
     def decode_ranges(self, sync_offset = 0, ranges = []):
         if sync_offset > 0:
-            self.ipt.set_instruction_sync_offset(sync_offset)
+            self.ipt_decoder.set_instruction_sync_offset(sync_offset)
 
         stop_addresses = {}
         for (start_address, end_address) in ranges:
@@ -310,8 +310,8 @@ class Analyzer:
             if not instruction:
                 break
 
-            current_offset = self.ipt.get_offset()
-            current_sync_offset = self.ipt.get_sync_offset()
+            current_offset = self.ipt_decoder.get_offset()
+            current_sync_offset = self.ipt_decoder.get_sync_offset()
 
             for (start_address, end_address) in ranges:
                 if start_address <= instruction.ip and instruction.ip <= end_address:
