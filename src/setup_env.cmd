@@ -1,0 +1,2 @@
+setx IPTANALYZER %CD%
+pause
