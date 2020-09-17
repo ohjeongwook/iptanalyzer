@@ -14,7 +14,8 @@
 /Libs/libipt/lib/libipt.lib
 /Libs/libipt/lib/libipt.dll
 /Libs/libipt/include/intel-pt.h
-/Debug
+Debug/
+Release/
 /ipt/Debug
 /ipt/x64
 /ipt/ipt.vcxproj.user
