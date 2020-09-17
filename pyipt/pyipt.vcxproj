@@ -96,7 +96,7 @@
       <PreprocessorDefinitions>_DEBUG;PYPTRACER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)ipt;$(SolutionDir)Libs\libipt\include;%PYTHONHOME%\include;%USERPROFILE%\AppData\Local\Programs\Python\Python38\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)iptdecoder;$(SolutionDir)Libs\libipt\include;%PYTHONHOME%\include;%USERPROFILE%\AppData\Local\Programs\Python\Python38\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -120,7 +120,7 @@ copy /Y $(SolutionDir)\Libs\libipt\lib\*.dll $(SolutionDir)\pyipttool</Command>
       <PreprocessorDefinitions>WIN32;_DEBUG;PYPTRACER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)ipt;$(SolutionDir)Libs\libipt\include;%PYTHONHOME%\include;%USERPROFILE%\AppData\Local\Programs\Python\Python38\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)iptdecoder;$(SolutionDir)Libs\libipt\include;%PYTHONHOME%\include;%USERPROFILE%\AppData\Local\Programs\Python\Python38\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -145,7 +145,7 @@ copy /Y $(SolutionDir)\Libs\libipt\lib\*.dll $(SolutionDir)\pyipttool</Command>
       <PreprocessorDefinitions>WIN32;NDEBUG;PYPTRACER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)ipt;$(SolutionDir)Libs\libipt\include;%PYTHONHOME%\include;%USERPROFILE%\AppData\Local\Programs\Python\Python38\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)iptdecoder;$(SolutionDir)Libs\libipt\include;%PYTHONHOME%\include;%USERPROFILE%\AppData\Local\Programs\Python\Python38\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -172,7 +172,7 @@ copy /Y $(SolutionDir)\Libs\libipt\lib\*.dll $(SolutionDir)\pyipttool</Command>
       <PreprocessorDefinitions>NDEBUG;PYPTRACER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)ipt;$(SolutionDir)Libs\libipt\include;%PYTHONHOME%\include;%USERPROFILE%\AppData\Local\Programs\Python\Python38\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)iptdecoder;$(SolutionDir)Libs\libipt\include;%PYTHONHOME%\include;%USERPROFILE%\AppData\Local\Programs\Python\Python38\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -192,7 +192,7 @@ copy /Y $(SolutionDir)\Libs\libipt\lib\*.dll $(SolutionDir)\pyipttool</Command>
     <ClCompile Include="pyipt.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ipt\ipt.vcxproj">
+    <ProjectReference Include="..\iptdecoder\iptdecoder.vcxproj">
       <Project>{1e1e288f-17d6-4c70-9fed-326c8cce6aaa}</Project>
     </ProjectReference>
   </ItemGroup>

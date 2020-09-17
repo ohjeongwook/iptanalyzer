@@ -2,7 +2,7 @@
 #include <iostream>
 #include <string>
 
-#include "ipt.h"
+#include "iptdecoder.h"
 
 IPTDecoder::IPTDecoder()
 {
