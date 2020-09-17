@@ -12,14 +12,6 @@ import logging
 import iptanalyzer.pyipt
 import windbgtool.debugger
 
-class Filter:
-    def __init__(self, offset = 0, start_address = 0, end_address = 0, stop_address = 0, sync_offset = 0):
-        self.offset = 0
-        self.start_address = 0
-        self.end_address = 0
-        self.stop_address = 0
-        self.sync_offset = 0
-
 class Loader:
     def __init__(self, dump_filename = '', load_image = False, dump_instructions = False, dump_symbols = True, temp_directory = '', debug_level = 0):     
         self.debug_level = debug_level
