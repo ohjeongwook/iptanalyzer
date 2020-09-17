@@ -11,7 +11,7 @@
 * [pyipt](pyipt) is a python wrapper around ipt
    * It features multiprocessing to process large IPT logs
    * It caches major block offsets to be used in post-processing scripts
-   * Some examples are under [pyipttool](pyipttool) folder
+   * Some examples are under [iptanalyzer](src/iptanalyzer) folder
 
 ---
 # Usage
