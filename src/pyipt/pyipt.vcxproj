@@ -96,19 +96,19 @@
       <PreprocessorDefinitions>_DEBUG;PYPTRACER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)iptdecoder;$(SolutionDir)Libs\libipt\include;%PYTHONHOME%\include;%USERPROFILE%\AppData\Local\Programs\Python\Python38\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)iptdecoder;$(SolutionDir)\libs\libipt\include;%PYTHONHOME%\include;%USERPROFILE%\AppData\Local\Programs\Python\Python38\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(SolutionDir)Libs\libipt\lib;%PYTHONHOME%\libs;%USERPROFILE%\AppData\Local\Programs\Python\Python38\libs</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)\libs\libipt\lib;%PYTHONHOME%\libs;%USERPROFILE%\AppData\Local\Programs\Python\Python38\libs</AdditionalLibraryDirectories>
       <AdditionalDependencies>libipt.lib;python38.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);libipt.lib;</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>copy /Y $(OutDir)*.pyd $(SolutionDir)\pyipttool
-copy /Y $(SolutionDir)\Libs\libipt\lib\*.dll $(SolutionDir)\pyipttool</Command>
+copy /Y $(SolutionDir)\libs\libipt\lib\*.dll $(SolutionDir)\pyipttool</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -120,18 +120,18 @@ copy /Y $(SolutionDir)\Libs\libipt\lib\*.dll $(SolutionDir)\pyipttool</Command>
       <PreprocessorDefinitions>WIN32;_DEBUG;PYPTRACER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)iptdecoder;$(SolutionDir)Libs\libipt\include;%PYTHONHOME%\include;%USERPROFILE%\AppData\Local\Programs\Python\Python38\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)iptdecoder;$(SolutionDir)\libs\libipt\include;%PYTHONHOME%\include;%USERPROFILE%\AppData\Local\Programs\Python\Python38\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(SolutionDir)Libs\libipt\lib;%PYTHONHOME%\libs;%USERPROFILE%\AppData\Local\Programs\Python\Python38\libs</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)\libs\libipt\lib;%PYTHONHOME%\libs;%USERPROFILE%\AppData\Local\Programs\Python\Python38\libs</AdditionalLibraryDirectories>
       <AdditionalDependencies>python38.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);libipt.lib;</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>copy /Y $(OutDir)*.pyd $(SolutionDir)\pyipttool
-copy /Y $(SolutionDir)\Libs\libipt\lib\*.dll $(SolutionDir)\pyipttool</Command>
+copy /Y $(SolutionDir)\libs\libipt\lib\*.dll $(SolutionDir)\pyipttool</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -145,7 +145,7 @@ copy /Y $(SolutionDir)\Libs\libipt\lib\*.dll $(SolutionDir)\pyipttool</Command>
       <PreprocessorDefinitions>WIN32;NDEBUG;PYPTRACER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)iptdecoder;$(SolutionDir)Libs\libipt\include;%PYTHONHOME%\include;%USERPROFILE%\AppData\Local\Programs\Python\Python38\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)iptdecoder;$(SolutionDir)\libs\libipt\include;%PYTHONHOME%\include;%USERPROFILE%\AppData\Local\Programs\Python\Python38\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -153,12 +153,12 @@ copy /Y $(SolutionDir)\Libs\libipt\lib\*.dll $(SolutionDir)\pyipttool</Command>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(SolutionDir)Libs\libipt\lib;%PYTHONHOME%\libs;%USERPROFILE%\AppData\Local\Programs\Python\Python38\libs</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)\libs\libipt\lib;%PYTHONHOME%\libs;%USERPROFILE%\AppData\Local\Programs\Python\Python38\libs</AdditionalLibraryDirectories>
       <AdditionalDependencies>python38.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);libipt.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>copy /Y $(OutDir)*.pyd $(SolutionDir)\pyipttool
-copy /Y $(SolutionDir)\Libs\libipt\lib\*.dll $(SolutionDir)\pyipttool</Command>
+copy /Y $(SolutionDir)\libs\libipt\lib\*.dll $(SolutionDir)\pyipttool</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -172,7 +172,7 @@ copy /Y $(SolutionDir)\Libs\libipt\lib\*.dll $(SolutionDir)\pyipttool</Command>
       <PreprocessorDefinitions>NDEBUG;PYPTRACER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)iptdecoder;$(SolutionDir)Libs\libipt\include;%PYTHONHOME%\include;%USERPROFILE%\AppData\Local\Programs\Python\Python38\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)iptdecoder;$(SolutionDir)\libs\libipt\include;%PYTHONHOME%\include;%USERPROFILE%\AppData\Local\Programs\Python\Python38\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -180,12 +180,12 @@ copy /Y $(SolutionDir)\Libs\libipt\lib\*.dll $(SolutionDir)\pyipttool</Command>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(SolutionDir)Libs\libipt\lib;%PYTHONHOME%\libs;%USERPROFILE%\AppData\Local\Programs\Python\Python38\libs</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)\libs\libipt\lib;%PYTHONHOME%\libs;%USERPROFILE%\AppData\Local\Programs\Python\Python38\libs</AdditionalLibraryDirectories>
       <AdditionalDependencies>python38.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);libipt.lib;</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>copy /Y $(OutDir)*.pyd $(SolutionDir)\pyipttool
-copy /Y $(SolutionDir)\Libs\libipt\lib\*.dll $(SolutionDir)\pyipttool</Command>
+copy /Y $(SolutionDir)\libs\libipt\lib\*.dll $(SolutionDir)\pyipttool</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

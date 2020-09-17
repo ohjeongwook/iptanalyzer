@@ -3,15 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29418.71
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ipt_tests", "tests\ipt_tests\ipt_tests.vcxproj", "{08251DEB-D585-4C35-8114-AC4AA91610D8}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pyipt", "pyipt\Pyipt.vcxproj", "{AED12ED3-51EA-4FB7-9F2E-E25A2BC5EF52}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "iptdecoder", "iptdecoder\iptdecoder.vcxproj", "{1E1E288F-17D6-4C70-9FED-326C8CCE6AAA}"
 EndProject
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "pyipttool", "pyipttool\pyipttool.pyproj", "{968BDD29-F1A3-4553-BB51-56085D15A258}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{64BC9812-DA60-4C13-81F9-041D4AC373DB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,16 +19,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{08251DEB-D585-4C35-8114-AC4AA91610D8}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{08251DEB-D585-4C35-8114-AC4AA91610D8}.Debug|x64.ActiveCfg = Debug|x64
-		{08251DEB-D585-4C35-8114-AC4AA91610D8}.Debug|x64.Build.0 = Debug|x64
-		{08251DEB-D585-4C35-8114-AC4AA91610D8}.Debug|x86.ActiveCfg = Debug|Win32
-		{08251DEB-D585-4C35-8114-AC4AA91610D8}.Debug|x86.Build.0 = Debug|Win32
-		{08251DEB-D585-4C35-8114-AC4AA91610D8}.Release|Any CPU.ActiveCfg = Release|Win32
-		{08251DEB-D585-4C35-8114-AC4AA91610D8}.Release|x64.ActiveCfg = Release|x64
-		{08251DEB-D585-4C35-8114-AC4AA91610D8}.Release|x64.Build.0 = Release|x64
-		{08251DEB-D585-4C35-8114-AC4AA91610D8}.Release|x86.ActiveCfg = Release|Win32
-		{08251DEB-D585-4C35-8114-AC4AA91610D8}.Release|x86.Build.0 = Release|Win32
 		{AED12ED3-51EA-4FB7-9F2E-E25A2BC5EF52}.Debug|Any CPU.ActiveCfg = Debug|Win32
 		{AED12ED3-51EA-4FB7-9F2E-E25A2BC5EF52}.Debug|x64.ActiveCfg = Debug|x64
 		{AED12ED3-51EA-4FB7-9F2E-E25A2BC5EF52}.Debug|x64.Build.0 = Debug|x64
@@ -62,9 +48,6 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{08251DEB-D585-4C35-8114-AC4AA91610D8} = {64BC9812-DA60-4C13-81F9-041D4AC373DB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5CC34411-1A04-4635-BC8B-5AF2B594C7A6}
