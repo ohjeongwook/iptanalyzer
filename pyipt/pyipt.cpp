@@ -27,7 +27,7 @@ PYBIND11_MODULE(pyipt, m) {
 
     py::class_<pt_insn>(m, "pt_insn")
         .def_readwrite("ip", &pt_insn::ip)
-        .def("GetRawBytes",
+        .def("get_raw_bytes",
             [](const pt_insn& a) {
                 vector<uint8_t> arr;
 
