@@ -4,13 +4,13 @@
 
 #include "ipt.h"
 
-ipt::ipt()
+IPTDecoder::IPTDecoder()
 {
     m_startOffset = 0;
     InitImageCache();
 }
 
-ipt::~ipt()
+IPTDecoder::~IPTDecoder()
 {
     if (m_iscache)
     {
@@ -33,12 +33,12 @@ ipt::~ipt()
     }
 }
 
-uint64_t ipt::GetSyncOffset()
+uint64_t IPTDecoder::GetSyncOffset()
 {
     return m_startOffset + m_syncOffset;
 }
 
-int ipt::SetInstructionSyncOffset(uint64_t sync_offset)
+int IPTDecoder::SetInstructionSyncOffset(uint64_t sync_offset)
 {
     if (m_insnDecoder)
     {
@@ -47,7 +47,7 @@ int ipt::SetInstructionSyncOffset(uint64_t sync_offset)
     return -1;
 }
 
-int ipt::SetBlockSyncOffset(uint64_t sync_offset)
+int IPTDecoder::SetBlockSyncOffset(uint64_t sync_offset)
 {
     if (m_blockDecoder)
     {
@@ -56,22 +56,22 @@ int ipt::SetBlockSyncOffset(uint64_t sync_offset)
     return -1;
 }
 
-uint64_t ipt::GetOffset()
+uint64_t IPTDecoder::GetOffset()
 {
     return m_startOffset + m_offset;
 }
 
-uint64_t ipt::GetSize()
+uint64_t IPTDecoder::GetSize()
 {
     return m_size;
 }
 
-pt_error_code ipt::GetStatus()
+pt_error_code IPTDecoder::GetStatus()
 {
     return pt_errcode(m_status);
 }
 
-const char* ipt::GetModeName(pt_exec_mode mode) {
+const char* IPTDecoder::GetModeName(pt_exec_mode mode) {
     switch (mode) {
     case ptem_unknown:
         return "unknown";
@@ -89,7 +89,7 @@ const char* ipt::GetModeName(pt_exec_mode mode) {
     return "unknown";
 }
 
-const char* ipt::GetEventTypeName(enum pt_event_type event_type) {
+const char* IPTDecoder::GetEventTypeName(enum pt_event_type event_type) {
     switch (event_type) {
     case ptev_enabled:
         return "ptev_enabled";
@@ -136,7 +136,7 @@ const char* ipt::GetEventTypeName(enum pt_event_type event_type) {
     return "unknown";
 }
 
-void ipt::BuildConfig(uint8_t* begin, uint8_t* end)
+void IPTDecoder::BuildConfig(uint8_t* begin, uint8_t* end)
 {
     memset(&m_config, 0, sizeof(m_config));
     m_config.size = sizeof(m_config);
@@ -151,7 +151,7 @@ void ipt::BuildConfig(uint8_t* begin, uint8_t* end)
     m_config.decode.context = NULL;
 }
 
-void ipt::Open(const char* filename, uint64_t start_offset, uint64_t end_offset)
+void IPTDecoder::Open(const char* filename, uint64_t start_offset, uint64_t end_offset)
 {
     int errcode = 0;
     m_startOffset = start_offset;
@@ -175,7 +175,7 @@ void ipt::Open(const char* filename, uint64_t start_offset, uint64_t end_offset)
     BuildConfig((uint8_t*)&m_buffer[0], (uint8_t*)&m_buffer[0] + m_size);
 }
 
-int ipt::InitImageCache()
+int IPTDecoder::InitImageCache()
 {
     m_iscache = pt_iscache_alloc(NULL);
     if (!m_iscache)
@@ -186,7 +186,7 @@ int ipt::InitImageCache()
     return 0;
 }
 
-void ipt::AddImage(uint64_t base, const char* filename)
+void IPTDecoder::AddImage(uint64_t base, const char* filename)
 {
     ifstream file(filename, ios::binary | ios::ate);
     streamsize fileSize = file.tellg();
@@ -216,7 +216,7 @@ void ipt::AddImage(uint64_t base, const char* filename)
     }
 }
 
-int ipt::InitDecoding(DecodingMode decodingMode)
+int IPTDecoder::InitDecoding(DecodingMode decodingMode)
 {
     m_status = 0;
     m_offset = 0;
@@ -260,7 +260,7 @@ int ipt::InitDecoding(DecodingMode decodingMode)
     return 0;
 }
 
-pt_insn* ipt::DecodeInstruction() {
+pt_insn* IPTDecoder::DecodeInstruction() {
     if (!m_insnDecoder)
     {
         InitDecoding(Instruction);
@@ -315,7 +315,7 @@ pt_insn* ipt::DecodeInstruction() {
     return p_insn;
 }
 
-bool ipt::ForwardBlockSync()
+bool IPTDecoder::ForwardBlockSync()
 {
     if (!m_blockDecoder) {
         InitDecoding(Block);
@@ -335,7 +335,7 @@ bool ipt::ForwardBlockSync()
     return true;
 }
 
-pt_block* ipt::DecodeBlock()
+pt_block* IPTDecoder::DecodeBlock()
 {
     if (!m_blockDecoder) {
         InitDecoding(Block);
@@ -381,12 +381,12 @@ pt_block* ipt::DecodeBlock()
     return p_block;
 }
 
-pt_error_code ipt::GetDecodeStatus()
+pt_error_code IPTDecoder::GetDecodeStatus()
 {
     return pt_errcode(m_decodeStatus);
 }
 
-uint64_t ipt::GetCurrentCR3()
+uint64_t IPTDecoder::GetCurrentCR3()
 {
     return m_currentCR3;
 }

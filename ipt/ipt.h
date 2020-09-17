@@ -15,7 +15,7 @@ enum DecodingMode
     Block
 };
 
-class ipt
+class IPTDecoder
 {
 private:
     int m_verboseLevel = 0;
@@ -50,8 +50,8 @@ private:
     int InitDecoding(DecodingMode decodingMode);
 
 public:
-    ipt();
-    ~ipt();
+    IPTDecoder();
+    ~IPTDecoder();
 
     void Open(const char* filename, uint64_t start_offset = 0, uint64_t endoffset = 0);
 
