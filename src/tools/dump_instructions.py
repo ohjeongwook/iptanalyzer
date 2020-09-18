@@ -13,30 +13,22 @@ import iptanalyzer.ipt
 if __name__ == '__main__':
     import argparse
     import windbgtool.debugger
+    import tools.arguments
 
     def auto_int(x):
         return int(x, 0)
 
-    parser = argparse.ArgumentParser(description='pyipt')
-    parser.add_argument('-p', action = "store", default = "", dest = "pt_file")
-    parser.add_argument('-d', action = "store", default = "", dest = "dump_file")
-
-    parser.add_argument('-m', action = "store", dest = "module_name", default = "")
-    parser.add_argument('-o', action = "store", dest = "output_filename", default = "output.log")
-    parser.add_argument('-f', action = "store", dest = "format", default = "instruction")
-
-    parser.add_argument('-s', dest = "start_address", default = 0, type = auto_int)
-    parser.add_argument('-e', dest = "end_address", default = 0, type = auto_int)
-
-    parser.add_argument('-S', dest = "start_offset", default = 0, type = auto_int)
-    parser.add_argument('-E', dest = "end_offset", default = 0, type = auto_int)
-
-    parser.add_argument('-i', dest = "instruction_offset", default = 0, type = auto_int)
-
+    parser = argparse.ArgumentParser(description='This is a tool to dump instruction from specify pt trace file offset')
+    tools.arguments.add_arguments(parser)
+    tools.arguments.add_address_range_arguments(parser)
+    tools.arguments.add_module_arguments(parser)
+    tools.arguments.add_offset_range_arguments(parser)
+    parser.add_argument('-o', action = "store", dest = "output_filename", default = "output.log", metavar = "<output filename>", help = "Output filename")
+    parser.add_argument('-i', dest = "instruction_offset", default = 0, type = auto_int, metavar = "<instruction offset>", help = "Offset of instruction to dump")
     args = parser.parse_args()
 
     debugger = windbgtool.debugger.DbgEngine()
-    debugger.load_dump(args.dump_file)
+    debugger.load_dump(args.dump_filename)
     debugger.enumerate_modules()
 
     start_address = 0
@@ -50,14 +42,14 @@ if __name__ == '__main__':
         start_address = args.start_address
         end_address = args.end_address
 
-    ptlog_analyzer = iptanalyzer.ipt.Loader(args.dump_file,
+    ipt_loader = iptanalyzer.ipt.Loader(args.dump_filename,
                                      dump_symbols = False,
                                      dump_instructions = False,
                                      load_image = True)
 
-    ptlog_analyzer.open(args.pt_file, start_offset = args.start_offset, end_offset = args.end_offset)
+    ipt_loader.open(args.pt_file, start_offset = args.start_offset, end_offset = args.end_offset)
 
-    for insn in ptlog_analyzer.decode_instructions(offset = args.instruction_offset, start_address = start_address, end_address = end_address):
+    for insn in ipt_loader.decode_instructions(offset = args.instruction_offset, start_address = start_address, end_address = end_address):
         try:
             disasmline = debugger.get_disassembly_line(insn.ip)
             print('Instruction: %s' % (disasmline))

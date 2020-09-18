@@ -65,19 +65,12 @@ if __name__ == '__main__':
     import tempfile
 
     import iptanalyzer.cache
+    import tools.arguments
 
-    def auto_int(x):
-        return int(x, 0)
-
-    parser = argparse.ArgumentParser(description='pyipt')
-    parser.add_argument('-p', action = "store", default = "", dest = "pt_filename")
-    parser.add_argument('-d', action = "store", default = "", dest = "dump_filename")
-    parser.add_argument('-o', action = "store", default="blocks.cache", dest = "cache_filename")
-    parser.add_argument('-t', action = "store", default = tempfile.gettempdir(), dest = "temp_directory")
-    parser.add_argument('-l', action = "store", default = os.path.join(os.getcwd(), "logs"), dest = "log_directory")
-    parser.add_argument('-O', dest = "offset", default = 0, type = auto_int)
-    parser.add_argument('-D', dest = "debug_level", default = 0, type = auto_int)
-
+    parser = argparse.ArgumentParser(description='This is a script to generate cache file')
+    tools.arguments.add_arguments(parser)
+    parser.add_argument('-t', action = "store", default = tempfile.gettempdir(), dest = "temp_directory", metavar = "<temporary directory>", help = "Temporary directory to save temporary cache files")
+    parser.add_argument('-l', action = "store", default = os.path.join(os.getcwd(), "logs"), dest = "log_directory", metavar = "<log directory>", help = "Log directory")
     args = parser.parse_args()
 
     if not os.path.isdir(args.log_directory):

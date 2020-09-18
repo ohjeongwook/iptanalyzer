@@ -8,18 +8,12 @@ if __name__ == '__main__':
     import iptanalyzer.cache
     import iptanalyzer.ipt
     import windbgtool.debugger
+    import tools.arguments
 
-    def auto_int(x):
-        return int(x, 0)
-
-    parser = argparse.ArgumentParser(description='pyipt')
-    parser.add_argument('-c', action = "store", dest = "cache_filename")
-    parser.add_argument('-o', action = "store", dest = "output_filename", default = 'apis_blocks.json')
-    parser.add_argument('-p', action = "store", default = "", dest = "pt_filename")
-    parser.add_argument('-d', action = "store", default = "", dest = "dump_filename")
-    parser.add_argument('-s', action = "store", dest = "symbol")
-    parser.add_argument('-C', dest = "cr3", default = 0, type = auto_int)
-
+    parser = argparse.ArgumentParser(description='This is a tool to find calls to APIs or functions')
+    tools.arguments.add_arguments(parser)
+    parser.add_argument('-o', action = "store", dest = "output_filename", default = 'apis_blocks.json', metavar = "<output filename>", help = "Output filename")
+    parser.add_argument('-s', action = "store", dest = "symbol", metavar = "<api name>", help = "API Symbol in ! notation e.g. kernel32!CreateFileW", required=True)
     args = parser.parse_args()
 
     debugger = windbgtool.debugger.DbgEngine()

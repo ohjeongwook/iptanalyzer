@@ -10,26 +10,13 @@ if __name__ == '__main__':
 
     import iptanalyzer.cache    
     import iptanalyzer.coverage
+    import tools.arguments
 
-    def auto_int(x):
-        return int(x, 0)
-
-    parser = argparse.ArgumentParser(description='pyipt')
-    parser.add_argument('-p', action = "store", default = "", dest = "pt_filename")
-    parser.add_argument('-d', action = "store", default = "", dest = "dump_filename")
-
-    parser.add_argument('-m', action = "store", dest = "module_name", default = "")
-    parser.add_argument('-o', action = "store", dest = "output_filename", default = "coverage.txt")
-    
-    parser.add_argument('-D', dest = "debug_level", default = 0, type = auto_int)
-    parser.add_argument('-O', action = "store", dest = "debug_filename", default = "stdout")
-    
-    parser.add_argument('-s', dest = "start_address", default = 0, type = auto_int)
-    parser.add_argument('-e', dest = "end_address", default = 0, type = auto_int)
-    
-    parser.add_argument('-c', action = "store", dest = "cache_filename")
-    parser.add_argument('-C', dest = "cr3", default = 0, type = auto_int)    
-
+    parser = argparse.ArgumentParser(description='This is a tool to generate coverage file that can be used by lighthouse')
+    tools.arguments.add_arguments(parser)
+    tools.arguments.add_address_range_arguments(parser)
+    tools.arguments.add_module_arguments(parser)
+    parser.add_argument('-o', dest = "output_filename", default = "coverage.txt", metavar = "<output filename>", help = "Output coverage filename")   
     args = parser.parse_args()
 
     if args.debug_level > 0:
