@@ -2,7 +2,7 @@
 
 Name | Description
 :--- | :----------
-generate_cache.py | Generate cache files
+generate_cache.py | Generate cache files using multiprocessing to speed up processing time
 dump_blocks.py | Dump blocks
 dump_coverage.py | Dump coverage file that can be loaded by Lighthouse
 dump_instructions.py | Dump instructions at specific offset
