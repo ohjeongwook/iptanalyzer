@@ -103,11 +103,11 @@ if __name__ == '__main__':
         return int(x, 0)
 
     parser = argparse.ArgumentParser(description='pyipt')
-    parser.add_argument('-c', action = "store", dest = "cache_file")
+    parser.add_argument('-c', action = "store", dest = "cache_filename")
     parser.add_argument('-o', action = "store", dest = "output")
 
     args = parser.parse_args()
     
     merger = Merger(args.output)
-    merger.add_record_directory(args.cache_file)
+    merger.add_record_directory(args.cache_filename)
     merger.save()

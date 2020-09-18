@@ -64,12 +64,12 @@ class Logger:
         self.temp_directory = temp_directory
         self.addresses = {}
 
-        self.ptlog_analyzer = iptanalyzer.ipt.Loader(self.dump_filename,
+        self.ipt_loader = iptanalyzer.ipt.Loader(self.dump_filename,
                                         dump_symbols = False,
                                         dump_instructions = False,
                                         load_image = True)
 
-        self.ptlog_analyzer.open(self.pt_filename)
+        self.ipt_loader.open(self.pt_filename)
 
         module_filename = os.path.join(self.temp_directory, '%x.dmp' % start_address)
         region_size = end_address - start_address
@@ -94,7 +94,7 @@ class Logger:
         instruction_addresses = {}
         for sync_offset, ranges in sync_offsets.items():
             logging.debug("sync_offset: %x" % sync_offset)
-            for insn in self.ptlog_analyzer.decode_ranges(sync_offset = block['SyncOffset'], ranges = ranges):
+            for insn in self.ipt_loader.decode_ranges(sync_offset = block['SyncOffset'], ranges = ranges):
                 logging.debug("\tinsn.ip: %x" % insn.ip)
                 instruction_addresses[insn.ip] = 1
 
