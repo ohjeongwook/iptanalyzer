@@ -1,8 +1,6 @@
-# ipt
+# IPTAnalyzer
 
-* What is Processor Trace for?
-
-> It can be used to automatically triage exploits. Usually PT logs are huge and it takes long time to process them. ipt will perform multiprocessing to create cache file to be used for post-mortem analysis.
+IPTAnalyzer is a tool that can expedite exploit and malware analysis using Intel Process Trace trace files. It wraps Python around libipt library and uses multiprocessing to generate basic block caches to expedite post-mortem analysis.
 
 ---
 # Tools
