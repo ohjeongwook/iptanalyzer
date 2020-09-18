@@ -1,4 +1,4 @@
-## Tools
+# IPTAnalyzer Tools
 
 Name | Description
 :--- | :----------
@@ -32,6 +32,13 @@ optional arguments:
 ```
 
 ---
+### Example
+
+```
+python %IPTANALYZER%\tools\generate_cache.py -p artifacts\EQNEDT32.pt -d artifacts\EQNEDT32.dmp -o artifacts\blocks.sqlite -D 3
+```
+
+---
 ## dump_blocks.py
 
 ```
@@ -56,6 +63,13 @@ optional arguments:
   -S <start offset>     Start offset in the file
   -E <end offset>       End offset in the file
   -b <block offset>     Block offset to dump
+```
+
+---
+### Example
+
+```
+python %IPTANALYZER%\tools\dump_blocks.py -p artifacts\trace.pt -d artifacts\notepad.exe.dmp -S 0x13aba74 -E 0x13adb4f -b 0x13ada69 
 ```
 
 ---
@@ -122,6 +136,13 @@ optional arguments:
 ```
 
 ---
+### Example
+
+```
+python %IPTANALYZER%\tools\dump_instructions.py -p artifacts\trace.pt -d artifacts\notepad.exe.dmp -s 0x13aba74 -e 0x13adb4f -i 0x13ada69
+```
+
+---
 ## find_api_calls.py
 
 ```
@@ -141,4 +162,11 @@ optional arguments:
   -O <debug filename>   Debug filename
   -o <output filename>  Output filename
   -s <api name>         API Symbol in ! notation e.g. kernel32!CreateFileW
+```
+
+---
+### Example
+
+```
+python %IPTANALYZER%\tools\find_api_calls.py -c artifacts\blocks.sqlite -p artifacts\trace.pt -d artifacts\notepad.exe.dmp -s "KERNELBASE!CreateFileW" -o apis_blocks.json
 ```
