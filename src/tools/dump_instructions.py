@@ -47,7 +47,7 @@ if __name__ == '__main__':
                                      dump_instructions = False,
                                      load_image = True)
 
-    ipt_loader.open(args.pt_file, start_offset = args.start_offset, end_offset = args.end_offset)
+    ipt_loader.open(args.pt_filename, start_offset = args.start_offset, end_offset = args.end_offset)
 
     for insn in ipt_loader.decode_instructions(offset = args.instruction_offset, start_address = start_address, end_address = end_address):
         try:
